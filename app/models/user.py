@@ -1,0 +1,29 @@
+﻿from datetime import date
+
+from app.database import db
+
+
+class User(db.Model):
+    __tablename__ = 'users'
+    user_id = db.Column(db.Integer, primary_key=True)
+    gender = db.Column(db.String(10))
+    registration_date = db.Column(db.Date, default=date.today)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
+    birth_date = db.Column(db.Date)
+    height = db.Column(db.Integer)
+    weight = db.Column(db.Integer)
+    zodiac_sign = db.Column(db.String(20))
+    bio = db.Column(db.Text)
+    is_active = db.Column(db.Boolean, default=True)
+
+    preferences = db.relationship('PartnerPreference', backref='user', cascade="all, delete-orphan")
+    meetings1 = db.relationship('Meeting', foreign_keys='Meeting.user1_id', backref='user1',
+                                cascade="all, delete-orphan")
+    meetings2 = db.relationship('Meeting', foreign_keys='Meeting.user2_id', backref='user2',
+                                cascade="all, delete-orphan")
+    refusals = db.relationship('Refusal', backref='user', cascade="all, delete-orphan")
+    couples1 = db.relationship('Couple', foreign_keys='Couple.user1_id', backref='user1_couple',
+                               cascade="all, delete-orphan")
+    couples2 = db.relationship('Couple', foreign_keys='Couple.user2_id', backref='user2_couple',
+                               cascade="all, delete-orphan")
