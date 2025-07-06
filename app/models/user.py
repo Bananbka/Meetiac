@@ -17,6 +17,7 @@ class User(db.Model):
     bio = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
 
+    credentials = db.relationship('Credentials', backref='user', cascade="all, delete-orphan", uselist=False)
     preferences = db.relationship('PartnerPreference', backref='user', cascade="all, delete-orphan")
     meetings1 = db.relationship('Meeting', foreign_keys='Meeting.user1_id', backref='user1',
                                 cascade="all, delete-orphan")

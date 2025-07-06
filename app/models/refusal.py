@@ -9,3 +9,5 @@ class Refusal(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     refusal_date = db.Column(db.Date, default=date.today)
     reason = db.Column(db.Text)
+    other_reason = db.Column(db.Text)
+    additional_info = db.Column(db.Text)

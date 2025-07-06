@@ -11,5 +11,3 @@ class Couple(db.Model):
     created_at = db.Column(db.Date, default=date.today)
     archived = db.Column(db.Boolean, default=False)
     comment = db.Column(db.Text)
-
-    archive = db.relationship('ArchivedCouple', backref='couple', uselist=False, cascade="all, delete-orphan")
