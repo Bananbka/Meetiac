@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Знайомства - Meetiac</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/discover.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-hearts">
+        <div class="floating-heart">💕</div>
+        <div class="floating-heart">💖</div>
+        <div class="floating-heart">✨</div>
+        <div class="floating-heart">💫</div>
+        <div class="floating-heart">💕</div>
+        <div class="floating-heart">💖</div>
+        <div class="floating-heart">✨</div>
+        <div class="floating-heart">💫</div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <a href="/" class="logo">
+                        <i class="fas fa-arrow-left"></i>
+                        <i class="fas fa-star"></i>
+                        <span>Meetiac</span>
+                    </a>
+                    <div class="header-actions">
+                        <button class="btn btn-outline btn-small">
+                            <i class="fas fa-filter"></i>
+                            Фільтри
+                        </button>
+                        <a href="/profile" class="btn btn-outline btn-small">Профіль</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="container discover-container">
+            <!-- Profile Card -->
+            <div class="profile-card" id="profileCard">
+                <div class="profile-image">
+                    <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=500&fit=crop&crop=face" alt="Profile" id="profileImage">
+                    <div class="compatibility-badge">
+                        <i class="fas fa-star"></i>
+                        <span id="compatibilityScore">95</span>% сумісність
+                    </div>
+                </div>
+
+                <div class="profile-info">
+                    <div class="profile-header">
+                        <h2 id="profileName">Анна, 25</h2>
+                        <div class="profile-details">
+                            <span id="profileZodiac">♌ Лев</span>
+                            <span>• <span id="profileDistance">2 км</span></span>
+                        </div>
+                    </div>
+
+                    <p id="profileBio">Люблю подорожі та нові пригоди. Шукаю когось особливого для спільних моментів під зірками.</p>
+
+                    <div class="interests" id="profileInterests">
+                        <span class="interest-tag">Подорожі</span>
+                        <span class="interest-tag">Йога</span>
+                        <span class="interest-tag">Астрологія</span>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="action-btn reject" onclick="handleReject()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="action-btn message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn like" onclick="handleLike()">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="likesCount">0</div>
+                    <div class="stat-label">Вподобання</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Збіги</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Повідомлення</div>
+                </div>
+            </div>
+
+            <!-- Tips -->
+            <div class="tip-card">
+                <div class="tip-header">
+                    <i class="fas fa-star"></i>
+                    <span>Зоряна порада</span>
+                </div>
+                <p>Леви та Стрільці мають високу сумісність! Ваші енергії доповнюють одна одну.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/discover.js') }}"></script>
+</body>
+</html>

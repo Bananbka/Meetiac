@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизація - Meetiac</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-hearts">
+      <div class="floating-heart">🔐</div>
+      <div class="floating-heart">✨</div>
+      <div class="floating-heart">💫</div>
+      <div class="floating-heart">⭐</div>
+      <div class="floating-heart">🔐</div>
+      <div class="floating-heart">✨</div>
+      <div class="floating-heart">💫</div>
+      <div class="floating-heart">⭐</div>
+    </div>
+
+    <div class="auth-page">
+        <div class="auth-container">
+            <!-- Header -->
+            <div class="auth-header">
+                <a href="/" class="back-link">
+                    <i class="fas fa-arrow-left"></i>
+                    Назад на головну
+                </a>
+                <div class="logo">
+                    <i class="fas fa-star"></i>
+                    <span>Meetiac</span>
+                </div>
+                <p>Ваша зоряна любов чекає на вас</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tab-list">
+                    <button class="tab-trigger active" data-tab="login">Увійти</button>
+                    <button class="tab-trigger" data-tab="register">Реєстрація</button>
+                </div>
+
+                <!-- Login Tab -->
+                <div class="tab-content active" id="login">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Вхід в акаунт</h2>
+                            <p>Введіть свої дані для входу</p>
+                        </div>
+                        <div class="card-content">
+                            <form class="auth-form">
+                                <div class="form-group">
+                                    <label for="login-email">Email</label>
+                                    <input type="email" id="login-email" placeholder="your@email.com" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="login-password">Пароль</label>
+                                    <input type="password" id="login-password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full">Увійти</button>
+                                <div class="forgot-password">
+                                    <a href="#">Забули пароль?</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Register Tab -->
+                <div class="tab-content" id="register">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Створити акаунт</h2>
+                            <p>Заповніть форму для реєстрації</p>
+                        </div>
+                        <div class="card-content">
+                            <form class="auth-form">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="firstName">Ім'я</label>
+                                        <input type="text" id="firstName" placeholder="Ім'я" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="lastName">Прізвище</label>
+                                        <input type="text" id="lastName" placeholder="Прізвище" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="register-email">Email</label>
+                                    <input type="email" id="register-email" placeholder="your@email.com" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="birthdate">Дата народження</label>
+                                    <input type="date" id="birthdate" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="zodiac">Знак зодіаку</label>
+                                    <select id="zodiac" required>
+                                        <option value="">Оберіть свій знак зодіаку</option>
+                                        <option value="aries">♈ Овен (21 березня - 19 квітня)</option>
+                                        <option value="taurus">♉ Телець (20 квітня - 20 травня)</option>
+                                        <option value="gemini">♊ Близнюки (21 травня - 20 червня)</option>
+                                        <option value="cancer">♋ Рак (21 червня - 22 липня)</option>
+                                        <option value="leo">♌ Лев (23 липня - 22 серпня)</option>
+                                        <option value="virgo">♍ Діва (23 серпня - 22 вересня)</option>
+                                        <option value="libra">♎ Терези (23 вересня - 22 жовтня)</option>
+                                        <option value="scorpio">♏ Скорпіон (23 жовтня - 21 листопада)</option>
+                                        <option value="sagittarius">♐ Стрілець (22 листопада - 21 грудня)</option>
+                                        <option value="capricorn">♑ Козеріг (22 грудня - 19 січня)</option>
+                                        <option value="aquarius">♒ Водолій (20 січня - 18 лютого)</option>
+                                        <option value="pisces">♓ Риби (19 лютого - 20 березня)</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="register-password">Пароль</label>
+                                    <input type="password" id="register-password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="confirm-password">Підтвердіть пароль</label>
+                                    <input type="password" id="confirm-password" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary btn-full">Створити акаунт</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="terms">
+                <p>Реєструючись, ви погоджуєтесь з нашими <a href="#">Умовами використання</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+</body>
+</html>

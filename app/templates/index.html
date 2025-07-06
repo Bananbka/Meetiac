@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meetiac - Зоряні знайомства</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Floating Background Elements -->
+    <div class="floating-hearts">
+      <div class="floating-heart">💖</div>
+      <div class="floating-heart">✨</div>
+      <div class="floating-heart">💫</div>
+      <div class="floating-heart">⭐</div>
+      <div class="floating-heart">💖</div>
+      <div class="floating-heart">✨</div>
+      <div class="floating-heart">💫</div>
+      <div class="floating-heart">⭐</div>
+      <div class="floating-heart">💖</div>
+    </div>
+
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <i class="fas fa-star"></i>
+                        <span>Meetiac</span>
+                    </div>
+                    <nav class="nav-desktop">
+                        <a href="#features">Особливості</a>
+                        <a href="#how-it-works">Як це працює</a>
+                        <a href="/auth">Увійти</a>
+                    </nav>
+                    <a href="/auth" class="btn btn-primary">Почати</a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">
+                        Знайди свою
+                        <span class="gradient-text">зоряну</span>
+                        половинку
+                    </h1>
+                    <p class="hero-description">
+                        Meetiac поєднує людей на основі астрологічної сумісності. Дізнайся, хто твоя ідеальна пара за зірками!
+                    </p>
+
+                    <div class="hero-buttons">
+                        <a href="/auth" class="btn btn-primary btn-large">
+                            <i class="fas fa-sparkles"></i>
+                            Розпочати знайомство
+                        </a>
+                        <button class="btn btn-outline btn-large">Дізнатися більше</button>
+                    </div>
+
+                    <!-- Zodiac Signs -->
+                    <div class="zodiac-grid">
+                        <div class="zodiac-sign">♈</div>
+                        <div class="zodiac-sign">♉</div>
+                        <div class="zodiac-sign">♊</div>
+                        <div class="zodiac-sign">♋</div>
+                        <div class="zodiac-sign">♌</div>
+                        <div class="zodiac-sign">♍</div>
+                        <div class="zodiac-sign">♎</div>
+                        <div class="zodiac-sign">♏</div>
+                        <div class="zodiac-sign">♐</div>
+                        <div class="zodiac-sign">♑</div>
+                        <div class="zodiac-sign">♒</div>
+                        <div class="zodiac-sign">♓</div>
+                    </div>
+                </div>
+                <div class="zodiac-constellation"></div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">Чому обирають Meetiac?</h2>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <i class="fas fa-star feature-icon"></i>
+                        <h3>Астрологічна сумісність</h3>
+                        <p>Наш алгоритм аналізує ваші знаки зодіаку та знаходить найкращі збіги</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-heart feature-icon pink"></i>
+                        <h3>Справжні стосунки</h3>
+                        <p>Знайдіть не просто побачення, а справжню любов на основі зіркової сумісності</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <i class="fas fa-users feature-icon blue"></i>
+                        <h3>Активна спільнота</h3>
+                        <p>Тисячі користувачів вже знайшли свою половинку завдяки зіркам</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <h2 class="section-title">Як це працює?</h2>
+                
+                <div class="steps-grid">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Створіть профіль</h3>
+                        <p>Вкажіть дату народження та створіть привабливий профіль</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Знайдіть збіги</h3>
+                        <p>Наш алгоритм покаже вам найсумісніших партнерів</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Почніть спілкування</h3>
+                        <p>Знайомтеся та будуйте стосунки під керівництвом зірок</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta">
+            <div class="container">
+                <h2>Готові знайти свою зоряну любов?</h2>
+                <p>Приєднуйтесь до тисяч людей, які вже знайшли свою половинку завдяки зіркам</p>
+                <a href="/auth" class="btn btn-white btn-large">
+                    <i class="fas fa-sparkles"></i>
+                    Почати зараз безкоштовно
+                </a>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="logo">
+                        <i class="fas fa-star"></i>
+                        <span>Meetiac</span>
+                    </div>
+                    <p>© 2024 Meetiac. Всі права захищені. Знайдіть любов під зірками.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/home.js') }}"></script>
+</body>
+</html>
