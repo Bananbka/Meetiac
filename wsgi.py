@@ -20,7 +20,7 @@ def before_request():
         if not request.path == "/" and request.endpoint not in free_endpoints:
             return redirect("/auth")
 
-        if not request.endpoint not in free_api_endpoints:
+        if request.endpoint not in free_api_endpoints:
             return jsonify({"status": 'error', 'message': 'Unauthenticated'}), 403
 
     return
