@@ -1,5 +1,6 @@
 ﻿from flask import Flask
 
+from app.blueprints.api.auth import auth_bp
 from app.blueprints.routes import pages_bp
 from app.database import db
 from app.config import Config
@@ -11,6 +12,7 @@ def create_app():
 
     # Реєстрація усіх роутів
     app.register_blueprint(pages_bp)
+    app.register_blueprint(auth_bp, url_prefix='/api/auth')
 
     db.init_app(app)
 
