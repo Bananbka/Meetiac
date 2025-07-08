@@ -6,14 +6,14 @@ from app.database import db
 class User(db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.Integer, primary_key=True)
-    gender = db.Column(db.String(10))
+    gender = db.Column(db.Integer, db.ForeignKey('gender.gender_id'))
     registration_date = db.Column(db.Date, default=date.today)
     first_name = db.Column(db.String(50))
     last_name = db.Column(db.String(50))
     birth_date = db.Column(db.Date)
     height = db.Column(db.Integer)
     weight = db.Column(db.Integer)
-    zodiac_sign = db.Column(db.String(20))
+    sign_id = db.Column(db.Integer, db.ForeignKey('zodiac_sign.sign_id'))
     bio = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
 
@@ -29,3 +29,4 @@ class User(db.Model):
     couples2 = db.relationship('Couple', foreign_keys='Couple.user2_id', backref='user2_couple',
                                cascade="all, delete-orphan")
     interests = db.relationship('Interest', secondary='user_interest', back_populates='users')
+    zodiac_sign = db.relationship('ZodiacSign', back_populates='users')
