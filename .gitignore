@@ -163,4 +163,4 @@ cython_debug/
 .idea/
 
 .vercel
-uploads/*
+app/static/uploads/*
