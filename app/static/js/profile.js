@@ -1,3 +1,5 @@
+import {isAdult} from "./auth.js";
+
 // Profile page functionality
 let selectedInterests = ["Подорожі", "Астрологія", "Йога"]
 let currentPhotoSlot = 0
@@ -214,12 +216,22 @@ async function saveProfile() {
     const requiredFields = form.querySelectorAll("[required]")
     let isValid = true
 
-    requiredFields.forEach((field) => {
+    for (const field of requiredFields) {
         if (!field.checkValidity()) {
-            isValid = false
-            field.style.borderColor = "rgba(239, 68, 68, 0.5)"
+            isValid = false;
+            field.style.borderColor = "rgba(239, 68, 68, 0.5)";
         }
-    })
+
+        if (field.id === 'birthdate') {
+            if (!isAdult(field.value)) {
+                isValid = false;
+                field.style.borderColor = "rgba(239, 68, 68, 0.5)";
+                showNotification("Вам повинно бути більше 18 років.", "error");
+                return; // Тепер це поверне з зовнішньої функції (наприклад saveProfile)
+            }
+        }
+    }
+
 
     if (!isValid) {
         showNotification("Будь ласка, заповніть всі обов'язкові поля", "error")
@@ -230,7 +242,7 @@ async function saveProfile() {
     const formData = {
         name: document.getElementById("profile-name")?.value,
         surname: document.getElementById("profile-surname")?.value,
-        age: document.getElementById("profile-age")?.value,
+        birthdate: document.getElementById("birthdate")?.value,
         gender: document.getElementById("profile-gender")?.value,
         height: document.getElementById("profile-height")?.value,
         weight: document.getElementById("profile-weight")?.value,

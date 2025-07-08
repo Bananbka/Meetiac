@@ -11,17 +11,14 @@ function initAuthPage() {
         trigger.addEventListener("click", function () {
             const targetTab = this.getAttribute("data-tab")
 
-            // Remove active class from all triggers and contents
             tabTriggers.forEach((t) => t.classList.remove("active"))
             tabContents.forEach((c) => c.classList.remove("active"))
 
-            // Add active class to clicked trigger and corresponding content
             this.classList.add("active")
             document.getElementById(targetTab).classList.add("active")
         })
     })
 
-    // Form submissions
     document.querySelectorAll(".auth-form").forEach((form) => {
         form.addEventListener("submit", async function (e) {
             e.preventDefault()
@@ -44,6 +41,17 @@ function initAuthPage() {
             if (!isValid) {
                 showNotification("Будь ласка, заповніть всі поля", "error")
                 return
+            }
+
+            // ВАЖЛИВО: Перевірка віку для форми реєстрації
+            if (formId === "register") {
+                const birthdateValue = payload["birthdate"]
+                if (!isAdult(birthdateValue)) {
+                    showNotification("Вам має бути не менше 18 років для реєстрації", "error")
+                    const birthdateInput = form.querySelector("#birthdate")
+                    birthdateInput.style.borderColor = "#ef4444"
+                    return
+                }
             }
 
             try {
@@ -69,8 +77,23 @@ function initAuthPage() {
         })
     })
 
-    // Add ripple effect to buttons
     addRippleEffect()
+}
+
+// Функція перевірки 18 років+
+export function isAdult(dateString) {
+    if (!dateString) return false
+    const today = new Date()
+    const birthDate = new Date(dateString)
+    let age = today.getFullYear() - birthDate.getFullYear()
+    const m = today.getMonth() - birthDate.getMonth()
+
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--
+    }
+    // return true;
+    return age >= 18 // ПОТІМ ЗАМІНИТИ НА НОРМ
+
 }
 
 function showNotification(message, type = "info") {
