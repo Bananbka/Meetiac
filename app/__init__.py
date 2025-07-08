@@ -1,29 +1,28 @@
 ﻿from flask import Flask
+from flask_migrate import Migrate
 
-from app.blueprints.api.auth import auth_bp
-from app.blueprints.routes import pages_bp
 from app.database import db
 from app.config import Config
+
+migrate = Migrate()
 
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
 
-    # Реєстрація усіх роутів
+    # Ініціалізація бази даних
+    db.init_app(app)
+    migrate.init_app(app, db)
+
+    from app import models
+
+    from app.blueprints.routes import pages_bp
+    from app.blueprints.api.auth import auth_bp
+    from app.blueprints.api.profile import profile_bp
+
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
-
-    db.init_app(app)
-
-    # Реєстрація моделей
-    from app.models.user import User
-    from app.models.partner_preference import PartnerPreference
-    from app.models.meeting import Meeting
-    from app.models.couple import Couple
-    from app.models.refusal import Refusal
-    from app.models.credentials import Credentials
-    with app.app_context():
-        db.create_all()
+    app.register_blueprint(profile_bp, url_prefix='/api/profile')
 
     return app
