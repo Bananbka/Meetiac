@@ -28,3 +28,4 @@ class User(db.Model):
                                cascade="all, delete-orphan")
     couples2 = db.relationship('Couple', foreign_keys='Couple.user2_id', backref='user2_couple',
                                cascade="all, delete-orphan")
+    interests = db.relationship('Interest', secondary='user_interest', back_populates='users')
