@@ -1,17 +1,21 @@
 ﻿import os
 import base64
+from datetime import datetime
 
 from flask import Blueprint, request, jsonify, session
 
 from app.database import db
 from app.models import Credentials, UserImage, UserInterest, Interest, PartnerPreference, ZodiacSign, Gender, \
     PreferenceSign
+from app.utils.access_utils import login_required_api
+from app.utils.zodiac_utils import get_zodiac_sign
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
 UPLOAD_FOLDER = 'app/static/uploads'
 
 
 @profile_bp.route('/update-profile', methods=['POST'])
+@login_required_api
 def update_profile():
     user_email = session.get('email')
     cred = Credentials.query.filter_by(login=user_email).first()
@@ -40,15 +44,24 @@ def update_profile():
         )
         db.session.add(new_image)
 
-    user.gender = data.get('gender')
+    raw_gender = data.get('gender')
+    gender = Gender.query.filter_by(name=raw_gender).first()
+    user.gender = gender.gender_id
+
+    birthdate = datetime.strptime(data['birthdate'], '%Y-%m-%d')
+    zodiac_name = get_zodiac_sign(birthdate)
+    zodiac = ZodiacSign.query.filter_by(name=zodiac_name).first()
+
     user.first_name = data.get('name')
     user.last_name = data.get('surname')
+    user.birth_date = data.get('birthdate')
     user.height = data.get('height')
     user.weight = data.get('weight')
     user.bio = data.get('bio')
+    user.sign_id = zodiac.sign_id
 
     interests = data.get("interests", [])
-    old_interests = UserInterest.query.filter_by(user_id=user.user_id).delete()
+    UserInterest.query.filter_by(user_id=user.user_id).delete()
     for interest in interests:
         interest = Interest.query.filter_by(name=interest).first()
         new_interest = UserInterest(
@@ -57,8 +70,6 @@ def update_profile():
         )
         db.session.add(new_interest)
 
-    # preferences
-
     db.session.commit()
     return jsonify({
         "message": "Профіль оновлено і фото збережено",
@@ -66,7 +77,6 @@ def update_profile():
 
 
 def save_base64_image(data_uri, save_path):
-    # data_uri формат: data:<mime-type>;base64,<data>
     header, encoded = data_uri.split(",", 1)
     data = base64.b64decode(encoded)
     with open(save_path, "wb") as f:
@@ -74,9 +84,8 @@ def save_base64_image(data_uri, save_path):
 
 
 def get_extension_from_data_uri(data_uri):
-    # data:image/png;base64,...
-    mime_part = data_uri.split(";")[0]  # 'data:image/png'
-    ext = mime_part.split("/")[1]  # 'png'
+    mime_part = data_uri.split(";")[0]
+    ext = mime_part.split("/")[1]
     return ext
 
 
@@ -90,6 +99,7 @@ def delete_old_images(images: list[UserImage]):
 
 
 @profile_bp.route('/update-preferences', methods=['POST'])
+@login_required_api
 def update_preferences():
     user_email = session.get('email')
     cred = Credentials.query.filter_by(login=user_email).first()
