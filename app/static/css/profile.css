@@ -268,7 +268,8 @@ input:checked + .slider:before {
 }
 
 .save-btn {
-  margin-top: 2rem;
+  margin-top: 0rem;
+  margin-bottom: 2rem;
   box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
 }
 
@@ -278,7 +279,7 @@ input:checked + .slider:before {
 
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 1rem;
   margin-bottom: 1.5rem;
 }

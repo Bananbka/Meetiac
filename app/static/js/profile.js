@@ -2,7 +2,7 @@
 let selectedInterests = ["Подорожі", "Астрологія", "Йога"]
 let currentPhotoSlot = 0
 const uploadedPhotos = [
-    "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face",
+    null,
     null,
     null,
 ]
@@ -74,10 +74,17 @@ function toggleInterest(interest, element) {
 
 function setupFormHandlers() {
     // Save button
-    const saveBtn = document.querySelector(".save-btn")
+    const saveBtn = document.querySelector("#save-profile-changes")
     if (saveBtn) {
         saveBtn.addEventListener("click", () => {
             saveProfile()
+        })
+    }
+
+    const savePrefsBtn = document.querySelector("#save-preferences-changes")
+    if (savePrefsBtn) {
+        savePrefsBtn.addEventListener("click", () => {
+            savePreferences()
         })
     }
 }
@@ -201,7 +208,7 @@ function updatePhotoGrid() {
     })
 }
 
-function saveProfile() {
+async function saveProfile() {
     // Validate required fields
     const form = document.querySelector(".profile-form")
     const requiredFields = form.querySelectorAll("[required]")
@@ -222,26 +229,19 @@ function saveProfile() {
     // Collect form data
     const formData = {
         name: document.getElementById("profile-name")?.value,
+        surname: document.getElementById("profile-surname")?.value,
         age: document.getElementById("profile-age")?.value,
         gender: document.getElementById("profile-gender")?.value,
-        zodiac: document.getElementById("profile-zodiac")?.value,
         height: document.getElementById("profile-height")?.value,
         weight: document.getElementById("profile-weight")?.value,
         bio: document.getElementById("profile-bio")?.value,
         interests: selectedInterests,
         photos: uploadedPhotos.filter((photo) => photo !== null),
-        preferences: {
-            minAge: document.getElementById("min-age")?.value,
-            maxAge: document.getElementById("max-age")?.value,
-            maxDistance: document.getElementById("max-distance")?.value,
-            lookingFor: document.getElementById("looking-for")?.value,
-        },
-        privacy: {
-            notifications: document.getElementById("notifications")?.checked,
-            showOnline: document.getElementById("show-online")?.checked,
-            showDistance: document.getElementById("show-distance")?.checked,
-            showPhysicalInfo: document.getElementById("show-physical-info")?.checked,
-        },
+        // preferences: {
+        //     minAge: document.getElementById("min-age")?.value,
+        //     maxAge: document.getElementById("max-age")?.value,
+        //     lookingFor: document.getElementById("looking-for")?.value,
+        // }
     }
 
     // Simulate saving with loading state
@@ -249,6 +249,20 @@ function saveProfile() {
     const originalText = saveBtn.innerHTML
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Збереження...'
     saveBtn.disabled = true
+
+    try {
+        const res = await fetch("/api/profile/update-profile", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(formData)
+        });
+
+        const result = await res.json();
+        alert(result.message || 'Зміни збережено!');
+    } catch (err) {
+        console.error('Upload error:', err);
+        alert('Сталася помилка при збереженні');
+    }
 
     setTimeout(() => {
         // Restore button
@@ -262,6 +276,68 @@ function saveProfile() {
         localStorage.setItem("meetiacProfile", JSON.stringify(formData))
     }, 1500)
 }
+
+async function savePreferences() {
+    const form = document.getElementById("preferences-form");
+    if (!form) {
+        showNotification("Форму не знайдено", "error");
+        return;
+    }
+
+    const minAge = parseInt(form.min_age.value);
+    const maxAge = parseInt(form.max_age.value);
+    const minHeight = parseInt(form.min_height.value) || null;
+    const maxHeight = parseInt(form.max_height.value) || null;
+    const minWeight = parseInt(form.min_weight.value) || null;
+    const maxWeight = parseInt(form.max_weight.value) || null;
+
+    // Валідація меж
+    if (minAge > maxAge) {
+        showNotification("Мінімальний вік не може бути більшим за максимальний", "warning");
+        return;
+    }
+    if (minHeight !== null && maxHeight !== null && minHeight > maxHeight) {
+        showNotification("Мінімальний зріст не може бути більшим за максимальний", "warning");
+        return;
+    }
+    if (minWeight !== null && maxWeight !== null && minWeight > maxWeight) {
+        showNotification("Мінімальна вага не може бути більшою за максимальну", "warning");
+        return;
+    }
+
+    const formData = {
+        min_age: minAge,
+        max_age: maxAge,
+        min_height: minHeight,
+        max_height: maxHeight,
+        min_weight: minWeight,
+        max_weight: maxWeight,
+        zodiac_signs: Array.from(form["zodiac_signs"].selectedOptions).map(opt => opt.value),
+        looking_for: form["looking_for"].value
+    };
+
+    try {
+        const response = await fetch("/api/profile/update-preferences", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(formData)
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            showNotification("Переваги збережено успішно ✨", "success");
+        } else {
+            showNotification(result.message || "Помилка збереження переваг", "error");
+        }
+    } catch (error) {
+        console.error("Помилка при збереженні переваг:", error);
+        showNotification("Не вдалося з'єднатися з сервером", "error");
+    }
+}
+
 
 function showNotification(message, type = "info") {
     // Remove existing notifications

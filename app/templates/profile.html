@@ -9,314 +9,313 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Floating Background Elements -->
-    <div class="floating-hearts">
-      <div class="floating-heart">⚙️</div>
-      <div class="floating-heart">✨</div>
-      <div class="floating-heart">💫</div>
-      <div class="floating-heart">⭐</div>
-      <div class="floating-heart">⚙️</div>
-      <div class="floating-heart">✨</div>
-      <div class="floating-heart">💫</div>
-      <div class="floating-heart">⭐</div>
-    </div>
+<!-- Floating Background Elements -->
+<div class="floating-hearts">
+    <div class="floating-heart">⚙️</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">⚙️</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+</div>
 
-    <div class="page-wrapper">
-        <!-- Header -->
-        <header class="header">
-            <div class="container">
-                <div class="header-content">
-                    <a href="/discover" class="logo">
-                        <i class="fas fa-arrow-left"></i>
-                        <i class="fas fa-star"></i>
-                        <span>Meetiac</span>
-                    </a>
-                    <div class="header-title">
-                        <i class="fas fa-cog"></i>
-                        <span>Налаштування профіля</span>
-                    </div>
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="/discover" class="logo">
+                    <i class="fas fa-arrow-left"></i>
+                    <i class="fas fa-star"></i>
+                    <span>Meetiac</span>
+                </a>
+                <div class="header-title">
+                    <i class="fas fa-cog"></i>
+                    <span>Налаштування профіля</span>
                 </div>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <div class="container profile-container">
-            <!-- Profile Photos -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Фото профіля</h2>
-                    <p>Додайте до 3 фотографій, щоб показати себе з найкращої сторони</p>
-                </div>
-                <div class="card-content">
-                    <div class="photo-grid">
-                        <div class="photo-slot main">
-                            <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?w=200&h=200&fit=crop&crop=face" alt="Main photo">
-                            <div class="photo-badge">Головне</div>
-                            <button class="photo-remove" onclick="removePhoto(0)">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        <div class="photo-slot empty" onclick="uploadPhoto(1)">
-                            <i class="fas fa-camera"></i>
-                            <span>Додати фото</span>
-                        </div>
-                        <div class="photo-slot empty" onclick="uploadPhoto(2)">
+    <div class="container profile-container">
+        <!-- Profile Photos -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Фото профіля</h2>
+                <p>Додайте до 3 фотографій, щоб показати себе з найкращої сторони</p>
+            </div>
+            <div class="card-content">
+                <div class="photo-grid">
+                    <div class="photo-slot main">
+                        <div class="photo-badge">Головне</div>
+                        <div class="photo-slot empty" onclick="uploadPhoto(0)">
                             <i class="fas fa-camera"></i>
                             <span>Додати фото</span>
                         </div>
                     </div>
-                    <input type="file" id="photoUpload" accept="image/*" style="display: none;" onchange="handlePhotoUpload(event)">
+                    <div class="photo-slot empty" onclick="uploadPhoto(1)">
+                        <i class="fas fa-camera"></i>
+                        <span>Додати фото</span>
+                    </div>
+                    <div class="photo-slot empty" onclick="uploadPhoto(2)">
+                        <i class="fas fa-camera"></i>
+                        <span>Додати фото</span>
+                    </div>
+                </div>
+                <input type="file" id="photoUpload" accept="image/*" style="display: none;"
+                       onchange="handlePhotoUpload(event)" multiple>
+            </div>
+        </div>
+
+        <!-- Basic Info -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Основна інформація</h2>
+            </div>
+            <div class="card-content">
+                <form class="profile-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profile-name">Ім'я *</label>
+                            <input type="text" id="profile-name" value="Анна" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-surname">Прізвище *</label>
+                            <input type="text" id="profile-surname" value="Іванівна" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profile-gender">Ґендер *</label>
+                            <select id="profile-gender" required>
+                                <option value="">Оберіть ґендер</option>
+                                <option value="female">Жінка</option>
+                                <option value="male">Чоловік</option>
+                                <option value="other">Інше</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-age">Вік *</label>
+                            <input type="number" id="profile-age" value="25" min="18" max="100" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="profile-height">Зріст (см) *</label>
+                            <input type="number" id="profile-height" placeholder="170" min="120" max="250" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profile-weight">Вага (кг) *</label>
+                            <input type="number" id="profile-weight" placeholder="65" min="30" max="300" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="profile-bio">Про себе *</label>
+                        <textarea id="profile-bio" rows="4" maxlength="500" required>Люблю подорожі та нові пригоди. Шукаю когось особливого для спільних моментів під зірками.</textarea>
+                        <div class="char-counter">
+                            <span id="bioCharCount">108</span>/500 символів
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Interests -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Інтереси</h2>
+                <p>Оберіть до 5 інтересів, які найкраще вас описують</p>
+            </div>
+            <div class="card-content">
+                <div class="interests-grid" id="interestsGrid">
+                    <!-- Interests will be populated by JavaScript -->
                 </div>
             </div>
+        </div>
 
-            <!-- Basic Info -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Основна інформація</h2>
+        <!-- Save Button -->
+        <button class="btn btn-primary btn-full btn-large save-btn" id="save-profile-changes">Зберегти профіль</button>
+
+        <form id="preferences-form" class="card">
+            <div class="card-header">
+                <h2>Налаштування знайомств</h2>
+            </div>
+            <div class="card-content">
+                <!-- Вікова категорія -->
+                <div class="form-group">
+                    <label>Вікова категорія</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="min-age">Від</label>
+                            <input type="number" id="min-age" name="min_age" min="18" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="max-age">До</label>
+                            <input type="number" id="max-age" name="max_age" min="18" max="100">
+                        </div>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <form class="profile-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="profile-name">Ім'я *</label>
-                                <input type="text" id="profile-name" value="Анна" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="profile-age">Вік *</label>
-                                <input type="number" id="profile-age" value="25" min="18" max="100" required>
-                            </div>
+
+                <!-- Зріст -->
+                <div class="form-group">
+                    <label>Зріст (см)</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="min-height">Від</label>
+                            <input type="number" id="min-height" name="min_height" min="100" max="250">
+                        </div>
+                        <div class="form-group">
+                            <label for="max-height">До</label>
+                            <input type="number" id="max-height" name="max_height" min="100" max="250">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Вага -->
+                <div class="form-group">
+                    <label>Вага (кг)</label>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="min-weight">Від</label>
+                            <input type="number" id="min-weight" name="min_weight" min="30" max="200">
+                        </div>
+                        <div class="form-group">
+                            <label for="max-weight">До</label>
+                            <input type="number" id="max-weight" name="max_weight" min="30" max="200">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Знаки зодіаку -->
+                <div class="form-group">
+                    <label for="preferred-zodiacs">Бажані знаки зодіаку</label>
+                    <select id="preferred-zodiacs" name="zodiac_signs" multiple>
+                        <option value="aries">Овен</option>
+                        <option value="taurus">Телець</option>
+                        <option value="gemini">Близнюки</option>
+                        <option value="cancer">Рак</option>
+                        <option value="leo">Лев</option>
+                        <option value="virgo">Діва</option>
+                        <option value="libra">Терези</option>
+                        <option value="scorpio">Скорпіон</option>
+                        <option value="sagittarius">Стрілець</option>
+                        <option value="capricorn">Козоріг</option>
+                        <option value="aquarius">Водолій</option>
+                        <option value="pisces">Риби</option>
+                    </select>
+                    <small>Утримуйте Ctrl (або ⌘ на Mac), щоб вибрати кілька</small>
+                </div>
+
+                <!-- Шукаю -->
+                <div class="form-group">
+                    <label for="looking-for">Шукаю</label>
+                    <select id="looking-for" name="looking_for">
+                        <option value="any">Будь-кого</option>
+                        <option value="female">Жінок</option>
+                        <option value="male">Чоловіків</option>
+                    </select>
+                </div>
+
+            </div>
+        </form>
+
+        <!-- Save Button -->
+        <button class="btn btn-primary btn-full btn-large save-btn" id="save-preferences-changes">Зберегти уподобання
+        </button>
+
+        <!--        &lt;!&ndash; Stats &ndash;&gt;-->
+        <!--        <div class="stats-grid">-->
+        <!--            <div class="stat-card">-->
+        <!--                <i class="fas fa-heart"></i>-->
+        <!--                <div class="stat-number">24</div>-->
+        <!--                <div class="stat-label">Вподобання</div>-->
+        <!--            </div>-->
+        <!--            <div class="stat-card">-->
+        <!--                <i class="fas fa-users"></i>-->
+        <!--                <div class="stat-number">8</div>-->
+        <!--                <div class="stat-label">Збіги</div>-->
+        <!--            </div>-->
+        <!--        </div>-->
+
+
+        <!-- Delete Account Button -->
+        <div class="disable-account-section">
+            <button class="btn btn-danger btn-full btn-large disable-account-btn">
+                <i class="fas fa-trash"></i>
+                Деактивувати акаунт
+            </button>
+        </div>
+
+        <!-- Delete Account Modal -->
+        <div class="modal" id="deleteAccountModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Деактивувати акаунт</h2>
+                    <button class="modal-close" onclick="closeDeleteModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="warning-message">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p><strong>Увага!</strong> Ця дія незворотна. Всі ваші дані, збіги та повідомлення будуть
+                            втрачені для вас назавжди.</p>
+                    </div>
+
+                    <form class="delete-form" id="deleteAccountForm">
+                        <div class="form-group">
+                            <label for="deleteReason">Чому ви хочете деактивувати акаунт? *</label>
+                            <select id="deleteReason" required>
+                                <option value="">Оберіть причину</option>
+                                <option value="no-matches">Не знаходжу підходящих людей</option>
+                                <option value="found-someone">Знайшов/знайшла когось</option>
+                                <option value="too-busy">Немає часу на знайомства</option>
+                                <option value="privacy-concerns">Турбуюся про приватність</option>
+                                <option value="technical-issues">Технічні проблеми з додатком</option>
+                                <option value="harassment">Домагання від інших користувачів</option>
+                                <option value="other">Інша причина</option>
+                            </select>
                         </div>
 
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="profile-gender">Стать *</label>
-                                <select id="profile-gender" required>
-                                    <option value="">Оберіть стать</option>
-                                    <option value="female" selected>Жінка</option>
-                                    <option value="male">Чоловік</option>
-                                    <option value="non-binary">Небінарна особа</option>
-                                    <option value="other">Інше</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="profile-height">Зріст (см)</label>
-                                <input type="number" id="profile-height" placeholder="170" min="120" max="250">
-                                <small class="field-hint">Необов'язково, але допомагає знайти кращі збіги</small>
-                            </div>
-                            <div class="form-group">
-                                <label for="profile-weight">Вага (кг)</label>
-                                <input type="number" id="profile-weight" placeholder="65" min="30" max="300">
-                                <small class="field-hint">Необов'язково, залишається приватним</small>
-                            </div>
+                        <div class="form-group" id="otherReasonGroup" style="display: none;">
+                            <label for="other-reason">Опишіть детальніше:</label>
+                            <textarea id="other-reason" rows="3"
+                                      placeholder="Розкажіть більше про вашу причину..."></textarea>
                         </div>
 
                         <div class="form-group">
-                            <label for="profile-bio">Про себе *</label>
-                            <textarea id="profile-bio" rows="4" maxlength="500" required>Люблю подорожі та нові пригоди. Шукаю когось особливого для спільних моментів під зірками.</textarea>
-                            <div class="char-counter">
-                                <span id="bioCharCount">108</span>/500 символів
-                            </div>
+                            <label for="additional-comments">Додаткові коментарі (необов'язково):</label>
+                            <textarea id="additional-comments" rows="3"
+                                      placeholder="Що ми могли б покращити?"></textarea>
+                        </div>
+
+                        <div class="confirmation-checkbox">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="confirmDelete" required>
+                                <span class="checkmark"></span>
+                                Я розумію, що ця дія незворотна і всі мої дані будуть видалені
+                            </label>
                         </div>
                     </form>
                 </div>
-            </div>
-
-            <!-- Interests -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Інтереси</h2>
-                    <p>Оберіть до 5 інтересів, які найкраще вас описують</p>
-                </div>
-                <div class="card-content">
-                    <div class="interests-grid" id="interestsGrid">
-                        <!-- Interests will be populated by JavaScript -->
-                    </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline" onclick="closeDeleteModal()">Скасувати</button>
+                    <button class="btn btn-danger" onclick="confirmDeleteAccount()" id="confirmDeleteBtn" disabled>
+                        <i class="fas fa-trash"></i>
+                        Деактивувати акаунт
+                    </button>
                 </div>
             </div>
-
-            <!-- Preferences -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Налаштування знайомств</h2>
-                </div>
-                <div class="card-content">
-                    <div class="form-group">
-                        <label>Вікова категорія</label>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="min-age">Від</label>
-                                <input type="number" id="min-age" value="22" min="18" max="100">
-                            </div>
-                            <div class="form-group">
-                                <label for="max-age">До</label>
-                                <input type="number" id="max-age" value="35" min="18" max="100">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="max-distance">Максимальна відстань (км)</label>
-                        <input type="number" id="max-distance" value="50" min="1" max="500">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="looking-for">Шукаю</label>
-                        <select id="looking-for">
-                            <option value="any">Будь-кого</option>
-                            <option value="female">Жінок</option>
-                            <option value="male">Чоловіків</option>
-                            <option value="non-binary">Небінарних осіб</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Privacy Settings -->
-            <div class="card">
-                <div class="card-header">
-                    <h2>Приватність</h2>
-                </div>
-                <div class="card-content">
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Сповіщення</h3>
-                            <p>Отримувати сповіщення про нові збіги</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="notifications" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Показувати онлайн статус</h3>
-                            <p>Інші користувачі бачитимуть, коли ви онлайн</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="show-online" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Показувати відстань</h3>
-                            <p>Показувати вашу відстань до інших користувачів</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="show-distance" checked>
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-
-                    <div class="setting-item">
-                        <div class="setting-info">
-                            <h3>Показувати зріст та вагу</h3>
-                            <p>Відображати фізичні параметри в профілі</p>
-                        </div>
-                        <label class="switch">
-                            <input type="checkbox" id="show-physical-info">
-                            <span class="slider"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <i class="fas fa-heart"></i>
-                    <div class="stat-number">24</div>
-                    <div class="stat-label">Вподобання</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <div class="stat-number">8</div>
-                    <div class="stat-label">Збіги</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-bell"></i>
-                    <div class="stat-number">15</div>
-                    <div class="stat-label">Повідомлення</div>
-                </div>
-            </div>
-
-            <!-- Save Button -->
-            <button class="btn btn-primary btn-full btn-large save-btn">Зберегти зміни</button>
-
-            <!-- Delete Account Button -->
-            <div class="disable-account-section">
-                <button class="btn btn-danger btn-full btn-large disable-account-btn">
-                    <i class="fas fa-trash"></i>
-                    Деактивувати акаунт
-                </button>
-            </div>
-
-            <!-- Delete Account Modal -->
-            <div class="modal" id="deleteAccountModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2>Деактивувати акаунт</h2>
-                        <button class="modal-close" onclick="closeDeleteModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="warning-message">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <p><strong>Увага!</strong> Ця дія незворотна. Всі ваші дані, збіги та повідомлення будуть втрачені для вас назавжди.</p>
-                        </div>
-
-                        <form class="delete-form" id="deleteAccountForm">
-                            <div class="form-group">
-                                <label for="deleteReason">Чому ви хочете деактивувати акаунт? *</label>
-                                <select id="deleteReason" required>
-                                    <option value="">Оберіть причину</option>
-                                    <option value="no-matches">Не знаходжу підходящих людей</option>
-                                    <option value="found-someone">Знайшов/знайшла когось</option>
-                                    <option value="too-busy">Немає часу на знайомства</option>
-                                    <option value="privacy-concerns">Турбуюся про приватність</option>
-                                    <option value="technical-issues">Технічні проблеми з додатком</option>
-                                    <option value="harassment">Домагання від інших користувачів</option>
-                                    <option value="other">Інша причина</option>
-                                </select>
-                            </div>
-
-                            <div class="form-group" id="otherReasonGroup" style="display: none;">
-                                <label for="other-reason">Опишіть детальніше:</label>
-                                <textarea id="other-reason" rows="3" placeholder="Розкажіть більше про вашу причину..."></textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="additional-comments">Додаткові коментарі (необов'язково):</label>
-                                <textarea id="additional-comments" rows="3" placeholder="Що ми могли б покращити?"></textarea>
-                            </div>
-
-                            <div class="confirmation-checkbox">
-                                <label class="checkbox-container">
-                                    <input type="checkbox" id="confirmDelete" required>
-                                    <span class="checkmark"></span>
-                                    Я розумію, що ця дія незворотна і всі мої дані будуть видалені
-                                </label>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button class="btn btn-outline" onclick="closeDeleteModal()">Скасувати</button>
-                        <button class="btn btn-danger" onclick="confirmDeleteAccount()" id="confirmDeleteBtn" disabled>
-                            <i class="fas fa-trash"></i>
-                            Деактивувати акаунт
-                        </button>
-                    </div>
-                </div>
-            </div>
-
         </div>
-    </div>
 
-    <script src="{{ url_for('static', filename='js/profile.js') }}"></script>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/profile.js') }}"></script>
 </body>
 </html>
