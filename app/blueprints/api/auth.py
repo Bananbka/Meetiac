@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from app.database import db
+from app.models import ZodiacSign, Gender
 from app.models.credentials import Credentials
 from app.models.refusal import Refusal
 from app.models.user import User
@@ -22,12 +23,18 @@ def register():
     #      'zodiac': 'aquarius', 'register-password': 'qwe', 'confirm-password': 'qwe'}
 
     birthdate = datetime.strptime(data['birthdate'], '%Y-%m-%d')
-    zodiac = get_zodiac_sign(birthdate)
+    zodiac_name = get_zodiac_sign(birthdate)
+    zodiac = ZodiacSign.query.filter_by(name=zodiac_name).first()
+
+    raw_gender = data['gender']
+    gender = Gender.query.filter_by(name=raw_gender).first()
+
     new_user = User(
         first_name=data["first-name"],
         last_name=data["last-name"],
         birth_date=data["birthdate"],
-        zodiac_sign=zodiac,
+        sign_id=zodiac.sign_id,
+        gender=gender.gender_id
     )
     db.session.add(new_user)
     db.session.flush()

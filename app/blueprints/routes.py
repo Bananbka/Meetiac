@@ -1,5 +1,7 @@
 ﻿from flask import Blueprint, render_template
 
+from app.utils.access_utils import login_required
+
 pages_bp = Blueprint('pages', __name__)
 
 
@@ -14,15 +16,18 @@ def auth():
 
 
 @pages_bp.route('/discover')
+@login_required
 def discover():
     return render_template('discover.html', methods=['GET'])
 
 
 @pages_bp.route('/admin')
+@login_required
 def admin():
     return render_template('admin.html', methods=['GET'])
 
 
 @pages_bp.route('/profile')
+@login_required
 def profile():
     return render_template('profile.html', methods=['GET'])
