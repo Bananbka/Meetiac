@@ -6,6 +6,7 @@ from app.models import ZodiacSign, Gender
 from app.models.credentials import Credentials
 from app.models.refusal import Refusal
 from app.models.user import User
+from app.utils.access_utils import login_required_api
 from app.utils.zodiac_utils import get_zodiac_sign
 
 auth_bp = Blueprint('auth', __name__)
@@ -14,13 +15,9 @@ auth_bp = Blueprint('auth', __name__)
 @auth_bp.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
-    print(data)
 
     if Credentials.query.filter_by(login=data["register-email"]).first():
         return jsonify({"status": "error", "message": "User already exists"}), 409
-    # a = {'first-name': '1', 'last-name': '1',
-    #      'register-email': '1@1.1', 'birthdate': '2025-07-08',
-    #      'zodiac': 'aquarius', 'register-password': 'qwe', 'confirm-password': 'qwe'}
 
     birthdate = datetime.strptime(data['birthdate'], '%Y-%m-%d')
     zodiac_name = get_zodiac_sign(birthdate)
@@ -57,7 +54,6 @@ def register():
 @auth_bp.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-    print(data)
 
     creds = Credentials.query.filter_by(login=data["login-email"]).first()
     if not creds:
@@ -72,6 +68,7 @@ def login():
 
 
 @auth_bp.route('/logout', methods=['POST'])
+@login_required_api
 def logout():
     session.pop('email', None)
     return jsonify({"status": "success"})
@@ -80,7 +77,6 @@ def logout():
 @auth_bp.route('/disable-account', methods=['POST'])
 def delete_account():
     data = request.get_json()
-    print(data)
 
     email = session.get('email')
     if not email:
