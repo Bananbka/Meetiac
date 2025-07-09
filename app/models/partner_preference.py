@@ -18,3 +18,6 @@ class PartnerPreference(db.Model):
         secondary='preference_signs',
         backref='preferences'
     )
+
+    gender_obj = db.relationship('Gender', backref='partner_preferences')
+

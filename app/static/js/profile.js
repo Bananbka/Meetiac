@@ -1,7 +1,7 @@
 import {isAdult} from "./auth.js";
 
 // Profile page functionality
-let selectedInterests = ["Подорожі", "Астрологія", "Йога"]
+let selectedInterests = []
 let currentPhotoSlot = 0
 const uploadedPhotos = [
     null,
@@ -25,17 +25,18 @@ const availableInterests = [
     "Медитація",
 ]
 
-document.addEventListener("DOMContentLoaded", () => {
-    initProfilePage()
+document.addEventListener("DOMContentLoaded", async () => {
+    await initProfilePage()
 })
 
-function initProfilePage() {
-    setupInterestsGrid()
+async function initProfilePage() {
     setupFormHandlers()
     setupDeleteAccountModal()
     setupBioCounter()
     setupFormValidation()
     setupLogoutModal()
+    await setupProfileData();
+    await setupPreferencesData();
 }
 
 function setupInterestsGrid() {
@@ -701,30 +702,46 @@ async function confirmLogout() {
     }
 }
 
+async function setupProfileData() {
+    const res = await fetch("/api/profile/get-profile-data");
+    const data = await res.json();
+    if (res.ok) {
+        document.getElementById("profile-name").value = data.name;
+        document.getElementById("profile-surname").value = data.surname;
+        document.getElementById("profile-gender").value = data.gender;
+        document.getElementById("birthdate").value = data.birthdate;
+        document.getElementById("profile-height").value = data.height;
+        document.getElementById("profile-weight").value = data.weight;
+        document.getElementById("profile-bio").value = data.bio;
+        document.getElementById("bioCharCount").innerText = data.bio.length;
 
-document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        const res = await fetch("/api/profile/get-profile-data");
-        const data = await res.json();
-
-        if (res.ok) {
-            document.getElementById("profile-name").value = data.name;
-            document.getElementById("profile-surname").value = data.surname;
-            document.getElementById("profile-gender").value = data.gender;
-            document.getElementById("birthdate").value = data.birthdate;
-            document.getElementById("profile-height").value = data.height;
-            document.getElementById("profile-weight").value = data.weight;
-            document.getElementById("profile-bio").value = data.bio;
-
-            // Оновлюємо лічильник біо
-            document.getElementById("bioCharCount").innerText = data.bio.length;
-        } else {
-            console.error("Помилка завантаження:", data.error);
-        }
-    } catch (error) {
-        console.error("Помилка з'єднання:", error);
+        selectedInterests = data.interests
+        setupInterestsGrid()
+        await loadProfilePhotos();
     }
-});
+}
+
+async function setupPreferencesData() {
+    const res = await fetch("/api/profile/preferences");
+    const data = await res.json();
+
+    if (res.ok) {
+        document.getElementById("min-age").value = data.min_age;
+        document.getElementById("max-age").value = data.max_age;
+        document.getElementById("min-height").value = data.min_height;
+        document.getElementById("max-height").value = data.max_height;
+        document.getElementById("min-weight").value = data.min_weight;
+        document.getElementById("max-weight").value = data.max_weight;
+        document.getElementById("looking-for").value = data.gender;
+
+        const selectedZodiacs = data.zodiacs;
+        const select = document.getElementById("preferred-zodiacs");
+        Array.from(select.options).forEach(option => {
+            option.selected = selectedZodiacs.includes(option.value);
+        });
+    }
+}
+
 
 async function loadProfilePhotos() {
     try {
@@ -753,10 +770,6 @@ async function loadProfilePhotos() {
         console.error("Помилка з'єднання:", err);
     }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    loadProfilePhotos();
-});
 
 window.handlePhotoUpload = handlePhotoUpload
 window.uploadPhoto = uploadPhoto

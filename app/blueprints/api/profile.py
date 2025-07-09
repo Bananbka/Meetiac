@@ -106,7 +106,6 @@ def delete_old_images(images: list[UserImage], save_paths):
         except FileNotFoundError:
             pass
 
-
         db.session.delete(img)
 
 
@@ -163,9 +162,33 @@ def get_profile_data():
         "birthdate": user.birth_date.isoformat(),
         "height": user.height,
         "weight": user.weight,
-        "bio": user.bio
+        "bio": user.bio,
+        "interests": [interest.name for interest in user.interests]
     }
     return jsonify(profile_data)
+
+@profile_bp.route("/preferences", methods=['GET'])
+@login_required_api
+def get_partner_preferences():
+    user = get_partner_preferences.cred.user
+
+    preference = PartnerPreference.query.filter_by(user_id=user.user_id).first()
+    if not preference:
+        return jsonify({})
+
+    preference_data = {
+        "gender": preference.gender_obj.name,
+        "min_age": preference.min_age,
+        "max_age": preference.max_age,
+        "min_height": preference.min_height,
+        "max_height": preference.max_height,
+        "min_weight": preference.min_weight,
+        "max_weight": preference.max_weight,
+        "zodiacs": [sign.name for sign in preference.zodiac_signs],
+    }
+
+    print(preference_data)
+    return jsonify(preference_data)
 
 
 @profile_bp.route("/photos", methods=['GET'])
