@@ -35,6 +35,7 @@ function initProfilePage() {
     setupDeleteAccountModal()
     setupBioCounter()
     setupFormValidation()
+    setupLogoutModal()
 }
 
 function setupInterestsGrid() {
@@ -146,6 +147,7 @@ function uploadPhoto(slotIndex) {
     fileInput.click()
 }
 
+
 function handlePhotoUpload(event) {
     const file = event.target.files[0]
     if (!file) return
@@ -248,7 +250,7 @@ async function saveProfile() {
         weight: document.getElementById("profile-weight")?.value,
         bio: document.getElementById("profile-bio")?.value,
         interests: selectedInterests,
-        photos: uploadedPhotos.filter((photo) => photo !== null),
+        photos: uploadedPhotos,
         // preferences: {
         //     minAge: document.getElementById("min-age")?.value,
         //     maxAge: document.getElementById("max-age")?.value,
@@ -433,7 +435,6 @@ function setupDeleteAccountModal() {
     const reasonSelect = document.getElementById("deleteReason")
     const otherReasonGroup = document.getElementById("otherReasonGroup")
     const confirmCheckbox = document.getElementById("confirmDelete")
-    const confirmDeleteBtn = document.getElementById("confirmDeleteBtn")
 
     if (deleteBtn) {
         deleteBtn.addEventListener("click", () => {
@@ -509,7 +510,6 @@ function confirmDeleteAccount() {
 
     // Show loading state
     const confirmBtn = document.getElementById("confirmDeleteBtn")
-    const originalText = confirmBtn.innerHTML
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Видалення...'
     confirmBtn.disabled = true
 
@@ -589,7 +589,7 @@ function redirectToHome() {
 
     // Redirect to home page
     setTimeout(() => {
-        window.location.href = "index.html"
+        window.location.href = ""
     }, 2000)
 }
 
@@ -610,3 +610,157 @@ document.addEventListener("keydown", (event) => {
         }
     }
 })
+
+
+function setupLogoutModal() {
+    // Close modal when clicking outside
+    document.addEventListener("click", (event) => {
+        const modal = document.getElementById("logoutModal")
+        if (event.target === modal) {
+            hideLogoutModal()
+        }
+    })
+
+    // Close modal with Escape key
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            const modal = document.getElementById("logoutModal")
+            if (modal && modal.classList.contains("show")) {
+                hideLogoutModal()
+            }
+        }
+    })
+}
+
+function showLogoutModal() {
+    const modal = document.getElementById("logoutModal")
+    modal.classList.add("show")
+    document.body.style.overflow = "hidden"
+}
+
+function hideLogoutModal() {
+    const modal = document.getElementById("logoutModal")
+    modal.classList.remove("show")
+    document.body.style.overflow = ""
+}
+
+async function confirmLogout() {
+    const confirmBtn = document.getElementById("confirmLogoutBtn")
+    const logoutText = confirmBtn.querySelector(".logout-text")
+
+    // Show loading state
+    confirmBtn.disabled = true
+    logoutText.innerHTML = `
+    <div class="logout-loading">
+      <div class="logout-spinner"></div>
+      Виходимо...
+    </div>
+  `
+
+    try {
+        // Send logout request to backend
+        const response = await fetch("/api/auth/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
+            },
+            credentials: "include",
+        })
+
+        if (response.ok) {
+            // Clear local storage
+            localStorage.removeItem("meetiacProfile")
+            localStorage.removeItem("userSession")
+            localStorage.removeItem("authToken")
+
+            // Clear cookies if any
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
+            })
+
+            // Show success message
+            showNotification("До побачення! 👋", "success")
+
+            // Hide modal and redirect
+            hideLogoutModal()
+            setTimeout(() => {
+                window.location.href = ""
+            }, 1500)
+        } else {
+            throw new Error("Logout failed")
+        }
+    } catch (error) {
+        console.error("Logout error:", error)
+
+        showNotification("Сесію завершено локально", "warning")
+        hideLogoutModal()
+        setTimeout(() => {
+            window.location.href = ""
+        }, 1500)
+    }
+}
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+    try {
+        const res = await fetch("/api/profile/get-profile-data");
+        const data = await res.json();
+
+        if (res.ok) {
+            document.getElementById("profile-name").value = data.name;
+            document.getElementById("profile-surname").value = data.surname;
+            document.getElementById("profile-gender").value = data.gender;
+            document.getElementById("birthdate").value = data.birthdate;
+            document.getElementById("profile-height").value = data.height;
+            document.getElementById("profile-weight").value = data.weight;
+            document.getElementById("profile-bio").value = data.bio;
+
+            // Оновлюємо лічильник біо
+            document.getElementById("bioCharCount").innerText = data.bio.length;
+        } else {
+            console.error("Помилка завантаження:", data.error);
+        }
+    } catch (error) {
+        console.error("Помилка з'єднання:", error);
+    }
+});
+
+async function loadProfilePhotos() {
+    try {
+        const res = await fetch("/api/profile/photos");
+        const data = await res.json();
+
+        if (res.ok) {
+            // Обнуляємо масив
+            console.log(data.photos)
+            for (let i = 0; i < 3; i++) {
+
+                const photo = data.photos[i]
+                if (photo !== undefined) {
+                    const filename = photo.split('/').pop();
+                    const index = filename.split('_')[2].split('.')[0];
+                    uploadedPhotos[index] = photo;
+                }
+            }
+            console.log(uploadedPhotos)
+
+            updatePhotoGrid();
+        } else {
+            console.error("Помилка завантаження фото:", data.error);
+        }
+    } catch (err) {
+        console.error("Помилка з'єднання:", err);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadProfilePhotos();
+});
+
+window.handlePhotoUpload = handlePhotoUpload
+window.uploadPhoto = uploadPhoto
+window.closeDeleteModal = closeDeleteModal
+window.confirmDeleteAccount = confirmDeleteAccount
+window.removePhoto = removePhoto
+window.showLogoutModal = showLogoutModal

@@ -9,373 +9,394 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="page-wrapper admin-page">
-        <!-- Header -->
-        <header class="header">
-            <div class="container">
-                <div class="header-content">
-                    <div class="logo">
-                        <i class="fas fa-star"></i>
-                        <span>Meetiac</span>
-                        <span class="admin-badge">Admin</span>
+<div class="page-wrapper admin-page">
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-star"></i>
+                    <span>Meetiac</span>
+                    <span class="admin-badge">Admin</span>
+                </div>
+                <div class="admin-nav">
+                    <button class="nav-item active" data-section="dashboard">
+                        <i class="fas fa-chart-bar"></i>
+                        Статистика
+                    </button>
+                    <button class="nav-item" data-section="users">
+                        <i class="fas fa-users"></i>
+                        Користувачі
+                    </button>
+                    <button class="nav-item" data-section="reports">
+                        <i class="fas fa-flag"></i>
+                        Скарги
+                    </button>
+                </div>
+                <div class="admin-actions">
+                    <a href="/" class="btn btn-outline btn-small">
+                        <i class="fas fa-home"></i>
+                        На сайт
+                    </a>
+                    <button class="btn btn-outline btn-small logout-btn" onclick="showLogoutModal()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Вийти
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="admin-container">
+        <!-- Dashboard Section -->
+        <section class="admin-section active" id="dashboard">
+            <div class="section-header">
+                <h1>Панель управління</h1>
+                <p>Огляд основних показників платформи</p>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-overview">
+                <div class="stat-card large">
+                    <div class="stat-icon users">
+                        <i class="fas fa-users"></i>
                     </div>
-                    <div class="admin-nav">
-                        <button class="nav-item active" data-section="dashboard">
-                            <i class="fas fa-chart-bar"></i>
-                            Статистика
-                        </button>
-                        <button class="nav-item" data-section="users">
-                            <i class="fas fa-users"></i>
-                            Користувачі
-                        </button>
-                        <button class="nav-item" data-section="reports">
-                            <i class="fas fa-flag"></i>
-                            Скарги
-                        </button>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalUsers">1,247</div>
+                        <div class="stat-label">Всього користувачів</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +<span id="newUsersToday">23</span> сьогодні
+                        </div>
                     </div>
-                    <div class="admin-actions">
-                        <a href="/" class="btn btn-outline btn-small">
-                            <i class="fas fa-home"></i>
-                            На сайт
-                        </a>
-                        <button class="btn btn-outline btn-small">
-                            <i class="fas fa-sign-out-alt"></i>
-                            Вийти
-                        </button>
+                </div>
+
+                <div class="stat-card large">
+                    <div class="stat-icon active">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="activeUsers">892</div>
+                        <div class="stat-label">Активні користувачі</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            71.5% від загальної кількості
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon matches">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalMatches">3,456</div>
+                        <div class="stat-label">Всього збігів</div>
+                        <div class="stat-change positive">
+                            +<span id="matchesToday">89</span> сьогодні
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon messages">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="totalMessages">12,847</div>
+                        <div class="stat-label">Повідомлень</div>
+                        <div class="stat-change positive">
+                            +<span id="messagesToday">234</span> сьогодні
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon reports">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="reportedUsers">12</div>
+                        <div class="stat-label">Скарги</div>
+                        <div class="stat-change neutral">
+                            Потребують розгляду
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon banned">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number" id="bannedUsers">8</div>
+                        <div class="stat-label">Заблоковані</div>
+                        <div class="stat-change negative">
+                            0.6% від загальної кількості
+                        </div>
                     </div>
                 </div>
             </div>
-        </header>
 
-        <div class="admin-container">
-            <!-- Dashboard Section -->
-            <section class="admin-section active" id="dashboard">
-                <div class="section-header">
-                    <h1>Панель управління</h1>
-                    <p>Огляд основних показників платформи</p>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="stats-overview">
-                    <div class="stat-card large">
-                        <div class="stat-icon users">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="totalUsers">1,247</div>
-                            <div class="stat-label">Всього користувачів</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                +<span id="newUsersToday">23</span> сьогодні
-                            </div>
-                        </div>
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Реєстрації за тиждень</h3>
                     </div>
-
-                    <div class="stat-card large">
-                        <div class="stat-icon active">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="activeUsers">892</div>
-                            <div class="stat-label">Активні користувачі</div>
-                            <div class="stat-change positive">
-                                <i class="fas fa-arrow-up"></i>
-                                71.5% від загальної кількості
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon matches">
-                            <i class="fas fa-heart"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="totalMatches">3,456</div>
-                            <div class="stat-label">Всього збігів</div>
-                            <div class="stat-change positive">
-                                +<span id="matchesToday">89</span> сьогодні
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon messages">
-                            <i class="fas fa-comments"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="totalMessages">12,847</div>
-                            <div class="stat-label">Повідомлень</div>
-                            <div class="stat-change positive">
-                                +<span id="messagesToday">234</span> сьогодні
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon reports">
-                            <i class="fas fa-flag"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="reportedUsers">12</div>
-                            <div class="stat-label">Скарги</div>
-                            <div class="stat-change neutral">
-                                Потребують розгляду
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="stat-card">
-                        <div class="stat-icon banned">
-                            <i class="fas fa-ban"></i>
-                        </div>
-                        <div class="stat-content">
-                            <div class="stat-number" id="bannedUsers">8</div>
-                            <div class="stat-label">Заблоковані</div>
-                            <div class="stat-change negative">
-                                0.6% від загальної кількості
-                            </div>
+                    <div class="chart-placeholder">
+                        <div class="chart-bars">
+                            <div class="bar" style="height: 60%"><span>Пн</span></div>
+                            <div class="bar" style="height: 80%"><span>Вт</span></div>
+                            <div class="bar" style="height: 45%"><span>Ср</span></div>
+                            <div class="bar" style="height: 90%"><span>Чт</span></div>
+                            <div class="bar" style="height: 70%"><span>Пт</span></div>
+                            <div class="bar" style="height: 95%"><span>Сб</span></div>
+                            <div class="bar" style="height: 85%"><span>Нд</span></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Charts Section -->
-                <div class="charts-section">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Реєстрації за тиждень</h3>
-                        </div>
-                        <div class="chart-placeholder">
-                            <div class="chart-bars">
-                                <div class="bar" style="height: 60%"><span>Пн</span></div>
-                                <div class="bar" style="height: 80%"><span>Вт</span></div>
-                                <div class="bar" style="height: 45%"><span>Ср</span></div>
-                                <div class="bar" style="height: 90%"><span>Чт</span></div>
-                                <div class="bar" style="height: 70%"><span>Пт</span></div>
-                                <div class="bar" style="height: 95%"><span>Сб</span></div>
-                                <div class="bar" style="height: 85%"><span>Нд</span></div>
-                            </div>
-                        </div>
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3>Розподіл за знаками зодіаку</h3>
                     </div>
-
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Розподіл за знаками зодіаку</h3>
+                    <div class="zodiac-stats">
+                        <div class="zodiac-item">
+                            <span class="zodiac-sign">♈</span>
+                            <span class="zodiac-name">Овен</span>
+                            <div class="zodiac-bar">
+                                <div class="zodiac-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="zodiac-count">106</span>
                         </div>
-                        <div class="zodiac-stats">
-                            <div class="zodiac-item">
-                                <span class="zodiac-sign">♈</span>
-                                <span class="zodiac-name">Овен</span>
-                                <div class="zodiac-bar">
-                                    <div class="zodiac-fill" style="width: 85%"></div>
-                                </div>
-                                <span class="zodiac-count">106</span>
+                        <div class="zodiac-item">
+                            <span class="zodiac-sign">♉</span>
+                            <span class="zodiac-name">Телець</span>
+                            <div class="zodiac-bar">
+                                <div class="zodiac-fill" style="width: 92%"></div>
                             </div>
-                            <div class="zodiac-item">
-                                <span class="zodiac-sign">♉</span>
-                                <span class="zodiac-name">Телець</span>
-                                <div class="zodiac-bar">
-                                    <div class="zodiac-fill" style="width: 92%"></div>
-                                </div>
-                                <span class="zodiac-count">115</span>
+                            <span class="zodiac-count">115</span>
+                        </div>
+                        <div class="zodiac-item">
+                            <span class="zodiac-sign">♊</span>
+                            <span class="zodiac-name">Близнюки</span>
+                            <div class="zodiac-bar">
+                                <div class="zodiac-fill" style="width: 78%"></div>
                             </div>
-                            <div class="zodiac-item">
-                                <span class="zodiac-sign">♊</span>
-                                <span class="zodiac-name">Близнюки</span>
-                                <div class="zodiac-bar">
-                                    <div class="zodiac-fill" style="width: 78%"></div>
-                                </div>
-                                <span class="zodiac-count">97</span>
+                            <span class="zodiac-count">97</span>
+                        </div>
+                        <div class="zodiac-item">
+                            <span class="zodiac-sign">♋</span>
+                            <span class="zodiac-name">Рак</span>
+                            <div class="zodiac-bar">
+                                <div class="zodiac-fill" style="width: 88%"></div>
                             </div>
-                            <div class="zodiac-item">
-                                <span class="zodiac-sign">♋</span>
-                                <span class="zodiac-name">Рак</span>
-                                <div class="zodiac-bar">
-                                    <div class="zodiac-fill" style="width: 88%"></div>
-                                </div>
-                                <span class="zodiac-count">110</span>
-                            </div>
+                            <span class="zodiac-count">110</span>
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            <!-- Users Section -->
-            <section class="admin-section" id="users">
-                <div class="section-header">
-                    <h1>Управління користувачами</h1>
-                    <div class="section-actions">
-                        <button class="btn btn-primary" id="exportBtn">
-                            <i class="fas fa-download"></i>
-                            Експорт
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Filters -->
-                <div class="filters-bar">
-                    <div class="search-box">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="userSearch" placeholder="Пошук користувачів...">
-                    </div>
-                    <select id="statusFilter" class="filter-select">
-                        <option value="all">Всі статуси</option>
-                        <option value="active">Активні</option>
-                        <option value="inactive">Неактивні</option>
-                        <option value="banned">Заблоковані</option>
-                    </select>
-                </div>
-
-                <!-- Users Table -->
-                <div class="table-container">
-                    <table class="users-table">
-                        <thead>
-                            <tr>
-                                <th>Користувач</th>
-                                <th>Вік</th>
-                                <th>Знак</th>
-                                <th>Статус</th>
-                                <th>Реєстрація</th>
-                                <th>Остання активність</th>
-                                <th>Збіги</th>
-                                <th>Лайки</th>
-                                <th>Скарги</th>
-                                <th>Дії</th>
-                            </tr>
-                        </thead>
-                        <tbody id="usersTableBody">
-                            <!-- Users will be populated by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <!-- Reports Section -->
-            <section class="admin-section" id="reports">
-                <div class="section-header">
-                    <h1>Скарги користувачів</h1>
-                    <p>Розгляд та модерація скарг</p>
-                </div>
-
-                <div class="reports-grid">
-                    <div class="report-card">
-                        <div class="report-header">
-                            <div class="report-type spam">Спам</div>
-                            <div class="report-date">20.01.2024</div>
-                        </div>
-                        <div class="report-content">
-                            <div class="report-users">
-                                <span>Скарга від: <strong>Анна П.</strong></span>
-                                <span>На користувача: <strong>Олексій К.</strong></span>
-                            </div>
-                            <p class="report-description">
-                                Користувач надсилає однакові повідомлення всім користувачам
-                            </p>
-                        </div>
-                        <div class="report-actions">
-                            <button class="btn btn-outline btn-small">Відхилити</button>
-                            <button class="btn btn-primary btn-small">Заблокувати</button>
-                        </div>
-                    </div>
-
-                    <div class="report-card">
-                        <div class="report-header">
-                            <div class="report-type inappropriate">Неприйнятний контент</div>
-                            <div class="report-date">19.01.2024</div>
-                        </div>
-                        <div class="report-content">
-                            <div class="report-users">
-                                <span>Скарга від: <strong>Марія С.</strong></span>
-                                <span>На користувача: <strong>Дмитро Л.</strong></span>
-                            </div>
-                            <p class="report-description">
-                                Неприйнятні фотографії в профілі
-                            </p>
-                        </div>
-                        <div class="report-actions">
-                            <button class="btn btn-outline btn-small">Відхилити</button>
-                            <button class="btn btn-primary btn-small">Попередження</button>
-                        </div>
-                    </div>
-
-                    <div class="report-card">
-                        <div class="report-header">
-                            <div class="report-type harassment">Домагання</div>
-                            <div class="report-date">18.01.2024</div>
-                        </div>
-                        <div class="report-content">
-                            <div class="report-users">
-                                <span>Скарга від: <strong>Ірина В.</strong></span>
-                                <span>На користувача: <strong>Сергій М.</strong></span>
-                            </div>
-                            <p class="report-description">
-                                Продовжує писати після відмови, нав'язливі повідомлення
-                            </p>
-                        </div>
-                        <div class="report-actions">
-                            <button class="btn btn-outline btn-small">Відхилити</button>
-                            <button class="btn btn-danger btn-small">Заблокувати назавжди</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-
-        <!-- Edit User Modal -->
-        <div class="modal" id="editUserModal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Редагувати користувача</h2>
-                    <button class="modal-close" onclick="closeEditModal()">
-                        <i class="fas fa-times"></i>
+        <!-- Users Section -->
+        <section class="admin-section" id="users">
+            <div class="section-header">
+                <h1>Управління користувачами</h1>
+                <div class="section-actions">
+                    <button class="btn btn-primary" id="exportBtn">
+                        <i class="fas fa-download"></i>
+                        Експорт
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form class="edit-form">
-                        <input type="hidden" id="editUserId">
-                        
-                        <div class="form-group">
-                            <label for="editUserName">Ім'я</label>
-                            <input type="text" id="editUserName" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="editUserEmail">Email</label>
-                            <input type="email" id="editUserEmail" required>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="editUserAge">Вік</label>
-                                <input type="number" id="editUserAge" min="18" max="100" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="editUserZodiac">Знак зодіаку</label>
-                                <select id="editUserZodiac" required>
-                                    <option value="Овен">Овен</option>
-                                    <option value="Телець">Телець</option>
-                                    <option value="Близнюки">Близнюки</option>
-                                    <option value="Рак">Рак</option>
-                                    <option value="Лев">Лев</option>
-                                    <option value="Діва">Діва</option>
-                                    <option value="Терези">Терези</option>
-                                    <option value="Скорпіон">Скорпіон</option>
-                                    <option value="Стрілець">Стрілець</option>
-                                    <option value="Козеріг">Козеріг</option>
-                                    <option value="Водолій">Водолій</option>
-                                    <option value="Риби">Риби</option>
-                                </select>
-                            </div>
-                        </div>
-                    </form>
+            </div>
+
+            <!-- Filters -->
+            <div class="filters-bar">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="userSearch" placeholder="Пошук користувачів...">
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-outline" onclick="closeEditModal()">Скасувати</button>
-                    <button class="btn btn-primary" onclick="saveUserChanges()">Зберегти</button>
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">Всі статуси</option>
+                    <option value="active">Активні</option>
+                    <option value="inactive">Неактивні</option>
+                    <option value="banned">Заблоковані</option>
+                </select>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-container">
+                <table class="users-table">
+                    <thead>
+                    <tr>
+                        <th>Користувач</th>
+                        <th>Вік</th>
+                        <th>Знак</th>
+                        <th>Статус</th>
+                        <th>Реєстрація</th>
+                        <th>Остання активність</th>
+                        <th>Збіги</th>
+                        <th>Лайки</th>
+                        <th>Скарги</th>
+                        <th>Дії</th>
+                    </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                    <!-- Users will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Reports Section -->
+        <section class="admin-section" id="reports">
+            <div class="section-header">
+                <h1>Скарги користувачів</h1>
+                <p>Розгляд та модерація скарг</p>
+            </div>
+
+            <div class="reports-grid">
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-type spam">Спам</div>
+                        <div class="report-date">20.01.2024</div>
+                    </div>
+                    <div class="report-content">
+                        <div class="report-users">
+                            <span>Скарга від: <strong>Анна П.</strong></span>
+                            <span>На користувача: <strong>Олексій К.</strong></span>
+                        </div>
+                        <p class="report-description">
+                            Користувач надсилає однакові повідомлення всім користувачам
+                        </p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn btn-outline btn-small">Відхилити</button>
+                        <button class="btn btn-primary btn-small">Заблокувати</button>
+                    </div>
                 </div>
+
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-type inappropriate">Неприйнятний контент</div>
+                        <div class="report-date">19.01.2024</div>
+                    </div>
+                    <div class="report-content">
+                        <div class="report-users">
+                            <span>Скарга від: <strong>Марія С.</strong></span>
+                            <span>На користувача: <strong>Дмитро Л.</strong></span>
+                        </div>
+                        <p class="report-description">
+                            Неприйнятні фотографії в профілі
+                        </p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn btn-outline btn-small">Відхилити</button>
+                        <button class="btn btn-primary btn-small">Попередження</button>
+                    </div>
+                </div>
+
+                <div class="report-card">
+                    <div class="report-header">
+                        <div class="report-type harassment">Домагання</div>
+                        <div class="report-date">18.01.2024</div>
+                    </div>
+                    <div class="report-content">
+                        <div class="report-users">
+                            <span>Скарга від: <strong>Ірина В.</strong></span>
+                            <span>На користувача: <strong>Сергій М.</strong></span>
+                        </div>
+                        <p class="report-description">
+                            Продовжує писати після відмови, нав'язливі повідомлення
+                        </p>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn btn-outline btn-small">Відхилити</button>
+                        <button class="btn btn-danger btn-small">Заблокувати назавжди</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div class="modal" id="editUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редагувати користувача</h2>
+                <button class="modal-close" onclick="closeEditModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="edit-form">
+                    <input type="hidden" id="editUserId">
+
+                    <div class="form-group">
+                        <label for="editUserName">Ім'я</label>
+                        <input type="text" id="editUserName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editUserEmail">Email</label>
+                        <input type="email" id="editUserEmail" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="editUserAge">Вік</label>
+                            <input type="number" id="editUserAge" min="18" max="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editUserZodiac">Знак зодіаку</label>
+                            <select id="editUserZodiac" required>
+                                <option value="Овен">Овен</option>
+                                <option value="Телець">Телець</option>
+                                <option value="Близнюки">Близнюки</option>
+                                <option value="Рак">Рак</option>
+                                <option value="Лев">Лев</option>
+                                <option value="Діва">Діва</option>
+                                <option value="Терези">Терези</option>
+                                <option value="Скорпіон">Скорпіон</option>
+                                <option value="Стрілець">Стрілець</option>
+                                <option value="Козеріг">Козеріг</option>
+                                <option value="Водолій">Водолій</option>
+                                <option value="Риби">Риби</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeEditModal()">Скасувати</button>
+                <button class="btn btn-primary" onclick="saveUserChanges()">Зберегти</button>
             </div>
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+    <!-- Logout Modal -->
+    <div class="logout-modal" id="logoutModal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-header">
+                <div class="logout-modal-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Вийти з адмін панелі?</h3>
+                <p>Ви впевнені, що хочете завершити адміністративну сесію? Всі незбережені зміни будуть втрачені.</p>
+            </div>
+            <div class="logout-modal-actions">
+                <button class="btn logout-btn-cancel" onclick="hideLogoutModal()">
+                    Скасувати
+                </button>
+                <button class="btn logout-btn-confirm" id="confirmLogoutBtn" onclick="confirmLogout()">
+                    <span class="logout-text">Вийти</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
 </html>

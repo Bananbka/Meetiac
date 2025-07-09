@@ -35,6 +35,16 @@
                     <i class="fas fa-cog"></i>
                     <span>Налаштування профіля</span>
                 </div>
+                <div class="header-actions">
+                    <a href="/discover" class="btn btn-outline btn-small">
+                        <i class="fas fa-heart"></i>
+                        Знайомства
+                    </a>
+                    <button class="btn btn-outline btn-small logout-btn" onclick="showLogoutModal()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Вийти
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -43,7 +53,7 @@
         <!-- Profile Photos -->
         <div class="card">
             <div class="card-header">
-                <h2>Фото профіля</h2>
+                <h2>Фото профілю</h2>
                 <p>Додайте до 3 фотографій, щоб показати себе з найкращої сторони</p>
             </div>
             <div class="card-content">
@@ -314,6 +324,27 @@
         </div>
 
     </div>
+    <!-- Logout Modal -->
+    <div class="logout-modal" id="logoutModal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-header">
+                <div class="logout-modal-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3>Вийти з акаунта?</h3>
+                <p>Ви впевнені, що хочете завершити сесію? Ви завжди можете повернутися пізніше.</p>
+            </div>
+            <div class="logout-modal-actions">
+                <button class="btn logout-btn-cancel" onclick="hideLogoutModal()">
+                    Скасувати
+                </button>
+                <button class="btn logout-btn-confirm" id="confirmLogoutBtn" onclick="confirmLogout()">
+                    <span class="logout-text">Вийти</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
 </div>
 
 <script type='module' src="{{ url_for('static', filename='js/profile.js') }}"></script>
