@@ -11,38 +11,37 @@ from app.utils.access_utils import login_required_api
 from app.utils.zodiac_utils import get_zodiac_sign
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
-UPLOAD_FOLDER = 'app/static/uploads'
+UPLOAD_FOLDER = 'static/uploads'
 
 
 @profile_bp.route('/update-profile', methods=['POST'])
 @login_required_api
 def update_profile():
-    user_email = session.get('email')
-    cred = Credentials.query.filter_by(login=user_email).first()
-    if not cred:
-        return jsonify({"status": 'error', 'message': 'User don\'t exists'}), 404
-
-    user = cred.user
-
+    user = update_profile.cred.user
     data = request.get_json()
     photos = data.get("photos", [])
 
     old_images = UserImage.query.filter_by(user_id=user.user_id).all()
-    delete_old_images(old_images)
 
+    save_paths = []
     for idx, photo_data_uri in enumerate(photos):
-        os.makedirs("uploads", exist_ok=True)
+        os.makedirs("app/static/uploads", exist_ok=True)
 
         ext = get_extension_from_data_uri(photo_data_uri)
+        if not ext:
+            continue
         filename = f"user_{user.user_id}_{idx}.{ext}"
         save_path = f"{UPLOAD_FOLDER}/{filename}"
         save_base64_image(photo_data_uri, save_path)
+        save_paths.append(save_path)
 
         new_image = UserImage(
             user_id=user.user_id,
             image_path=save_path,
         )
         db.session.add(new_image)
+
+    delete_old_images(old_images, save_paths)
 
     raw_gender = data.get('gender')
     gender = Gender.query.filter_by(name=raw_gender).first()
@@ -77,37 +76,44 @@ def update_profile():
 
 
 def save_base64_image(data_uri, save_path):
+    if not data_uri or not data_uri.startswith("data:image/"):
+        return
     header, encoded = data_uri.split(",", 1)
     data = base64.b64decode(encoded)
+    save_path = f"app/{save_path}"
     with open(save_path, "wb") as f:
         f.write(data)
 
 
 def get_extension_from_data_uri(data_uri):
+    if not data_uri:
+        return
+    if data_uri.startswith("static/uploads/"):
+        return data_uri.split(".")[-1]
     mime_part = data_uri.split(";")[0]
     ext = mime_part.split("/")[1]
     return ext
 
 
-def delete_old_images(images: list[UserImage]):
+def delete_old_images(images: list[UserImage], save_paths):
+    print(save_paths)
     for img in images:
         try:
-            os.remove(img.image_path)
+            path = img.image_path
+            if path not in save_paths:
+                os.remove(f"app/{path}")
+
         except FileNotFoundError:
             pass
+
+
         db.session.delete(img)
 
 
 @profile_bp.route('/update-preferences', methods=['POST'])
 @login_required_api
 def update_preferences():
-    user_email = session.get('email')
-    cred = Credentials.query.filter_by(login=user_email).first()
-    if not cred:
-        return jsonify({"status": 'error', 'message': 'User don\'t exists'}), 404
-
-    user = cred.user
-
+    user = update_preferences.cred.user
     data = request.get_json()
 
     gender = data.get('looking_for', "any")
@@ -143,3 +149,30 @@ def update_preferences():
 
     db.session.commit()
     return jsonify({"status": 'ok'})
+
+
+@profile_bp.route("/get-profile-data", methods=['GET'])
+@login_required_api
+def get_profile_data():
+    user = get_profile_data.cred.user
+
+    profile_data = {
+        "name": user.first_name,
+        "surname": user.last_name,
+        "gender": user.gender_obj.name,
+        "birthdate": user.birth_date.isoformat(),
+        "height": user.height,
+        "weight": user.weight,
+        "bio": user.bio
+    }
+    return jsonify(profile_data)
+
+
+@profile_bp.route("/photos", methods=['GET'])
+@login_required_api
+def get_profile_photos():
+    user = get_profile_photos.cred.user
+
+    images = UserImage.query.filter_by(user_id=user.user_id).all()
+    image_urls = [img.image_path for img in images]
+    return jsonify({"photos": image_urls})

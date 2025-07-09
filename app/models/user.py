@@ -30,3 +30,4 @@ class User(db.Model):
                                cascade="all, delete-orphan")
     interests = db.relationship('Interest', secondary='user_interest', back_populates='users')
     zodiac_sign = db.relationship('ZodiacSign', back_populates='users')
+    gender_obj = db.relationship('Gender', backref='users')
