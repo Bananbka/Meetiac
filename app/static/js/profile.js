@@ -2,6 +2,7 @@ import {isAdult} from "./auth.js";
 
 // Profile page functionality
 let selectedInterests = []
+let selectedPrefInterests = []
 let currentPhotoSlot = 0
 const uploadedPhotos = [
     null,
@@ -10,20 +11,7 @@ const uploadedPhotos = [
 ]
 
 // Available interests
-const availableInterests = [
-    "Подорожі",
-    "Музика",
-    "Спорт",
-    "Кулінарія",
-    "Мистецтво",
-    "Фотографія",
-    "Йога",
-    "Танці",
-    "Читання",
-    "Кіно",
-    "Астрологія",
-    "Медитація",
-]
+let availableInterests = []
 
 document.addEventListener("DOMContentLoaded", async () => {
     await initProfilePage()
@@ -39,11 +27,13 @@ async function initProfilePage() {
     await setupPreferencesData();
 }
 
-function setupInterestsGrid() {
+async function setupInterestsGrid() {
     const interestsGrid = document.getElementById("interestsGrid")
     if (!interestsGrid) return
 
     interestsGrid.innerHTML = ""
+
+    availableInterests = await getInterests()
 
     availableInterests.forEach((interest) => {
         const item = document.createElement("div")
@@ -55,23 +45,56 @@ function setupInterestsGrid() {
         }
 
         item.addEventListener("click", function () {
-            toggleInterest(interest, this)
+            toggleInterest(selectedInterests, interest, this)
         })
 
         interestsGrid.appendChild(item)
     })
 }
 
-function toggleInterest(interest, element) {
-    if (selectedInterests.includes(interest)) {
-        selectedInterests = selectedInterests.filter((i) => i !== interest)
-        element.classList.remove("selected")
+async function setupPrefInterestsGrid() {
+    const interestsGrid = document.getElementById("interestsPrefGrid")
+    if (!interestsGrid) return
+
+    interestsGrid.innerHTML = ""
+
+    availableInterests = await getInterests()
+
+    availableInterests.forEach((interest) => {
+        const item = document.createElement("div")
+        item.className = "interest-item"
+        item.textContent = interest
+
+        if (selectedPrefInterests.includes(interest)) {
+            item.classList.add("selected")
+        }
+
+        item.addEventListener("click", function () {
+            toggleInterest(selectedPrefInterests, interest, this)
+        })
+
+        interestsGrid.appendChild(item)
+    })
+}
+
+async function getInterests() {
+    const response = await fetch("/api/profile/interests", {method: "GET"})
+    if (!response.ok) return []
+    return await response.json()
+}
+
+function toggleInterest(list, interest, element) {
+    const index = list.indexOf(interest);
+
+    if (index !== -1) {
+        list.splice(index, 1); // змінює сам масив
+        element.classList.remove("selected");
     } else {
-        if (selectedInterests.length < 5) {
-            selectedInterests.push(interest)
-            element.classList.add("selected")
+        if (list.length < 5) {
+            list.push(interest);
+            element.classList.add("selected");
         } else {
-            showNotification("Можна обрати максимум 5 інтересів", "warning")
+            showNotification("Можна обрати максимум 5 інтересів", "warning");
         }
     }
 }
@@ -328,6 +351,7 @@ async function savePreferences() {
         min_weight: minWeight,
         max_weight: maxWeight,
         zodiac_signs: Array.from(form["zodiac_signs"].selectedOptions).map(opt => opt.value),
+        interests: selectedPrefInterests,
         looking_for: form["looking_for"].value
     };
 
@@ -714,9 +738,8 @@ async function setupProfileData() {
         document.getElementById("profile-weight").value = data.weight;
         document.getElementById("profile-bio").value = data.bio;
         document.getElementById("bioCharCount").innerText = data.bio.length;
-
         selectedInterests = data.interests
-        setupInterestsGrid()
+        await setupInterestsGrid()
         await loadProfilePhotos();
     }
 }
@@ -735,10 +758,15 @@ async function setupPreferencesData() {
         document.getElementById("looking-for").value = data.gender;
 
         const selectedZodiacs = data.zodiacs;
-        const select = document.getElementById("preferred-zodiacs");
-        Array.from(select.options).forEach(option => {
+        const selector = document.getElementById("preferred-zodiacs");
+        Array.from(selector.options).forEach(option => {
             option.selected = selectedZodiacs.includes(option.value);
         });
+
+        selectedPrefInterests = data.interests;
+        console.log(data.interests)
+
+        await setupPrefInterestsGrid();
     }
 }
 

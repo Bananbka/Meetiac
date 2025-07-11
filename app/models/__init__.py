@@ -10,3 +10,4 @@ from .interest import Interest
 from .preference_signs import PreferenceSign
 from .zodiac_sign import ZodiacSign
 from .gender import Gender
+from .preference_interest import PreferenceInterest

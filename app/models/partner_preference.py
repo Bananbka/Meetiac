@@ -19,5 +19,11 @@ class PartnerPreference(db.Model):
         backref='preferences'
     )
 
+    interests = db.relationship(
+        'Interest',
+        secondary='preference_interest',
+        backref='preferred_by'
+    )
+
     gender_obj = db.relationship('Gender', backref='partner_preferences')
 

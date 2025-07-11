@@ -6,8 +6,8 @@ from flask import Blueprint, request, jsonify, session
 
 from app.database import db
 from app.models import Credentials, UserImage, UserInterest, Interest, PartnerPreference, ZodiacSign, Gender, \
-    PreferenceSign
-from app.utils.access_utils import login_required_api
+    PreferenceSign, PreferenceInterest
+from app.utils.access_utils import login_required_api, api_error
 from app.utils.zodiac_utils import get_zodiac_sign
 
 profile_bp = Blueprint('profile', __name__, url_prefix='/profile')
@@ -118,7 +118,7 @@ def update_preferences():
     gender = data.get('looking_for', "any")
     gender_object = Gender.query.filter_by(name=gender).first()
     if not gender_object:
-        return jsonify({"status": 'error', 'message': 'Gender don\'t exists'}), 404
+        return api_error("Gender don't exists", 404)
 
     old_partner_preference = PartnerPreference.query.filter_by(user_id=user.user_id).first()
     if old_partner_preference:
@@ -145,6 +145,17 @@ def update_preferences():
         for sign in signs
     ]
     db.session.add_all(new_preference_signs)
+
+    interests = data.get("interests", [])
+    PreferenceInterest.query.filter_by(preference_id=new_preference.preference_id).delete()
+    for interest in interests:
+        interest = Interest.query.filter_by(name=interest).first()
+        new_interest = PreferenceInterest(
+            preference_id=new_preference.preference_id,
+            interest_id=interest.interest_id,
+        )
+        db.session.add(new_interest)
+
 
     db.session.commit()
     return jsonify({"status": 'ok'})
@@ -185,6 +196,7 @@ def get_partner_preferences():
         "min_weight": preference.min_weight,
         "max_weight": preference.max_weight,
         "zodiacs": [sign.name for sign in preference.zodiac_signs],
+        "interests": [interest.name for interest in preference.interests]
     }
 
     print(preference_data)
@@ -199,3 +211,11 @@ def get_profile_photos():
     images = UserImage.query.filter_by(user_id=user.user_id).all()
     image_urls = [img.image_path for img in images]
     return jsonify({"photos": image_urls})
+
+
+@profile_bp.route("/interests", methods=['GET'])
+@login_required_api
+def get_interests():
+    interests = Interest.query.all()
+    return jsonify([interest.name for interest in interests])
+

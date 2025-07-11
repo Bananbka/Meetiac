@@ -31,3 +31,7 @@ def login_required(f):
         return f(*args, **kwargs)
 
     return decorated_function
+
+
+def api_error(message: str, code: int):
+    return jsonify({'status': 'error', 'message': message}), code
