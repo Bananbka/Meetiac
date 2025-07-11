@@ -1,5 +1,5 @@
 from .credentials import Credentials
-from .couple import Couple
+from .match import Match
 from .meeting import Meeting
 from .partner_preference import PartnerPreference
 from .refusal import Refusal
@@ -11,3 +11,5 @@ from .preference_signs import PreferenceSign
 from .zodiac_sign import ZodiacSign
 from .gender import Gender
 from .preference_interest import PreferenceInterest
+from .like import Like
+from .dislike import Dislike

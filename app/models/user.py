@@ -24,9 +24,9 @@ class User(db.Model):
     meetings2 = db.relationship('Meeting', foreign_keys='Meeting.user2_id', backref='user2',
                                 cascade="all, delete-orphan")
     refusals = db.relationship('Refusal', backref='user', cascade="all, delete-orphan")
-    couples1 = db.relationship('Couple', foreign_keys='Couple.user1_id', backref='user1_couple',
+    matchs1 = db.relationship('Match', foreign_keys='Match.user1_id', backref='user1_match',
                                cascade="all, delete-orphan")
-    couples2 = db.relationship('Couple', foreign_keys='Couple.user2_id', backref='user2_couple',
+    matchs2 = db.relationship('Match', foreign_keys='Match.user2_id', backref='user2_match',
                                cascade="all, delete-orphan")
     interests = db.relationship('Interest', secondary='user_interest', back_populates='users')
     zodiac_sign = db.relationship('ZodiacSign', back_populates='users')
