@@ -3,76 +3,84 @@ let currentProfileIndex = 0
 const likedProfiles = []
 
 // Sample profile data
-const profiles = [
-    {
-        id: 1,
-        name: "Анна",
-        age: 25,
-        zodiac: "♌ Лев",
-        compatibility: 95,
-        distance: "2 км",
-        bio: "Люблю подорожі та нові пригоди. Шукаю когось особливого для спільних моментів під зірками.",
-        interests: ["Подорожі", "Йога", "Астрологія"],
-        image: "https://www.georgetown.edu/wp-content/uploads/2022/02/Jkramerheadshot-scaled-e1645036825432-1050x1050-c-default.jpg",
-    },
-    {
-        id: 2,
-        name: "Марія",
-        age: 28,
-        zodiac: "♐ Стрілець",
-        compatibility: 88,
-        distance: "5 км",
-        bio: "Творча особистість, яка вірить у силу зірок. Люблю мистецтво та глибокі розмови.",
-        interests: ["Мистецтво", "Музика", "Фотографія"],
-        image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=500&fit=crop&crop=face",
-    },
-    {
-        id: 3,
-        name: "Олена",
-        age: 23,
-        zodiac: "♊ Близнюки",
-        compatibility: 92,
-        distance: "1 км",
-        bio: "Енергійна та позитивна. Шукаю когось, хто поділяє мою любов до життя та зірок.",
-        interests: ["Спорт", "Танці", "Кулінарія"],
-        image: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=500&fit=crop&crop=face",
-    },
-]
+let profiles = [];
+let currentPage = 1;
+let hasNext = true;
 
 document.addEventListener("DOMContentLoaded", () => {
     initDiscoverPage()
 })
 
-function initDiscoverPage() {
+async function initDiscoverPage() {
+    await uploadProfilesData()
+    if (profiles.length === 0) showEmptyProfile()
     updateProfileCard()
     updateLikesCount()
     setupKeyboardNavigation()
     setupTouchGestures()
     setupLogoutModal()
+
+}
+
+
+const zodiacsNames = {
+    aquarius: {name: "Водолій", emj: "♒️"},
+    pisces: {name: "Риби", emj: "♓️"},
+    aries: {name: "Овен", emj: "♈️"},
+    taurus: {name: "Телець", emj: "♉️"},
+    gemini: {name: "Близнюки", emj: "♊️"},
+    cancer: {name: "Рак", emj: "♋️"},
+    leo: {name: "Лев", emj: "♌️"},
+    virgo: {name: "Діва", emj: "♍️"},
+    libra: {name: "Терези", emj: "♎️"},
+    scorpio: {name: "Скорпіон", emj: "♏️"},
+    sagittarius: {name: "Стрілець", emj: "♐️"},
+    capricorn: {name: "Козеріг", emj: "♑️"}
+}
+
+function getZodiacName(sign, addEmoji = false) {
+    const zodiacData = zodiacsNames[sign];
+    return `${addEmoji ? zodiacData.emj : ""} ${zodiacData.name}`
 }
 
 function updateProfileCard() {
-    const profile = profiles[currentProfileIndex]
+    const profile = profiles[currentProfileIndex];
 
-    document.getElementById("profileImage").src = profile.image
-    document.getElementById("profileName").textContent = `${profile.name}, ${profile.age}`
-    document.getElementById("profileZodiac").textContent = profile.zodiac
-    document.getElementById("profileDistance").textContent = profile.distance
-    document.getElementById("profileBio").textContent = profile.bio
-    document.getElementById("compatibilityScore").textContent = profile.compatibility
+    if (!profile) return
 
-    // Update interests
-    const interestsContainer = document.getElementById("profileInterests")
-    interestsContainer.innerHTML = ""
+    const bioElement = document.getElementById("profileBio");
+    const toggleElement = document.getElementById("bioToggle");
+    setupBio(bioElement, toggleElement, profile.bio || "");
+
+    document.getElementById("profileName").textContent = `${profile.name}, ${profile.age}`;
+    document.getElementById("profileZodiac").textContent = getZodiacName(profile.sign, true);
+    document.getElementById("compatibilityScore").textContent = profile.compatibility;
+    document.getElementById("profileImage").src = profile.images[0];
+
+    const interestsContainer = document.getElementById("profileInterests");
+    interestsContainer.innerHTML = "";
     profile.interests.forEach((interest) => {
-        const tag = document.createElement("span")
-        tag.className = "interest-tag"
-        tag.textContent = interest
-        interestsContainer.appendChild(tag)
-    })
+        const tag = document.createElement("span");
+        tag.className = "interest-tag";
+        tag.textContent = interest;
+        interestsContainer.appendChild(tag);
+    });
 }
 
-function handleLike() {
+async function uploadProfilesData(page = 1) {
+    currentProfileIndex = 0;
+
+    const includes = "age,sign,bio,interests,images";
+    const response = await fetch(`/api/discover/users?page=${page}&includes=${includes}`);
+    if (!response.ok) showNotification("Помилка при отриманні профілів.", "error")
+
+    const data = await response.json();
+    hasNext = data.pagination.has_next;
+    profiles = data.users;
+
+}
+
+async function handleLike() {
     const profile = profiles[currentProfileIndex]
     likedProfiles.push(profile.id)
 
@@ -81,31 +89,83 @@ function handleLike() {
     card.style.transform = "translateX(100%) rotate(20deg)"
     card.style.opacity = "0"
 
-    setTimeout(() => {
-        nextProfile()
+    await likeUser();
+
+    setTimeout(async () => {
+        await nextProfile()
         card.style.transform = "translateX(0) rotate(0deg)"
         card.style.opacity = "1"
     }, 300)
 
     updateLikesCount()
-    showNotification("Вподобано! 💖", "success")
 }
 
-function handleReject() {
+async function handleReject() {
     const card = document.getElementById("profileCard")
     card.style.transform = "translateX(-100%) rotate(-20deg)"
     card.style.opacity = "0"
 
-    setTimeout(() => {
-        nextProfile()
+    await dislikeUser();
+
+    setTimeout(async () => {
+        await nextProfile()
         card.style.transform = "translateX(0) rotate(0deg)"
         card.style.opacity = "1"
     }, 300)
 }
 
-function nextProfile() {
-    currentProfileIndex = (currentProfileIndex + 1) % profiles.length
-    updateProfileCard()
+async function likeUser() {
+    const profile = profiles[currentProfileIndex];
+    const userId = profile.user_id;
+
+    const response = await fetch("/api/discover/like", {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({to_user_id: userId})
+    })
+
+    if (!response.ok) {
+        showNotification("Цей користувач уже був лайкнутий!")
+    }
+}
+
+async function dislikeUser() {
+    const profile = profiles[currentProfileIndex];
+    const userId = profile.user_id;
+
+    const response = await fetch("/api/discover/dislike", {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({to_user_id: userId})
+    })
+
+    if (!response.ok) {
+        showNotification("Цей користувач уже був дізлайкнутий!")
+    }
+}
+
+async function nextProfile() {
+    currentProfileIndex += 1;
+
+    console.log(currentProfileIndex)
+
+    if (currentProfileIndex >= profiles.length) {
+        if (!hasNext) {
+            showEmptyProfile();
+            return;
+        }
+
+        currentProfileIndex = 0;
+        currentPage += 1;
+        await uploadProfilesData();
+
+        if (profiles.length === 0) {
+            showEmptyProfile()
+            return;
+        }
+    }
+
+    updateProfileCard();
 }
 
 function updateLikesCount() {
@@ -116,20 +176,122 @@ function updateLikesCount() {
 }
 
 function setupKeyboardNavigation() {
-    document.addEventListener("keydown", (e) => {
-        switch (e.key) {
-            case "ArrowLeft":
-                handleReject()
-                break
-            case "ArrowRight":
-                handleLike()
-                break
-            case " ":
-                e.preventDefault()
-                handleLike()
-                break
+    let isProcessing = false;
+
+    document.addEventListener("keydown", async (e) => {
+        if (currentProfileIndex >= profiles.length) return
+
+        if (isProcessing) return;
+
+        if (["ArrowLeft", "ArrowRight", " "].includes(e.key)) {
+            e.preventDefault(); // блокуємо прокручування сторінки (особливо для Space)
+            isProcessing = true;
+
+
+            if (e.key === "ArrowLeft") {
+                await handleReject();
+            } else {
+                await handleLike();
+            }
+
+            // sleep-затримка 400 мс
+            setTimeout(() => {
+                isProcessing = false;
+            }, 400);
         }
-    })
+    });
+}
+
+
+function showEmptyProfile() {
+    const profileCard = document.getElementById("profileCard");
+    if (profileCard) {
+        profileCard.innerHTML = `
+            <div class="no-profiles-message">
+                <p>Нових людей за вашими вимогами не знайдено 🙁</p>
+            </div>
+            <div class="empty-buttons-section">
+                <button class="action-btn btn-outline like" id="refresh-btn">
+                    <i class="fas fa-refresh"></i>
+                </button>
+                <div class="empty-buttons">
+                    <button class="btn btn-primary" id="clear-likes-btn">Очистити лайки</button>
+                    <button class="btn btn-primary" id="clear-dislikes-btn">Очистити дизлайки</button>
+                </div>
+            </div>
+                
+        `;
+
+        const dislikesBtn = document.getElementById('clear-dislikes-btn');
+        const likesBtn = document.getElementById('clear-likes-btn');
+        const refreshBtn = document.getElementById('refresh-btn');
+
+        dislikesBtn.addEventListener('click', async () => {
+            const response = await fetch('/api/discover/clear-dislikes', {
+                method: "DELETE"
+            });
+            if (!response.ok) {
+                showNotification("Помилка при очищенні.", "error")
+                return
+            }
+            showNotification("Дизлайки очищещно!")
+        })
+
+        likesBtn.addEventListener('click', async () => {
+            const response = await fetch('/api/discover/clear-likes', {
+                method: "DELETE"
+            });
+            if (!response.ok) {
+                showNotification("Помилка при очищенні.", "error")
+                return
+            }
+            showNotification("Лайки очищено!")
+        })
+
+        refreshBtn.addEventListener('click', async () => {
+            await uploadProfilesData()
+
+            profileCard.innerHTML = `
+                <div class="profile-image">
+                    <img alt="Profile" id="profileImage">
+                    <div class="compatibility-badge">
+                        <i class="fas fa-star"></i>
+                        <span id="compatibilityScore">95</span>% сумісність
+                    </div>
+                </div>
+    
+                <div class="profile-info">
+                    <div class="profile-header">
+                        <h2 id="profileName"></h2>
+                        <div class="profile-details">
+                            <span id="profileZodiac"></span>
+                        </div>
+                    </div>
+    
+                    <p id="profileBio"></p>
+                    <span id="bioToggle" class="bio-toggle" style="display: none;">Далі...</span>
+    
+                    <div class="interests" id="profileInterests">
+                    </div>
+    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button class="action-btn reject" onclick="handleReject()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                        <button class="action-btn message">
+                            <i class="fas fa-comment"></i>
+                        </button>
+                        <button class="action-btn like" onclick="handleLike()">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            `
+            if (profiles.length === 0) showEmptyProfile()
+            updateProfileCard()
+        })
+    }
 }
 
 function setupTouchGestures() {
@@ -166,7 +328,7 @@ function setupTouchGestures() {
             }
         })
 
-        profileCard.addEventListener("touchend", function (e) {
+        profileCard.addEventListener("touchend", async function (e) {
             if (!isDragging) return
             isDragging = false
 
@@ -174,9 +336,9 @@ function setupTouchGestures() {
 
             if (Math.abs(deltaX) > 100) {
                 if (deltaX > 0) {
-                    handleLike()
+                    await handleLike()
                 } else {
-                    handleReject()
+                    await handleReject()
                 }
             } else {
                 // Snap back
@@ -264,95 +426,113 @@ function removeNotification(notification) {
 
 // Logout Function
 function setupLogoutModal() {
-  // Close modal when clicking outside
-  document.addEventListener("click", (event) => {
-    const modal = document.getElementById("logoutModal")
-    if (event.target === modal) {
-      hideLogoutModal()
-    }
-  })
+    // Close modal when clicking outside
+    document.addEventListener("click", (event) => {
+        const modal = document.getElementById("logoutModal")
+        if (event.target === modal) {
+            hideLogoutModal()
+        }
+    })
 
-  // Close modal with Escape key
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") {
-      const modal = document.getElementById("logoutModal")
-      if (modal && modal.classList.contains("show")) {
-        hideLogoutModal()
-      }
-    }
-  })
+    // Close modal with Escape key
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            const modal = document.getElementById("logoutModal")
+            if (modal && modal.classList.contains("show")) {
+                hideLogoutModal()
+            }
+        }
+    })
 }
 
 function showLogoutModal() {
-  const modal = document.getElementById("logoutModal")
-  modal.classList.add("show")
-  document.body.style.overflow = "hidden"
+    const modal = document.getElementById("logoutModal")
+    modal.classList.add("show")
+    document.body.style.overflow = "hidden"
 }
 
 function hideLogoutModal() {
-  const modal = document.getElementById("logoutModal")
-  modal.classList.remove("show")
-  document.body.style.overflow = ""
+    const modal = document.getElementById("logoutModal")
+    modal.classList.remove("show")
+    document.body.style.overflow = ""
 }
 
 async function confirmLogout() {
-  const confirmBtn = document.getElementById("confirmLogoutBtn")
-  const logoutText = confirmBtn.querySelector(".logout-text")
+    const confirmBtn = document.getElementById("confirmLogoutBtn")
+    const logoutText = confirmBtn.querySelector(".logout-text")
 
-  // Show loading state
-  confirmBtn.disabled = true
-  logoutText.innerHTML = `
+    // Show loading state
+    confirmBtn.disabled = true
+    logoutText.innerHTML = `
     <div class="logout-loading">
       <div class="logout-spinner"></div>
       Виходимо...
     </div>
-  `
+    `
 
-  try {
-    // Send logout request to backend
-    const response = await fetch("/api/auth/logout", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-      },
-      credentials: "include",
-    })
+    try {
+        const response = await fetch("/api/auth/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
+            },
+            credentials: "include",
+        })
 
-    if (response.ok) {
-      // Clear local storage
-      localStorage.removeItem("meetiacProfile")
-      localStorage.removeItem("userSession")
-      localStorage.removeItem("authToken")
+        if (response.ok) {
+            // Clear cookies if any
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
+            })
 
-      // Clear cookies if any
-      document.cookie.split(";").forEach((c) => {
-        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
-      })
+            // Show success message
+            showNotification("До побачення! 👋", "success")
 
-      // Show success message
-      showNotification("До побачення! 👋", "success")
+            // Hide modal and redirect
+            hideLogoutModal()
+            setTimeout(() => {
+                window.location.href = ""
+            }, 1500)
+        } else {
+            throw new Error("Logout failed")
+        }
+    } catch (error) {
+        console.error("Logout error:", error)
 
-      // Hide modal and redirect
-      hideLogoutModal()
-      setTimeout(() => {
-        window.location.href = ""
-      }, 1500)
-    } else {
-      throw new Error("Logout failed")
+        // Even if backend fails, clear local data and redirect
+        localStorage.removeItem("meetiacProfile")
+        localStorage.removeItem("userSession")
+        localStorage.removeItem("authToken")
+
+        showNotification("Сесію завершено локально", "warning")
+        hideLogoutModal()
+        setTimeout(() => {
+            window.location.href = ""
+        }, 1500)
     }
-  } catch (error) {
-    console.error("Logout error:", error)
-
-    // Even if backend fails, clear local data and redirect
-    localStorage.removeItem("meetiacProfile")
-    localStorage.removeItem("userSession")
-    localStorage.removeItem("authToken")
-
-    showNotification("Сесію завершено локально", "warning")
-    hideLogoutModal()
-    setTimeout(() => {
-      window.location.href = ""
-    }, 1500)
-  }
 }
+
+
+function setupBio(bioElement, toggleElement, fullText) {
+    bioElement.textContent = fullText;
+    bioElement.style.marginBottom = "25px";
+    toggleElement.style.display = "none";
+    toggleElement.textContent = "Далі...";
+    bioElement.classList.remove("expanded");
+
+    requestAnimationFrame(() => {
+        const isOverflowing = bioElement.scrollHeight > bioElement.clientHeight;
+
+        if (isOverflowing) {
+            bioElement.style.marginBottom = "0";
+            toggleElement.style.display = "inline-block";
+        }
+    });
+
+    toggleElement.onclick = () => {
+        const expanded = bioElement.classList.toggle("expanded");
+        toggleElement.textContent = expanded ? "Менше" : "Далі...";
+    };
+}
+

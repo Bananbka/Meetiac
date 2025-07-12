@@ -10,6 +10,21 @@ from app.utils.likes_utils import available_to_act
 discover_bp = Blueprint('discover', __name__)
 
 
+@discover_bp.route('/user', methods=['GET'])
+@login_required_api
+def get_user():
+    user_id = request.args.get('user_id')
+
+    if not user_id:
+        return api_error("User id was not specified.", 400)
+
+    includes = request.args.get('includes')
+    include_list = includes.split(',') if includes else None
+
+    user = User.query.filter_by(user_id=user_id).first_or_404()
+    return jsonify(user.to_dict(include_list))
+
+
 @discover_bp.route('/users', methods=['GET'])
 @login_required_api
 def discover():
@@ -19,9 +34,14 @@ def discover():
 
     prefs = PartnerPreference.query.filter_by(user_id=user.user_id).first()
 
+    liked_subquery = db.session.query(Like.to_user_id).filter(Like.from_user_id == user.user_id)
+    disliked_subquery = db.session.query(Dislike.to_user_id).filter(Dislike.from_user_id == user.user_id)
+
     query = User.query.filter(
         User.user_id != user.user_id,
-        User.is_active == True
+        User.is_active == True,
+        ~User.user_id.in_(liked_subquery),
+        ~User.user_id.in_(disliked_subquery)
     )
 
     if prefs:
@@ -72,14 +92,12 @@ def discover():
     pagination = query.order_by(sort_query).paginate(page=page, per_page=per_page, error_out=False)
     suitable_users = pagination.items
 
-    users_data = [{
-        "id": u.user_id,
-        "name": f"{u.first_name} {u.last_name}",
-        "age": today.year - u.birth_date.year,
-        "gender": u.gender_obj.name,
-        "sign": u.zodiac_sign.name
-        # ДОДАТИ ІНФУ ПРО ЗЗ І СУМІСНІСТЬ
-    } for u in suitable_users]
+    includes = request.args.get('includes')
+    include_list = includes.split(',') if includes else None
+
+    users_data = [u.to_dict(include_list) for u in suitable_users]
+
+    print(users_data)
 
     return jsonify({
         "users": users_data,
@@ -97,7 +115,7 @@ def discover():
 @discover_bp.route('/like', methods=['PUT'])
 @login_required_api
 def like():
-    user = dislike.cred.user
+    user = like.cred.user
 
     data = request.get_json()
     to_user_id = data.get('to_user_id')
@@ -145,6 +163,28 @@ def clear_votes():
 
     Like.query.filter_by(from_user_id=user.user_id).delete()
     Dislike.query.filter_by(from_user_id=user.user_id).delete()
+    db.session.commit()
+
+    return "ok"
+
+
+@discover_bp.route('/clear-dislikes', methods=['DELETE'])
+@login_required_api
+def clear_dislikes():
+    user = clear_dislikes.cred.user
+
+    Dislike.query.filter_by(from_user_id=user.user_id).delete()
+    db.session.commit()
+
+    return "ok"
+
+
+@discover_bp.route('/clear-likes', methods=['DELETE'])
+@login_required_api
+def clear_likes():
+    user = clear_likes.cred.user
+
+    Like.query.filter_by(from_user_id=user.user_id).delete()
     db.session.commit()
 
     return "ok"
