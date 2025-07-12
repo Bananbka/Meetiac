@@ -669,7 +669,7 @@ function hideLogoutModal() {
     document.body.style.overflow = ""
 }
 
-async function confirmLogout() {
+export async function confirmLogout() {
     const confirmBtn = document.getElementById("confirmLogoutBtn")
     const logoutText = confirmBtn.querySelector(".logout-text")
 
@@ -805,3 +805,4 @@ window.closeDeleteModal = closeDeleteModal
 window.confirmDeleteAccount = confirmDeleteAccount
 window.removePhoto = removePhoto
 window.showLogoutModal = showLogoutModal
+window.confirmLogout = confirmLogout
