@@ -1,6 +1,7 @@
 // Discover page functionality
 let currentProfileIndex = 0
 const likedProfiles = []
+let currentSortType = "default"
 
 // Sample profile data
 let profiles = [];
@@ -67,11 +68,11 @@ function updateProfileCard() {
     });
 }
 
-async function uploadProfilesData(page = 1) {
+async function uploadProfilesData(sorting = "-id") {
     currentProfileIndex = 0;
 
     const includes = "age,sign,bio,interests,images";
-    const response = await fetch(`/api/discover/users?page=${page}&includes=${includes}`);
+    const response = await fetch(`/api/discover/users?sort=${sorting}&includes=${includes}`);
     if (!response.ok) showNotification("Помилка при отриманні профілів.", "error")
 
     const data = await response.json();
@@ -536,3 +537,76 @@ function setupBio(bioElement, toggleElement, fullText) {
     };
 }
 
+
+async function handleSortChange() {
+    const sortSelect = document.getElementById("sortSelect")
+    const sortType = sortSelect.value
+    currentSortType = sortType
+
+    // Reset to first profile when sorting changes
+    currentProfileIndex = 0
+
+    // Apply sorting
+    switch (sortType) {
+        case "default":
+            await uploadProfilesData()
+            break
+        case "height-asc":
+            await uploadProfilesData("height")
+            break
+        case "height-desc":
+            await uploadProfilesData("-height")
+            break
+        case "weight-asc":
+            await uploadProfilesData("weight")
+            break
+        case "weight-desc":
+            await uploadProfilesData("-weight")
+            break
+        case "age-asc":
+            await uploadProfilesData("age")
+            break
+        case "age-desc":
+            await uploadProfilesData("-age")
+            break
+        case "shuffle":
+            await uploadProfilesData("shuffle")
+            break
+    }
+
+    updateProfileCard()
+    showNotification(`Сортування змінено: ${getSortDisplayName(sortType)}`, "info")
+}
+
+function shuffleArray(array) {
+    const shuffled = [...array]
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+    }
+    return shuffled
+}
+
+function getSortDisplayName(sortType) {
+    const sortNames = {
+        default: "Звичайне",
+        "height-asc": "По росту ↑",
+        "height-desc": "По росту ↓",
+        "weight-asc": "По вазі ↑",
+        "weight-desc": "По вазі ↓",
+        "age-asc": "По віку ↑",
+        "age-desc": "По віку ↓",
+        shuffle: "Перемішано",
+    }
+    return sortNames[sortType] || "Невідомо"
+}
+
+function resetSort() {
+    const sortSelect = document.getElementById("sortSelect")
+    sortSelect.value = "default"
+    currentSortType = "default"
+    currentProfileIndex = 0
+    profiles = [...profiles]
+    updateProfileCard()
+    showNotification("Сортування скинуто", "success")
+}

@@ -58,7 +58,7 @@
 
             <div class="profile-info">
                 <div class="profile-header">
-                    <h2 id="profileName"></h2>
+                    <h2 id="profileName">z</h2>
                     <div class="profile-details">
                         <span id="profileZodiac"></span>
                     </div>
@@ -95,10 +95,6 @@
                 <div class="stat-number">3</div>
                 <div class="stat-label">Збіги</div>
             </div>
-            <div class="stat-card">
-                <div class="stat-number">12</div>
-                <div class="stat-label">Повідомлення</div>
-            </div>
         </div>
 
         <!-- Tips -->
@@ -108,6 +104,31 @@
                 <span>Зоряна порада</span>
             </div>
             <p>Леви та Стрільці мають високу сумісність! Ваші енергії доповнюють одна одну.</p>
+        </div>
+    </div>
+
+    <div class="container discover-container">
+        <!-- Sort Selector -->
+        <div class="sort-section">
+            <div class="sort-header">
+                <i class="fas fa-sort"></i>
+                <span>Сортування</span>
+            </div>
+            <div class="sort-controls">
+                <select id="sortSelect" class="sort-select" onchange="handleSortChange()">
+                    <option value="default">Звичайне</option>
+                    <option value="height-asc">По росту ↑</option>
+                    <option value="height-desc">По росту ↓</option>
+                    <option value="weight-asc">По вазі ↑</option>
+                    <option value="weight-desc">По вазі ↓</option>
+                    <option value="age-asc">По віку ↑</option>
+                    <option value="age-desc">По віку ↓</option>
+                    <option value="shuffle">Перемішати</option>
+                </select>
+                <button class="sort-reset-btn" onclick="resetSort()" title="Скинути сортування">
+                    <i class="fas fa-undo"></i>
+                </button>
+            </div>
         </div>
     </div>
 

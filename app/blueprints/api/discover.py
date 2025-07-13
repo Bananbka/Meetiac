@@ -1,6 +1,7 @@
 ﻿from datetime import date
 
 from flask import Blueprint, jsonify, request
+from sqlalchemy import func
 
 from app import db
 from app.models import PartnerPreference, User, Like, Dislike
@@ -84,6 +85,8 @@ def discover():
         sort_query = User.birth_date.asc() if is_desc else User.birth_date.desc()  # реверс через дати
     elif sort_by == "id":
         sort_query = User.user_id.desc() if is_desc else User.user_id.asc()
+    elif sort_by == "shuffle":
+        sort_query = func.random()
     else:
         sort_query = User.user_id.desc() if is_desc else User.user_id.asc()
 
