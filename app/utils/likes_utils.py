@@ -1,4 +1,4 @@
-﻿from app.models import Like, Dislike
+﻿from app.models import Like, Dislike, User
 
 
 def is_liked(from_user_id, to_user_id):

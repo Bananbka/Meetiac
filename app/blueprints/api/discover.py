@@ -4,7 +4,7 @@ from flask import Blueprint, jsonify, request
 from sqlalchemy import func
 
 from app import db
-from app.models import PartnerPreference, User, Like, Dislike
+from app.models import PartnerPreference, User, Like, Dislike, Match
 from app.utils.access_utils import login_required_api, api_error
 from app.utils.likes_utils import available_to_act
 
@@ -74,21 +74,7 @@ def discover():
             query = query.filter(User.sign_id.in_(zodiac_ids))
 
     sort = request.args.get("sort", "-id", type=str)
-    is_desc = sort.startswith("-")
-    sort_by = sort[1:] if is_desc else sort
-
-    if sort_by == "height":
-        sort_query = User.height.desc() if is_desc else User.height.asc()
-    elif sort_by == "weight":
-        sort_query = User.weight.desc() if is_desc else User.weight.asc()
-    elif sort_by == "age":
-        sort_query = User.birth_date.asc() if is_desc else User.birth_date.desc()  # реверс через дати
-    elif sort_by == "id":
-        sort_query = User.user_id.desc() if is_desc else User.user_id.asc()
-    elif sort_by == "shuffle":
-        sort_query = func.random()
-    else:
-        sort_query = User.user_id.desc() if is_desc else User.user_id.asc()
+    sort_query = User.get_user_sort_query(sort)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
@@ -99,8 +85,6 @@ def discover():
     include_list = includes.split(',') if includes else None
 
     users_data = [u.to_dict(include_list) for u in suitable_users]
-
-    print(users_data)
 
     return jsonify({
         "users": users_data,
@@ -130,6 +114,14 @@ def like():
         from_user_id=user.user_id,
         to_user_id=to_user_id
     )
+
+    reply_like = Like.query.filter_by(from_user_id=to_user_id, to_user_id=user.user_id).first()
+    if reply_like:
+        new_match = Match(
+            user1_id=to_user_id,
+            user2_id=user.user_id,
+        )
+        db.session.add(new_match)
 
     db.session.add(new_like)
     db.session.commit()

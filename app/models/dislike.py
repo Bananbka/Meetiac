@@ -1,4 +1,4 @@
-﻿from app import db
+﻿from app.database import db
 
 
 class Dislike(db.Model):
@@ -11,3 +11,12 @@ class Dislike(db.Model):
 
     from_user = db.relationship('User', foreign_keys=[from_user_id])
     to_user = db.relationship('User', foreign_keys=[to_user_id])
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'created_at': self.created_at,
+            'from_user_id': self.from_user_id,
+            'to_user_id': self.to_user_id,
+            'to_user': self.to_user.to_dict(['images']),
+        }
