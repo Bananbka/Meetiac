@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профіль користувача - Meetiac</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user-profile.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<!-- Floating Background Elements -->
+<div class="floating-hearts">
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+</div>
+
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Профіль</h1>
+            <div class="header-actions">
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Завантаження профілю...</p>
+    </div>
+
+    <!-- User Profile Content -->
+    <main class="profile-content" id="profileContent">
+        <!-- Photo Gallery -->
+        <section class="photo-gallery">
+            <div class="photo-container">
+                <div class="photo-slider" id="photoSlider">
+                    <!-- Photos will be loaded dynamically -->
+                    <div class="photo-slide"
+                         style="background-image: url('/static/uploads/blank.jpg');"></div>
+                    <div class="photo-slide"
+                         style="background-image: url('/static/uploads/blank.jpg');"></div>
+                    <div class="photo-slide"
+                         style="background-image: url('/static/uploads/blank.jpg');"></div>
+                </div>
+                <div class="photo-indicators" id="photoIndicators">
+                    <!-- Indicators will be generated dynamically -->
+                </div>
+                <button class="photo-nav prev" onclick="previousPhoto()">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="photo-nav next" onclick="nextPhoto()">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </section>
+
+        <div class="info-wrapper">
+            <!-- Detailed Info -->
+            <section class="detailed-info">
+                <!-- Bio -->
+                <div class="info-card">
+                    <h2 id="userName">Ім'я Користувача</h2>
+                    <span class="age" id="userAge">0</span>
+                </div>
+                <div class="info-card">
+
+                    <h3><i class="fas fa-user"></i> Про себе</h3>
+                    <p id="userBio">Привіт! Я люблю подорожувати, читати книги та проводити час на природі. Шукаю
+                        цікавих
+                        людей для спілкування та, можливо, чогось більшого.</p>
+                </div>
+
+                <div class="card-grid">
+                    <!-- Physical Info -->
+                    <div class="info-card">
+                        <h3><i class="fas fa-ruler"></i> Фізичні дані</h3>
+                        <div class="physical-info">
+                            <div class="info-item">
+                                <span class="label">Зріст:</span>
+                                <span id="userHeight">170 см</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Вага:</span>
+                                <span id="userWeight">60 кг</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="label">Стать:</span>
+                                <span id="userGender">Жінка</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interests -->
+                    <div class="info-card">
+                        <h3><i class="fas fa-heart"></i> Інтереси</h3>
+                        <div class="interests-grid" id="userInterests">
+                            <span class="interest-tag">Подорожі</span>
+                            <span class="interest-tag">Книги</span>
+                            <span class="interest-tag">Природа</span>
+                            <span class="interest-tag">Кулінарія</span>
+                            <span class="interest-tag">Музика</span>
+                        </div>
+                    </div>
+
+                    <!-- Zodiac -->
+                <div class="info-card">
+                    <h3><i class="fas fa-star-of-david"></i> Астрологія</h3>
+                    <div class="zodiac-info">
+                        <div class="zodiac-sign" id="userZodiac">
+                            <i class="fas fa-gemini"></i>
+                            <span>Близнюки</span>
+                        </div>
+                        <div class="compatibility" id="compatibility">
+                            <span class="compatibility-label">Сумісність:</span>
+                            <div class="compatibility-bar">
+                                <div class="compatibility-fill" style="width: 75%"></div>
+                            </div>
+                            <span class="compatibility-percent">75%</span>
+                        </div>
+                    </div>
+                </div>
+                </div>
+
+
+
+
+            </section>
+        </div>
+
+    </main>
+
+</div>
+
+<script src="{{ url_for('static', filename='js/user-profile.js') }}"></script>
+</body>
+</html>

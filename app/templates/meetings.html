@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Зустрічі - Meetiac</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/meetings.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<!-- Floating Background Elements -->
+<div class="floating-hearts">
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+</div>
+
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Зустрічі</h1>
+            <div class="header-actions">
+                <button class="calendar-btn" onclick="toggleCalendarView()">
+                    <i class="fas fa-calendar-alt"></i>
+                </button>
+                <button class="add-btn" onclick="showAddMeeting()">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-tab="upcoming" onclick="switchTab('upcoming')">
+            <i class="fas fa-clock"></i>
+            <span>Майбутні</span>
+            <div class="badge" id="upcomingBadge">2</div>
+        </button>
+        <button class="tab-btn" data-tab="past" onclick="switchTab('past')">
+            <i class="fas fa-history"></i>
+            <span>Минулі</span>
+            <div class="badge" id="pastBadge">1</div>
+        </button>
+        <button class="tab-btn" data-tab="pending" onclick="switchTab('pending')">
+            <i class="fas fa-hourglass-half"></i>
+            <span>Очікують</span>
+            <div class="badge" id="pendingBadge">1</div>
+        </button>
+    </div>
+
+    <!-- Calendar View -->
+    <div class="calendar-view" id="calendarView" style="display: none;">
+        <div class="calendar-header">
+            <button class="calendar-nav" onclick="previousMonth()">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <h3 id="calendarMonth">Січень 2024</h3>
+            <button class="calendar-nav" onclick="nextMonth()">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </div>
+        <div class="calendar-grid" id="calendarGrid">
+            <!-- Calendar will be generated dynamically -->
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Завантаження зустрічей...</p>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+        <!-- Upcoming Meetings Tab -->
+        <div class="tab-content active" id="upcomingTab">
+            <div class="meetings-list" id="upcomingMeetings">
+                <!-- Meetings will be loaded dynamically -->
+            </div>
+            <div class="empty-state" id="upcomingEmpty" style="display: none;">
+                <i class="fas fa-calendar-plus"></i>
+                <h3>Немає запланованих зустрічей</h3>
+                <p>Запросіть когось на побачення!</p>
+                <button class="btn btn-primary" onclick="goToMatches()">Переглянути збіги</button>
+            </div>
+        </div>
+
+        <!-- Past Meetings Tab -->
+        <div class="tab-content" id="pastTab">
+            <div class="meetings-list" id="pastMeetings">
+                <!-- Past meetings will be loaded dynamically -->
+            </div>
+            <div class="empty-state" id="pastEmpty" style="display: none;">
+                <i class="fas fa-history"></i>
+                <h3>Немає минулих зустрічей</h3>
+                <p>Ваші завершені зустрічі з'являться тут</p>
+            </div>
+        </div>
+
+        <!-- Pending Meetings Tab -->
+        <div class="tab-content" id="pendingTab">
+            <div class="meetings-list" id="pendingMeetings">
+                <!-- Pending meetings will be loaded dynamically -->
+            </div>
+            <div class="empty-state" id="pendingEmpty" style="display: none;">
+                <i class="fas fa-hourglass-half"></i>
+                <h3>Немає запитів на зустрічі</h3>
+                <p>Запити на зустрічі з'являться тут</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Meeting Modal -->
+    <div class="modal" id="addMeetingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Запросити на зустріч</h3>
+                <button class="close-btn" onclick="closeAddMeeting()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="meeting-form" onsubmit="submitMeeting(event)">
+                <div class="form-group">
+                    <label>Хто:</label>
+                    <select id="meetingPerson" required>
+                        <option value="">Оберіть особу</option>
+                        <!-- Options will be loaded dynamically -->
+                        <option value="userA">Олена</option>
+                        <option value="userB">Дмитро</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Дата:</label>
+                    <input type="date" id="meetingDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Час:</label>
+                    <input type="time" id="meetingTime" required>
+                </div>
+                <div class="form-group">
+                    <label>Місце:</label>
+                    <input type="text" id="meetingPlace" placeholder="Назва місця або адреса" required>
+                </div>
+                <div class="form-group">
+                    <label>Повідомлення (необов'язково):</label>
+                    <textarea id="meetingMessage" placeholder="Додайте повідомлення до запрошення..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeAddMeeting()">Скасувати</button>
+                    <button type="submit" class="btn btn-primary">Відправити запрошення</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/meetings.js') }}"></script>
+</body>
+</html>

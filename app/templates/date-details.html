@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Деталі зустрічі - Meetiac</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/date-details.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+<body>
+<!-- Floating Background Elements -->
+<div class="floating-hearts">
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+</div>
+
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Деталі зустрічі</h1>
+            <div class="header-actions">
+                <button class="share-btn" onclick="shareMeeting()">
+                    <i class="fas fa-share"></i>
+                </button>
+                <button class="edit-btn" onclick="editMeeting()" id="editBtn" style="display: none;">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Завантаження деталей зустрічі...</p>
+    </div>
+
+    <!-- Content -->
+    <main class="content" id="meetingContent">
+        <!-- Meeting Header -->
+        <section class="meeting-header">
+            <div class="meeting-status-badge" id="statusBadge">
+                <i class="fas fa-clock"></i>
+                <span>Очікує підтвердження</span>
+            </div>
+
+            <div class="meeting-participants">
+                <div class="participant">
+                    <div class="participant-avatar" id="myAvatar">
+                        <img src="/placeholder.svg?height=60&width=60&text=Me" alt="Я">
+                    </div>
+                    <span class="participant-name">Ви</span>
+                </div>
+
+                <div class="meeting-heart">
+                    <i class="fas fa-heart"></i>
+                </div>
+
+                <div class="participant">
+                    <div class="participant-avatar" id="partnerAvatar">
+                        <img src="/placeholder.svg?height=60&width=60&text=Partner" alt="Партнер">
+                    </div>
+                    <span class="participant-name" id="partnerName">Завантаження...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Meeting Details -->
+        <section class="meeting-details">
+            <div class="detail-card">
+                <div class="detail-header">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>Дата та час</h3>
+                </div>
+                <div class="detail-content">
+                    <div class="date-time">
+                        <div class="date" id="meetingDate">Завантаження...</div>
+                        <div class="time" id="meetingTime">--:--</div>
+                    </div>
+                    <div class="countdown" id="countdown">
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="days">0</span>
+                            <span class="countdown-label">днів</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="hours">0</span>
+                            <span class="countdown-label">годин</span>
+                        </div>
+                        <div class="countdown-item">
+                            <span class="countdown-number" id="minutes">0</span>
+                            <span class="countdown-label">хвилин</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-card">
+                <div class="detail-header">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <h3>Місце зустрічі</h3>
+                </div>
+                <div class="detail-content">
+                    <div class="location-info">
+                        <div class="place-name" id="placeName">Завантаження...</div>
+                        <div class="place-address" id="placeAddress">Завантаження адреси...</div>
+                        <div class="place-actions">
+                            <button class="action-btn" onclick="openInMaps()">
+                                <i class="fas fa-directions"></i>
+                                Маршрут
+                            </button>
+                            <button class="action-btn" onclick="callPlace()">
+                                <i class="fas fa-phone"></i>
+                                Телефон
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <i class="fas fa-map"></i>
+                    <h3>Карта</h3>
+                    <button class="map-toggle" onclick="toggleMapSize()">
+                        <i class="fas fa-expand"></i>
+                    </button>
+                </div>
+                <div class="map-container">
+                    <div id="map" class="map"></div>
+                    <div class="map-overlay" id="mapOverlay">
+                        <div class="map-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Завантаження карти...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Message -->
+            <div class="detail-card" id="messageCard" style="display: none;">
+                <div class="detail-header">
+                    <i class="fas fa-comment"></i>
+                    <h3>Повідомлення</h3>
+                </div>
+                <div class="detail-content">
+                    <div class="message-content" id="messageContent">
+                        <!-- Message will be loaded dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Weather -->
+            <div class="detail-card">
+                <div class="detail-header">
+                    <i class="fas fa-cloud-sun"></i>
+                    <h3>Погода</h3>
+                </div>
+                <div class="detail-content">
+                    <div class="weather-info" id="weatherInfo">
+                        <div class="weather-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Завантаження прогнозу...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Actions -->
+        <section class="meeting-actions" id="meetingActions">
+            <!-- Actions will be loaded dynamically based on meeting status -->
+        </section>
+    </main>
+
+    <!-- Edit Meeting Modal -->
+    <div class="modal" id="editMeetingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Редагувати зустріч</h3>
+                <button class="close-btn" onclick="closeEditMeeting()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form class="meeting-form" onsubmit="updateMeeting(event)">
+                <div class="form-group">
+                    <label>Дата:</label>
+                    <input type="date" id="editDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Час:</label>
+                    <input type="time" id="editTime" required>
+                </div>
+                <div class="form-group">
+                    <label>Місце:</label>
+                    <input type="text" id="editPlace" placeholder="Назва місця або адреса" required>
+                </div>
+                <div class="form-group">
+                    <label>Повідомлення (необов'язково):</label>
+                    <textarea id="editMessage" placeholder="Додайте повідомлення..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="closeEditMeeting()">Скасувати</button>
+                    <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="confirmTitle">Підтвердження</h3>
+                <button class="close-btn" onclick="closeConfirmModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage">Ви впевнені?</p>
+            </div>
+            <div class="form-actions">
+                <button class="btn btn-outline" onclick="closeConfirmModal()">Скасувати</button>
+                <button class="btn btn-primary" id="confirmBtn" onclick="confirmAction()">Підтвердити</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="{{ url_for('static', filename='js/date-details.js') }}"></script>
+</body>
+</html>

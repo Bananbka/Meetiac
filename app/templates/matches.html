@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Збіги - Meetiac</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/matches.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+<!-- Floating Background Elements -->
+<div class="floating-hearts">
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+    <div class="floating-heart">✨</div>
+    <div class="floating-heart">💫</div>
+    <div class="floating-heart">⭐</div>
+    <div class="floating-heart">💖</div>
+</div>
+
+<div class="page-wrapper">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <h1>Збіги</h1>
+            <div class="header-actions">
+                <button class="search-btn" onclick="toggleSearch()">
+                    <i class="fas fa-search"></i>
+                </button>
+                <button class="filter-btn" onclick="toggleFilter()">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Bar -->
+    <div class="search-bar" id="searchBar">
+        <div class="search-input-container">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Пошук збігів..." onkeyup="searchMatches()">
+            <button class="clear-search" onclick="clearSearch()" style="display: none;">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel" id="filterPanel">
+        <div class="filter-content">
+            <h3>Фільтри збігів</h3>
+            <div class="filter-group">
+                <label>Сортування:</label>
+                <select id="sortSelect">
+                    <option value="newest">Найновіші</option>
+                    <option value="oldest">Найстаріші</option>
+                    <option value="activity">За активністю</option>
+                    <option value="distance">За відстанню</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Статус чату:</label>
+                <select id="chatStatusSelect">
+                    <option value="all">Всі</option>
+                    <option value="active">Активні</option>
+                    <option value="new">Нові</option>
+                    <option value="inactive">Неактивні</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Онлайн статус:</label>
+                <select id="onlineStatusSelect">
+                    <option value="all">Всі</option>
+                    <option value="online">Онлайн</option>
+                    <option value="recent">Нещодавно</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-outline" onclick="resetFilters()">Скинути</button>
+                <button class="btn btn-primary" onclick="applyFilters()">Застосувати</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <p>Завантаження збігів...</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <span class="stat-number" id="totalMatches">0</span>
+            <span class="stat-label">Збігів</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="newMatches">0</span>
+            <span class="stat-label">Нових</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-number" id="activeChats">0</span>
+            <span class="stat-label">Активних</span>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <main class="content">
+        <div class="matches-list" id="matchesList">
+            <!-- Matches will be loaded dynamically -->
+        </div>
+
+        <div class="empty-state" id="emptyState" style="display: none;">
+            <i class="fas fa-heart-broken"></i>
+            <h3>Поки що немає збігів</h3>
+            <p>Продовжуйте лайкати профілі, щоб знайти свою половинку!</p>
+            <button class="btn btn-primary" onclick="goToDiscover()">Почати пошук</button>
+        </div>
+    </main>
+
+    <!-- Load More Button -->
+    <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+        <button class="btn btn-outline" id="loadMoreBtn" onclick="loadMore()">
+            <span class="load-more-text">Завантажити ще</span>
+            <div class="load-more-spinner" style="display: none;"></div>
+        </button>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/matches.js') }}"></script>
+</body>
+</html>
