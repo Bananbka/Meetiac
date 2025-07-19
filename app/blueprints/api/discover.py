@@ -183,3 +183,12 @@ def clear_likes():
     db.session.commit()
 
     return "ok"
+
+
+@discover_bp.route('/clear-like/<int:like_id>', methods=['DELETE'])
+@login_required_api
+def clear_like(like_id):
+    Like.query.filter_by(id=like_id).delete()
+    db.session.commit()
+
+    return "ok"

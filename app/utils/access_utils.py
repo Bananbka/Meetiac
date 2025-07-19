@@ -17,7 +17,6 @@ def login_required_api(f):
             return jsonify({"status": 'error', 'message': 'User don\'t exists'}), 404
 
         decorated_function.cred = cred
-
         return f(*args, **kwargs)
 
     return decorated_function
@@ -26,8 +25,15 @@ def login_required_api(f):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'email' not in session:
+        user_email = session.get('email')
+        if not user_email:
             return redirect('/auth')
+
+        cred = Credentials.query.filter_by(login=user_email).first()
+        if not cred:
+            return redirect('/auth')
+
+        decorated_function.cred = cred
         return f(*args, **kwargs)
 
     return decorated_function

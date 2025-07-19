@@ -43,7 +43,6 @@ class User(db.Model):
             "user_id": self.user_id,
             "name": f"{self.first_name} {self.last_name}"
         }
-
         if "birth_date" in fields:
             data["birth_date"] = self.birth_date.isoformat() if self.birth_date else None
 

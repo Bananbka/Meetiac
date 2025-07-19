@@ -24,11 +24,15 @@ def create_app():
     from app.blueprints.api.zodiac import zodiac_bp
     from app.blueprints.api.discover import discover_bp
 
+    from app.blueprints.api.repositories.user_controller import user_bp
+
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
     app.register_blueprint(profile_bp, url_prefix='/api/profile')
     app.register_blueprint(zodiac_bp, url_prefix='/api/zodiac')
     app.register_blueprint(discover_bp, url_prefix='/api/discover')
     app.register_blueprint(reaction_bp, url_prefix='/api/reactions')
+
+    app.register_blueprint(user_bp, url_prefix='/api/user')
 
     return app
