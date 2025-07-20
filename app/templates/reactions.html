@@ -40,10 +40,15 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" data-tab="sent" onclick="switchTab('sent')">
+        <button class="tab-btn active" data-tab="likes" onclick="switchTab('likes')">
             <i class="fas fa-heart"></i>
-            <span>Відправлені лайки</span>
-            <div class="badge" id="sentBadge">0</div>
+            <span>Лайки</span>
+            <div class="badge" id="likesBadge">0</div>
+        </button>
+        <button class="tab-btn active" data-tab="dislikes" onclick="switchTab('dislikes')">
+            <i class="fas fa-heart-crack"></i>
+            <span>Дизайки</span>
+            <div class="badge" id="dislikesBadge">0</div>
         </button>
     </div>
 
@@ -78,16 +83,16 @@
     <!-- Loading State -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner"></div>
-        <p>Завантаження лайків...</p>
+        <p>Завантаження реакцій...</p>
     </div>
 
     <!-- Content -->
     <main class="content">
-        <!-- Sent Likes Tab -->
-        <div class="likes-grid" id="sentLikes">
+        <!-- Likes Likes Tab -->
+        <div class="likes-grid" id="likesLikes">
             <!-- Likes will be loaded dynamically -->
         </div>
-        <div class="empty-state" id="sentEmpty" style="display: none;">
+        <div class="empty-state" id="likesEmpty" style="display: none;">
             <i class="fas fa-search"></i>
             <h3>Ви ще нікого не лайкали</h3>
             <p>Почніть шукати цікавих людей!</p>
@@ -101,8 +106,8 @@
             <span class="load-more-text">Завантажити ще</span>
             <div class="load-more-spinner" style="display: none;"></div>
         </button>
-        <button class="btn btn-outline" id="clearLikesBtn" onclick="clearLikes()">
-            <span class="load-more-text">Видалити лайки</span>
+        <button class="btn btn-outline" id="clearLikesBtn" onclick="clearAll()">
+            <span class="load-more-text">Очистити</span>
             <div class="load-more-spinner" style="display: none;"></div>
         </button>
     </div>

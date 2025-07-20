@@ -280,9 +280,7 @@ function showEmptyProfile() {
                         <button class="action-btn reject" onclick="handleReject()">
                             <i class="fas fa-times"></i>
                         </button>
-                        <button class="action-btn message">
-                            <i class="fas fa-comment"></i>
-                        </button>
+
                         <button class="action-btn like" onclick="handleLike()">
                             <i class="fas fa-heart"></i>
                         </button>

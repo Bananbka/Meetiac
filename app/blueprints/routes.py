@@ -34,16 +34,10 @@ def profile():
     return render_template('profile.html')
 
 
-@pages_bp.route('/likes', methods=['GET'])
+@pages_bp.route('/reactions', methods=['GET'])
 @login_required
 def user_likes():
-    return render_template('likes.html')
-
-
-@pages_bp.route('/dislikes', methods=['GET'])
-@login_required
-def user_dislikes():
-    return render_template('dislikes.html')
+    return render_template('reactions.html')
 
 
 @pages_bp.route('/matches', methods=['GET'])

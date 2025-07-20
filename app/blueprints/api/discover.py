@@ -192,3 +192,28 @@ def clear_like(like_id):
     db.session.commit()
 
     return "ok"
+
+
+@discover_bp.route('/clear-dislike/<int:dislike_id>', methods=['DELETE'])
+@login_required_api
+def clear_dislike(dislike_id):
+    Dislike.query.filter_by(id=dislike_id).delete()
+    db.session.commit()
+
+    return "ok"
+
+
+@discover_bp.route('/like-count', methods=['GET'])
+@login_required_api
+def like_count():
+    user = like_count.cred.user
+    likes = Like.query.filter_by(from_user_id=user.user_id).all()
+    return str(len(likes))
+
+
+@discover_bp.route('/dislike-count', methods=['GET'])
+@login_required_api
+def dislike_count():
+    user = dislike_count.cred.user
+    dislikes = Dislike.query.filter_by(from_user_id=user.user_id).all()
+    return str(len(dislikes))
