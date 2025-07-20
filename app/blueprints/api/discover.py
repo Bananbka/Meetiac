@@ -1,29 +1,14 @@
 ﻿from datetime import date
 
 from flask import Blueprint, jsonify, request
-from sqlalchemy import func
+from sqlalchemy import func, desc, case
 
 from app import db
-from app.models import PartnerPreference, User, Like, Dislike, Match
+from app.models import PartnerPreference, User, Like, Dislike, Match, Interest, UserInterest
 from app.utils.access_utils import login_required_api, api_error
 from app.utils.likes_utils import available_to_act
 
 discover_bp = Blueprint('discover', __name__)
-
-
-@discover_bp.route('/user', methods=['GET'])
-@login_required_api
-def get_user():
-    user_id = request.args.get('user_id')
-
-    if not user_id:
-        return api_error("User id was not specified.", 400)
-
-    includes = request.args.get('includes')
-    include_list = includes.split(',') if includes else None
-
-    user = User.query.filter_by(user_id=user_id).first_or_404()
-    return jsonify(user.to_dict(include_list))
 
 
 @discover_bp.route('/users', methods=['GET'])
@@ -44,6 +29,8 @@ def discover():
         ~User.user_id.in_(liked_subquery),
         ~User.user_id.in_(disliked_subquery)
     )
+
+    print(prefs)
 
     if prefs:
         if prefs.gender_obj.name != "any":
@@ -73,6 +60,23 @@ def discover():
             zodiac_ids = [z.sign_id for z in prefs.zodiac_signs]
             query = query.filter(User.sign_id.in_(zodiac_ids))
 
+        if prefs.interests:
+            interest_ids = [i.interest_id for i in prefs.interests]
+
+            match_case = case(
+                (Interest.interest_id.in_(interest_ids), 1),
+                else_=0
+            )
+
+            query = (
+                query
+                .outerjoin(UserInterest, User.user_id == UserInterest.user_id)
+                .outerjoin(Interest, Interest.interest_id == UserInterest.interest_id)
+                .group_by(User.user_id)
+                .add_columns(func.sum(match_case).label("match_count"))
+                .order_by(desc("match_count"))
+            )
+
     sort = request.args.get("sort", "-id", type=str)
     sort_query = User.get_user_sort_query(sort)
 
@@ -84,7 +88,9 @@ def discover():
     includes = request.args.get('includes')
     include_list = includes.split(',') if includes else None
 
-    users_data = [u.to_dict(include_list) for u in suitable_users]
+    print(suitable_users)
+
+    users_data = [(u[0] if prefs else u).to_dict(include_list) for u in suitable_users]
 
     return jsonify({
         "users": users_data,
@@ -126,7 +132,10 @@ def like():
     db.session.add(new_like)
     db.session.commit()
 
-    return "ok"
+    return jsonify({
+        "status": "ok",
+        "match": True if reply_like else False
+    })
 
 
 @discover_bp.route('/dislike', methods=['PUT'])

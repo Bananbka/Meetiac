@@ -296,10 +296,8 @@ async function saveProfile() {
         });
 
         const result = await res.json();
-        alert(result.message || 'Зміни збережено!');
     } catch (err) {
         console.error('Upload error:', err);
-        alert('Сталася помилка при збереженні');
     }
 
     setTimeout(() => {
@@ -737,7 +735,7 @@ async function setupProfileData() {
         document.getElementById("profile-height").value = data.height;
         document.getElementById("profile-weight").value = data.weight;
         document.getElementById("profile-bio").value = data.bio;
-        document.getElementById("bioCharCount").innerText = data.bio.length;
+        document.getElementById("bioCharCount").innerText = (data.bio || "").length;
         selectedInterests = data.interests
         await setupInterestsGrid()
         await loadProfilePhotos();
@@ -757,13 +755,13 @@ async function setupPreferencesData() {
         document.getElementById("max-weight").value = data.max_weight;
         document.getElementById("looking-for").value = data.gender;
 
-        const selectedZodiacs = data.zodiacs;
+        const selectedZodiacs = data.zodiacs || [];
         const selector = document.getElementById("preferred-zodiacs");
         Array.from(selector.options).forEach(option => {
             option.selected = selectedZodiacs.includes(option.value);
         });
 
-        selectedPrefInterests = data.interests;
+        selectedPrefInterests = data.interests || [];
         console.log(data.interests)
 
         await setupPrefInterestsGrid();

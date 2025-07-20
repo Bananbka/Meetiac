@@ -17,6 +17,7 @@ async function initDiscoverPage() {
     if (profiles.length === 0) showEmptyProfile()
     updateProfileCard()
     updateLikesCount()
+    updateMatchesCount()
     setupKeyboardNavigation()
     setupTouchGestures()
     setupLogoutModal()
@@ -99,6 +100,7 @@ async function handleLike() {
     }, 300)
 
     updateLikesCount()
+    updateMatchesCount()
 }
 
 async function handleReject() {
@@ -128,6 +130,13 @@ async function likeUser() {
     if (!response.ok) {
         showNotification("Цей користувач уже був лайкнутий!")
     }
+
+    const data = await response.json();
+
+    if (data.match) {
+        playMatchAnimation()
+
+    }
 }
 
 async function dislikeUser() {
@@ -148,8 +157,6 @@ async function dislikeUser() {
 async function nextProfile() {
     currentProfileIndex += 1;
 
-    console.log(currentProfileIndex)
-
     if (currentProfileIndex >= profiles.length) {
         if (!hasNext) {
             showEmptyProfile();
@@ -169,10 +176,21 @@ async function nextProfile() {
     updateProfileCard();
 }
 
-function updateLikesCount() {
+async function updateLikesCount() {
     const likesElement = document.getElementById("likesCount")
+    const likeResponse = await fetch(`/api/discover/like-count`)
+    const likeData = await likeResponse.json()
     if (likesElement) {
-        likesElement.textContent = likedProfiles.length
+        likesElement.textContent = likeData || 0
+    }
+}
+
+async function updateMatchesCount() {
+    const matchesElement = document.getElementById("matchesCount")
+    const matchesResponse = await fetch(`/api/match/count`)
+    const matchesData = await matchesResponse.json()
+    if (matchesElement) {
+        matchesElement.textContent = matchesData || 0
     }
 }
 
@@ -607,4 +625,47 @@ function resetSort() {
     profiles = [...profiles]
     updateProfileCard()
     showNotification("Сортування скинуто", "success")
+}
+
+function playMatchAnimation() {
+    // Перевірка чи вже існує, щоб не дублювати
+    if (document.getElementById("matchAnimationOverlay")) return;
+
+    // Створюємо оверлей
+    const overlay = document.createElement("div");
+    overlay.id = "matchAnimationOverlay";
+    overlay.style.position = "fixed";
+    overlay.style.top = 0;
+    overlay.style.left = 0;
+    overlay.style.width = "100vw";
+    overlay.style.height = "100vh";
+    overlay.style.zIndex = "9999";
+    overlay.style.backgroundColor = "rgba(0, 0, 0, 0.6)";
+    overlay.style.display = "flex";
+    overlay.style.alignItems = "center";
+    overlay.style.justifyContent = "center";
+    overlay.style.flexDirection = "column";
+    overlay.style.animation = "fadeOut 0.5s ease-out 2.5s forwards";
+
+    // Серце або що завгодно
+    const heart = document.createElement("div");
+    heart.innerHTML = "💖";
+    heart.style.fontSize = "8rem";
+    heart.style.animation = "pop 0.8s ease";
+
+    const text = document.createElement("div");
+    text.innerText = "Це взаємність!";
+    text.style.color = "white";
+    text.style.fontSize = "2rem";
+    text.style.marginTop = "1rem";
+    text.style.animation = "fadeInUp 1s ease";
+
+    overlay.appendChild(heart);
+    overlay.appendChild(text);
+    document.body.appendChild(overlay);
+
+    // Видаляємо анімацію через 3с
+    setTimeout(() => {
+        overlay.remove();
+    }, 3000);
 }
