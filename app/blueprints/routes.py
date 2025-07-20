@@ -1,4 +1,4 @@
-﻿from flask import Blueprint, render_template, redirect, url_for
+﻿from flask import Blueprint, render_template, redirect, url_for, session
 
 from app.models import Meeting, Like
 from app.utils.access_utils import login_required
@@ -13,6 +13,8 @@ def index():
 
 @pages_bp.route('/auth', methods=['GET'])
 def auth():
+    if 'email' in session:
+        return redirect(url_for('pages.profile'))
     return render_template('auth.html')
 
 

@@ -21,23 +21,23 @@ class User(db.Model):
 
     credentials = db.relationship('Credentials', backref='user', cascade="all, delete-orphan", uselist=False)
     preferences = db.relationship('PartnerPreference', backref='user', cascade="all, delete-orphan")
-    meetings1 = db.relationship('Meeting', foreign_keys='Meeting.user1_id', backref='user1',
-                                cascade="all, delete-orphan")
-    meetings2 = db.relationship('Meeting', foreign_keys='Meeting.user2_id', backref='user2',
-                                cascade="all, delete-orphan")
+    meetings1 = db.relationship('Meeting', foreign_keys='Meeting.user1_id', backref='user1', cascade="all, delete-orphan")
+    meetings2 = db.relationship('Meeting', foreign_keys='Meeting.user2_id', backref='user2', cascade="all, delete-orphan")
     refusals = db.relationship('Refusal', backref='user', cascade="all, delete-orphan")
-    matchs1 = db.relationship('Match', foreign_keys='Match.user1_id', backref='user1_match',
-                              cascade="all, delete-orphan")
-    matchs2 = db.relationship('Match', foreign_keys='Match.user2_id', backref='user2_match',
-                              cascade="all, delete-orphan")
+
     interests = db.relationship('Interest', secondary='user_interest', back_populates='users')
     zodiac_sign = db.relationship('ZodiacSign', back_populates='users')
     gender_obj = db.relationship('Gender', backref='users')
     images = db.relationship('UserImage', backref='user')
 
-    def to_dict(self, fields=None):
+    def to_dict(self, fields=None, full=False):
         if fields is None:
             fields = []
+
+        if full:
+            fields = ['birth_date', 'age', 'gender', 'height',
+                      'weight', 'sign', "bio", "images",
+                      "interests", "is_active", "registration_date"]
 
         data = {
             "user_id": self.user_id,
@@ -65,16 +65,19 @@ class User(db.Model):
             data["bio"] = self.bio
 
         if "images" in fields:
-            data["images"] = ['static/uploads/user_2_0.png', 'static/uploads/user_2_1.png',
-                              'static/uploads/user_2_2.png']
-            import random
-            random.shuffle(data["images"])
+            # data["images"] = ['static/uploads/user_2_0.png', 'static/uploads/user_2_1.png',
+            #                   'static/uploads/user_2_2.png']
+            # import random
+            # random.shuffle(data["images"])
 
-            # data["images"] = [img.image_url for img in self.images]
+            if len(self.images) != 0:
+                data["images"] = [img.image_path for img in self.images]
+            else:
+                data["images"] = ["static/uploads/blank.jpg"]
 
         if "interests" in fields:
-            data["interests"] = ["Подорожі"]
-            # data["interests"] = [interest.name for interest in self.interests]
+            # data["interests"] = ["Подорожі"]
+            data["interests"] = [interest.name for interest in self.interests]
 
         if "is_active" in fields:
             data["is_active"] = self.is_active

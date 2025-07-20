@@ -24,7 +24,8 @@ def create_app():
     from app.blueprints.api.zodiac import zodiac_bp
     from app.blueprints.api.discover import discover_bp
 
-    from app.blueprints.api.repositories.user_controller import user_bp
+    from app.blueprints.api.controllers.user_controller import user_bp
+    from app.blueprints.api.controllers.match_controller import match_bp
 
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -34,5 +35,6 @@ def create_app():
     app.register_blueprint(reaction_bp, url_prefix='/api/reactions')
 
     app.register_blueprint(user_bp, url_prefix='/api/user')
+    app.register_blueprint(match_bp, url_prefix='/api/match')
 
     return app
