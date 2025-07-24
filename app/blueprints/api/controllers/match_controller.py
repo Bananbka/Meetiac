@@ -1,4 +1,4 @@
-﻿from flask import Blueprint, jsonify
+﻿from flask import Blueprint, jsonify, request
 
 from app import db
 from app.models import Match, Like
@@ -12,7 +12,8 @@ match_bp = Blueprint('match', __name__)
 def match_count():
     user = match_count.cred.user
     matches_count = Match.query.filter(
-        (Match.user1_id == user.user_id) | (Match.user2_id == user.user_id)
+        (Match.archived == False) &
+        ((Match.user1_id == user.user_id) | (Match.user2_id == user.user_id))
     ).count()
 
     return str(matches_count)
@@ -22,12 +23,30 @@ def match_count():
 @login_required_api
 def get_matches():
     user = get_matches.cred.user
-    users_matches = Match.query.filter(
-        (Match.archived == False) & ((Match.user1_id == user.user_id) | (Match.user2_id == user.user_id))
+
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
+
+    users_matches_query = Match.query.filter(
+        (Match.archived == False) &
+        ((Match.user1_id == user.user_id) | (Match.user2_id == user.user_id))
     )
 
-    data = [m.to_dict() for m in users_matches]
-    return jsonify(data)
+    pagination = users_matches_query.paginate(page=page, per_page=per_page, error_out=False)
+
+    data = [match.to_dict(user.user_id) for match in pagination.items]
+
+    return jsonify({
+        "matches": data,
+        "pagination": {
+            "page": pagination.page,
+            "per_page": pagination.per_page,
+            "pages": pagination.pages,
+            "total": pagination.total,
+            "has_next": pagination.has_next,
+            "has_prev": pagination.has_prev
+        }
+    })
 
 
 @match_bp.route('/<int:match_id>', methods=['DELETE'])

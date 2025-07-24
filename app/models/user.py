@@ -21,8 +21,6 @@ class User(db.Model):
 
     credentials = db.relationship('Credentials', backref='user', cascade="all, delete-orphan", uselist=False)
     preferences = db.relationship('PartnerPreference', backref='user', cascade="all, delete-orphan")
-    meetings1 = db.relationship('Meeting', foreign_keys='Meeting.user1_id', backref='user1', cascade="all, delete-orphan")
-    meetings2 = db.relationship('Meeting', foreign_keys='Meeting.user2_id', backref='user2', cascade="all, delete-orphan")
     refusals = db.relationship('Refusal', backref='user', cascade="all, delete-orphan")
 
     interests = db.relationship('Interest', secondary='user_interest', back_populates='users')

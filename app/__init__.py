@@ -26,6 +26,7 @@ def create_app():
 
     from app.blueprints.api.controllers.user_controller import user_bp
     from app.blueprints.api.controllers.match_controller import match_bp
+    from app.blueprints.api.controllers.meeting_controller import meeting_bp
 
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -36,5 +37,6 @@ def create_app():
 
     app.register_blueprint(user_bp, url_prefix='/api/user')
     app.register_blueprint(match_bp, url_prefix='/api/match')
+    app.register_blueprint(meeting_bp, url_prefix='/api/meeting')
 
     return app

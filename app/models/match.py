@@ -25,11 +25,31 @@ class Match(db.Model):
         overlaps="matches_as_user1,user1"
     )
 
-    def to_dict(self):
+    def to_dict(self, user_id=None):
+        user1 = self.user1.to_dict(full=True)
+        user2 = self.user2.to_dict(full=True)
+
+        if user_id:
+            if user1["user_id"] == user_id:
+                requested_user = user1
+                match_user = user2
+            else:
+                requested_user = user2
+                match_user = user1
+
+            return {
+                "match_id": self.match_id,
+                "req_user": requested_user,
+                "match_user": match_user,
+                "created_at": self.created_at,
+                "archived": self.archived,
+                "comment": self.comment,
+            }
+
         return {
             "match_id": self.match_id,
-            "user1": self.user1.to_dict(full=True),
-            "user2": self.user2.to_dict(full=True),
+            "req_user": user1,
+            "match_user": user2,
             "created_at": self.created_at,
             "archived": self.archived,
             "comment": self.comment,
