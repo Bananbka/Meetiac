@@ -150,7 +150,7 @@ function createMatchCard(match) {
     unmatchBtn.innerHTML = `<i class="fas fa-heart-broken"></i> Розпарувати`
     unmatchBtn.onclick = (e) => {
         e.stopPropagation()
-        handleUnmatch(match.id)
+        handleUnmatch(match.match_id)
     }
     actions.appendChild(unmatchBtn)
 
@@ -185,37 +185,34 @@ function clearSearch() {
 }
 
 function applyFilters() {
-    alert("Фільтри застосовано!")
+    showNotification("Фільтри застосовано!")
     toggleFilter()
     loadMatches()
 }
 
 function resetFilters() {
     document.getElementById("sortSelect").value = "newest"
-    alert("Фільтри скинуто!")
+    showNotification("Фільтри скинуто!")
     loadMatches()
 }
 
-function goToChat(matchId) {
-    alert(`Перехід до чату з ${matchId}`)
-    // window.location.href = `chat.html?id=${matchId}`;
-}
-
-function handleUnmatch(matchId) {
-    if (confirm(`Ви впевнені, що хочете розпаруватись з ${matchId}?`)) {
-        alert(`Розпаровано з ${matchId}`)
-        // Remove from mockMatches and reload
-        mockMatches.splice(
-            mockMatches.findIndex((m) => m.id === matchId),
-            1,
-        )
-        loadMatches()
+async function handleUnmatch(matchId) {
+    const resp = await fetch(`/api/match/${matchId}`, {
+        method: "DELETE"
+    })
+    if (resp.ok) {
+        showNotification("Успішно розпаровано!", 'success')
     }
+    else {
+        showNotification("Помилка розпарування", 'danger')
+    }
+
+
+    loadMatches()
 }
 
 function goToDiscover() {
-    alert("Перехід до сторінки пошуку")
-    // window.location.href = 'discover.html';
+    window.location.href = 'discover';
 }
 
 function goBack() {
@@ -282,7 +279,7 @@ document.getElementById("meetingForm").addEventListener("submit", async (e) => {
 
     // Перевірка координат
     if (!lat || !lng) {
-        alert("Оберіть точку на карті.")
+        showNotification("Оберіть точку на карті.")
         return
     }
 
@@ -291,28 +288,32 @@ document.getElementById("meetingForm").addEventListener("submit", async (e) => {
     const now = new Date()
 
     if (isNaN(selectedDate.getTime())) {
-        alert("Некоректна дата.")
+        showNotification("Некоректна дата.", 'danger')
         return
     }
 
     if (selectedDate <= now) {
-        alert("Дата та час зустрічі мають бути в майбутньому.")
+        showNotification("Дата та час зустрічі мають бути в майбутньому.", "danger")
         return
     }
 
-        console.log({user2_id, meeting_date, lat, lng})
+    console.log({user2_id, meeting_date, lat, lng})
 
     // Надсилання запиту
-    const res = await fetch('/api/meeting/create', {
-        method: "POST",
+    const res = await fetch('/api/meeting/', {
+        method: "PUT",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({user2_id, meeting_date, lat, lng})
+        body: JSON.stringify({
+            user2_id: user2_id,
+            datetime: meeting_date,
+            location: `${lat} ${lng}`
+        })
     })
 
     if (res.ok) {
-        alert("Зустріч призначено!")
+        showNotification("Зустріч призначено!", "success")
         closeMeetingModal()
     } else {
-        alert("Помилка при створенні зустрічі")
+        showNotification("Помилка при створенні зустрічі", "danger")
     }
 })
