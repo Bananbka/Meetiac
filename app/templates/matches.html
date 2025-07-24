@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/matches.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 </head>
 <body>
 <!-- Floating Background Elements -->
@@ -61,25 +62,6 @@
                 <select id="sortSelect">
                     <option value="newest">Найновіші</option>
                     <option value="oldest">Найстаріші</option>
-                    <option value="activity">За активністю</option>
-                    <option value="distance">За відстанню</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Статус чату:</label>
-                <select id="chatStatusSelect">
-                    <option value="all">Всі</option>
-                    <option value="active">Активні</option>
-                    <option value="new">Нові</option>
-                    <option value="inactive">Неактивні</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label>Онлайн статус:</label>
-                <select id="onlineStatusSelect">
-                    <option value="all">Всі</option>
-                    <option value="online">Онлайн</option>
-                    <option value="recent">Нещодавно</option>
                 </select>
             </div>
             <div class="filter-actions">
@@ -101,20 +83,15 @@
             <span class="stat-number" id="totalMatches">0</span>
             <span class="stat-label">Збігів</span>
         </div>
-        <div class="stat-item">
-            <span class="stat-number" id="newMatches">0</span>
-            <span class="stat-label">Нових</span>
-        </div>
-        <div class="stat-item">
-            <span class="stat-number" id="activeChats">0</span>
-            <span class="stat-label">Активних</span>
-        </div>
     </div>
 
     <!-- Content -->
     <main class="content">
-        <div class="matches-list" id="matchesList">
-            <!-- Matches will be loaded dynamically -->
+        <div class="info-wrapper">
+            <div class="matches-list" id="matchesList">
+                <!-- Matches will be loaded dynamically -->
+            </div>
+
         </div>
 
         <div class="empty-state" id="emptyState" style="display: none;">
@@ -134,6 +111,32 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div id="meetingModal" style="display: none;" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Запропонувати зустріч</h2>
+      <button onclick="closeMeetingModal()" class="close-btn">&times;</button>
+    </div>
+
+    <form id="meetingForm">
+      <input type="hidden" id="meetingUserId" name="user2_id">
+
+      <label for="meetingDateTime">Дата і час</label>
+      <input type="datetime-local" id="meetingDateTime" name="meeting_date" required>
+
+      <label>Оберіть місце зустрічі:</label>
+      <div id="map" style="height: 300px; border-radius: 8px; margin-bottom: 1rem;"></div>
+
+      <input type="hidden" id="meetingLat" name="lat">
+      <input type="hidden" id="meetingLng" name="lng">
+
+      <button type="submit" class="submit-btn">Запропонувати</button>
+    </form>
+  </div>
+</div>
 <script src="{{ url_for('static', filename='js/matches.js') }}"></script>
+<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>

@@ -248,14 +248,6 @@ function clearAll() {
     }
 }
 
-function formatDate(dateString) {
-    const date = new Date(dateString)
-    return date.toLocaleString("uk-UA", {
-        dateStyle: "short",
-        timeStyle: "short"
-    })
-}
-
 function toggleFilter() {
     isFilterPanelOpen = !isFilterPanelOpen
     document.getElementById("filterPanel").classList.toggle("show", isFilterPanelOpen)

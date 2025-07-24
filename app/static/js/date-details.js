@@ -185,11 +185,6 @@ function getStatusIcon(status) {
   }
 }
 
-function formatDate(dateString) {
-  const options = { year: "numeric", month: "long", day: "numeric" }
-  return new Date(dateString).toLocaleDateString("uk-UA", options)
-}
-
 function startCountdown(dateString, timeString) {
   if (countdownInterval) {
     clearInterval(countdownInterval)
