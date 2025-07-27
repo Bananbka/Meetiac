@@ -642,3 +642,42 @@ body {
         display: none;
     }
 }
+
+
+.load-more-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: rgb(17, 24, 39);
+    border-top: 1px solid rgba(236, 72, 153, 0.2);
+    display: flex;
+    justify-content: center;
+}
+
+.load-more-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid #ec4899;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.page-wrapper {
+    background: linear-gradient(135deg, rgb(3, 7, 18) 0%, rgb(17, 24, 39) 50%, rgb(3, 7, 18) 100%);
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+.info-wrapper {
+    padding: 0 150px 0 150px;
+}
+
+@media (max-width: 768px) {
+    .info-wrapper {
+        padding: 0 50px 0 50px;
+    }
+}

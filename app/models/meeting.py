@@ -14,7 +14,7 @@ class Meeting(db.Model):
     user1_comment = db.Column(db.Text)
     user2_comment = db.Column(db.Text)
     result = db.Column(db.String(50))  # 'запланована', 'відбулася', 'відмова', 'успішна'
-    archived = db.Column(db.Boolean)
+    archived = db.Column(db.Boolean, default=False)
 
     user1 = db.relationship(
         'User',
@@ -41,7 +41,7 @@ class Meeting(db.Model):
                 match_user = user1
 
             return {
-                "meeting_id": self.match_id,
+                "meeting_id": self.meeting_id,
                 "req_user": requested_user,
                 "meet_user": match_user,
                 "created_at": self.created_at,

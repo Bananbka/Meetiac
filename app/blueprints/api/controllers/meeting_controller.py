@@ -34,7 +34,6 @@ def create_meeting():
 def meeting_count():
     user = meeting_count.cred.user
     meetings_count = Meeting.query.filter(
-        (Meeting.archived == False) &
         ((Meeting.user1_id == user.user_id) | (Meeting.user2_id == user.user_id))
     ).count()
 
@@ -50,9 +49,8 @@ def get_meetings():
     per_page = request.args.get("per_page", 10, type=int)
 
     users_matches_query = Meeting.query.filter(
-        (Meeting.archived == False) &
         ((Meeting.user1_id == user.user_id) | (Meeting.user2_id == user.user_id))
-    )
+    ).order_by(Meeting.meeting_date.asc())
 
     pagination = users_matches_query.paginate(page=page, per_page=per_page, error_out=False)
 
@@ -97,4 +95,18 @@ def comment_meeting(meeting_id):
 
     db.session.commit()
 
+    return "ok"
+
+
+@meeting_bp.route('/to-archive', methods=['PATCH'])
+@login_required_api
+def send_meeting_to_archive():
+    meeting_id = request.args.get('id')
+    meeting = Meeting.query.get(meeting_id)
+
+    if meeting.archived:
+        return "ok"
+
+    meeting.archived = True
+    db.session.commit()
     return "ok"

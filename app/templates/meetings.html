@@ -77,7 +77,7 @@
     <!-- Content -->
     <main class="content">
         <!-- Upcoming Meetings Tab -->
-        <div class="tab-content active" id="upcomingTab">
+        <div class="tab-content active info-wrapper" id="upcomingTab">
             <div class="meetings-list" id="upcomingMeetings">
                 <!-- Meetings will be loaded dynamically -->
             </div>
@@ -89,31 +89,27 @@
             </div>
         </div>
 
-        <!-- Past Meetings Tab -->
-        <div class="tab-content" id="pastTab">
-            <div class="meetings-list" id="pastMeetings">
-                <!-- Past meetings will be loaded dynamically -->
-            </div>
-            <div class="empty-state" id="pastEmpty" style="display: none;">
-                <i class="fas fa-history"></i>
-                <h3>Немає минулих зустрічей</h3>
-                <p>Ваші завершені зустрічі з'являться тут</p>
-            </div>
-        </div>
-
         <!-- Pending Meetings Tab -->
-        <div class="tab-content" id="pendingTab">
-            <div class="meetings-list" id="pendingMeetings">
+        <div class="tab-content info-wrapper" id="archiveTab">
+            <div class="meetings-list" id="archiveMeetings">
                 <!-- Pending meetings will be loaded dynamically -->
             </div>
-            <div class="empty-state" id="pendingEmpty" style="display: none;">
+            <div class="empty-state" id="archiveEmpty" style="display: none;">
                 <i class="fas fa-hourglass-half"></i>
-                <h3>Немає запитів на зустрічі</h3>
-                <p>Запити на зустрічі з'являться тут</p>
+                <h3>Немає заархівованих зустрічей.</h3>
+                <p>Минулі та зустрічі, кинуті в архів, з'являтимуться тут.</p>
             </div>
         </div>
     </main>
+
+    <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+        <button class="btn btn-outline" id="loadMoreBtn" onclick="loadMore()">
+            <span class="load-more-text">Завантажити ще</span>
+            <div class="load-more-spinner" style="display: none;"></div>
+        </button>
+    </div>
 </div>
+
 
 <script src="{{ url_for('static', filename='js/meetings.js') }}"></script>
 <script src="{{ url_for('static', filename='js/common.js') }}"></script>
