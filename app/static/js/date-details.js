@@ -1,54 +1,5 @@
 // Mock data for demonstration
-const mockMeetingDetails = {
-  meet1: {
-    id: "meet1",
-    person: { id: "userA", name: "Олена", photo: "/placeholder.svg?height=60&width=60&text=Олена" },
-    date: "2025-07-20",
-    time: "19:00",
-    place: 'Кафе "Зоряна Ніч"',
-    address: "Вулиця Хрещатик, 24, Київ",
-    coordinates: [50.4495, 30.5234], // Kyiv coordinates
-    message: "Буду рада зустрічі! Сподіваюся, тобі сподобається це місце.",
-    status: "confirmed",
-    phone: "+380441234567",
-  },
-  meet2: {
-    id: "meet2",
-    person: { id: "userC", name: "Марія", photo: "/placeholder.svg?height=60&width=60&text=Марія" },
-    date: "2025-07-25",
-    time: "18:30",
-    place: "Парк Шевченка",
-    address: "Бульвар Тараса Шевченка, Київ",
-    coordinates: [50.4437, 30.5165],
-    message: "",
-    status: "confirmed",
-    phone: "",
-  },
-  meet3: {
-    id: "meet3",
-    person: { id: "userD", name: "Андрій", photo: "/placeholder.svg?height=60&width=60&text=Андрій" },
-    date: "2025-06-15",
-    time: "20:00",
-    place: 'Ресторан "Сузір\'я"',
-    address: "Вулиця Сагайдачного, 10, Київ",
-    coordinates: [50.4637, 30.5195],
-    message: "Дякую за чудовий вечір!",
-    status: "completed",
-    phone: "+380449876543",
-  },
-  meet4: {
-    id: "meet4",
-    person: { id: "userE", name: "Наталія", photo: "/placeholder.svg?height=60&width=60&text=Наталія" },
-    date: "2025-07-22",
-    time: "17:00",
-    place: 'Кінотеатр "Космос"',
-    address: "Вулиця Велика Васильківська, 114, Київ",
-    coordinates: [50.4289, 30.52],
-    message: "Хочеш сходити на новий фільм?",
-    status: "pending",
-    phone: "",
-  },
-}
+let meeting = {};
 
 let currentMeetingId = null
 let map = null
@@ -58,206 +9,234 @@ let countdownInterval = null
 // Declare L variable before using it
 const L = window.L
 
-document.addEventListener("DOMContentLoaded", () => {
-  const urlParams = new URLSearchParams(window.location.search)
-  currentMeetingId = urlParams.get("id")
-  if (currentMeetingId) {
-    loadMeetingDetails(currentMeetingId)
-  } else {
-    alert("Ідентифікатор зустрічі не знайдено.")
-    goBack()
-  }
+document.addEventListener("DOMContentLoaded", async () => {
+    const pathParts = window.location.pathname.split("/");
+    const currentMeetingId = pathParts[pathParts.length - 1]; // останній елемент — це ID
+
+    if (currentMeetingId) {
+        await loadMeetingDetails(currentMeetingId);
+        map.invalidateSize()
+    } else {
+        alert("Ідентифікатор зустрічі не знайдено.");
+        goBack();
+    }
+
+
 })
 
 function showLoading() {
-  document.getElementById("loadingOverlay").style.display = "flex"
-  document.getElementById("meetingContent").style.display = "none"
+    document.getElementById("loadingOverlay").style.display = "flex"
+    document.getElementById("meetingContent").style.display = "none"
 }
 
 function hideLoading() {
-  document.getElementById("loadingOverlay").style.display = "none"
-  document.getElementById("meetingContent").style.display = "block"
+    document.getElementById("loadingOverlay").style.display = "none"
+    document.getElementById("meetingContent").style.display = "block"
+}
+
+
+async function fetchMeeting(id) {
+    const resp = await fetch(`/api/meeting/${id}`)
+
+    if (!resp.ok) {
+        showNotification("Помилка завантаження зустрічі.", "error")
+    }
+
+    return await resp.json()
 }
 
 async function loadMeetingDetails(meetingId) {
-  showLoading()
-  await new Promise((resolve) => setTimeout(resolve, 700)) // Simulate API call
+    showLoading()
 
-  const meeting = mockMeetingDetails[meetingId]
-  if (!meeting) {
-    alert("Зустріч не знайдено.")
-    goBack()
-    return
-  }
-
-  // Set status badge
-  const statusBadge = document.getElementById("statusBadge")
-  statusBadge.className = `meeting-status-badge ${meeting.status}`
-  statusBadge.querySelector("span").textContent = getStatusText(meeting.status)
-  statusBadge.querySelector("i").className = getStatusIcon(meeting.status)
-
-  // Set participants
-  document.getElementById("partnerAvatar").src = meeting.person.photo
-  document.getElementById("partnerAvatar").alt = meeting.person.name
-  document.getElementById("partnerName").textContent = meeting.person.name
-
-  // Set date and time
-  document.getElementById("meetingDate").textContent = formatDate(meeting.date)
-  document.getElementById("meetingTime").textContent = meeting.time
-
-  // Set place details
-  document.getElementById("placeName").textContent = meeting.place
-  document.getElementById("placeAddress").textContent = meeting.address
-  document.querySelector(".place-actions .action-btn:nth-child(2)").style.display = meeting.phone ? "flex" : "none"
-
-  // Set message
-  const messageCard = document.getElementById("messageCard")
-  const messageContent = document.getElementById("messageContent")
-  if (meeting.message) {
-    messageContent.textContent = meeting.message
-    messageCard.style.display = "block"
-  } else {
-    messageCard.style.display = "none"
-  }
-
-  // Initialize map
-  if (map) {
-    map.remove() // Remove existing map instance
-  }
-  map = L.map("map").setView(meeting.coordinates, 13)
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  }).addTo(map)
-  mapMarker = L.marker(meeting.coordinates).addTo(map).bindPopup(meeting.place).openPopup()
-  map.on("load", () => {
-    document.getElementById("mapOverlay").style.display = "none"
-  })
-  // Fallback if map load event doesn't fire quickly
-  setTimeout(() => {
-    if (document.getElementById("mapOverlay").style.display !== "none") {
-      document.getElementById("mapOverlay").style.display = "none"
+    meeting = await fetchMeeting(meetingId)
+    if (!meeting) {
+        showNotification("Зустріч не знайдена!")
+        goBack()
+        return
     }
-  }, 2000)
 
-  // Load weather (mock for now)
-  loadWeather(meeting.coordinates)
 
-  // Set actions based on status
-  renderMeetingActions(meeting.status)
+    // Учасник
+    const partner = meeting.meet_user
+    document.getElementById("partnerAvatar").src = `/${partner.images[0]}` || "/static/uploads/blank.jpg"
+    document.getElementById("partnerAvatar").alt = partner.name
+    document.getElementById("partnerName").textContent = partner.name
 
-  // Start countdown
-  startCountdown(meeting.date, meeting.time)
+    document.getElementById("userAvatar").src = `/${meeting.req_user.images[0]}` || "/static/uploads/blank.jpg"
+    document.getElementById("userAvatar").alt = partner.name
+    document.getElementById("userName").textContent = meeting.req_user.name
 
-  // Show edit button if confirmed or pending
-  document.getElementById("editBtn").style.display =
-    meeting.status === "confirmed" || meeting.status === "pending" ? "flex" : "none"
 
-  hideLoading()
+    // Дата й час
+    const dateObj = new Date(meeting.meeting_date)
+    document.getElementById("meetingDate").textContent = dateObj.toLocaleDateString("uk-UA", {
+        year: "numeric", month: "long", day: "numeric"
+    })
+    document.getElementById("meetingTime").textContent = dateObj.toLocaleTimeString("uk-UA", {
+        hour: "2-digit", minute: "2-digit"
+    })
+
+    // Локація
+    const [lat, lng] = meeting.location.split(" ").map(parseFloat)
+
+    // Повідомлення
+    const meetMessage = meeting.meet_comment
+    const reqMessage = meeting.req_comment
+    const meetMessageContent = document.getElementById("meetMessageContent")
+    const reqMessageContent = document.getElementById("reqMessageContent")
+
+    meetMessageContent.innerHTML = meetMessage ? meetMessage : "*<i>Ваша пара поки не залишила коментаря...</i>*"
+    reqMessageContent.innerHTML = reqMessage ? reqMessage : "*<i>Ви ще не залишили коментаря...</i>*"
+
+
+
+    // Мапа
+    if (map) {
+        map.remove()
+    }
+    map = L.map("map").setView([lat, lng], 13)
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    }).addTo(map)
+    mapMarker = L.marker([lat, lng]).addTo(map).bindPopup("Місце зустрічі").openPopup()
+    map.on("load", () => {
+        document.getElementById("mapOverlay").style.display = "none"
+    })
+    setTimeout(() => {
+        if (document.getElementById("mapOverlay").style.display !== "none") {
+            document.getElementById("mapOverlay").style.display = "none"
+        }
+    }, 2000)
+
+    // Погода
+    loadWeather([lat, lng])
+
+    // Кнопки дій (немає статусу, тому ховаємо)
+    renderMeetingActions(null)
+
+    // Таймер
+    startCountdown(dateObj.toISOString())
+
+    // Кнопка редагування схована
+    document.getElementById("editBtn").style.display = "none"
+
+    hideLoading()
 }
 
 function getStatusText(status) {
-  switch (status) {
-    case "confirmed":
-      return "Підтверджено"
-    case "pending":
-      return "Очікує підтвердження"
-    case "completed":
-      return "Завершено"
-    case "cancelled":
-      return "Скасовано"
-    default:
-      return ""
-  }
+    switch (status) {
+        case "confirmed":
+            return "Підтверджено"
+        case "pending":
+            return "Очікує підтвердження"
+        case "completed":
+            return "Завершено"
+        case "cancelled":
+            return "Скасовано"
+        default:
+            return ""
+    }
 }
 
 function getStatusIcon(status) {
-  switch (status) {
-    case "confirmed":
-      return "fas fa-check-circle"
-    case "pending":
-      return "fas fa-hourglass-half"
-    case "completed":
-      return "fas fa-calendar-check"
-    case "cancelled":
-      return "fas fa-times-circle"
-    default:
-      return "fas fa-clock"
-  }
+    switch (status) {
+        case "confirmed":
+            return "fas fa-check-circle"
+        case "pending":
+            return "fas fa-hourglass-half"
+        case "completed":
+            return "fas fa-calendar-check"
+        case "cancelled":
+            return "fas fa-times-circle"
+        default:
+            return "fas fa-clock"
+    }
 }
 
-function startCountdown(dateString, timeString) {
-  if (countdownInterval) {
-    clearInterval(countdownInterval)
-  }
-
-  const targetDateTime = new Date(`${dateString}T${timeString}:00`)
-
-  const updateCountdown = () => {
-    const now = new Date()
-    const difference = targetDateTime.getTime() - now.getTime()
-
-    if (difference <= 0) {
-      clearInterval(countdownInterval)
-      document.getElementById("countdown").innerHTML =
-        '<div class="countdown-item"><span class="countdown-number">0</span><span class="countdown-label">днів</span></div><div class="countdown-item"><span class="countdown-number">0</span><span class="countdown-label">годин</span></div><div class="countdown-item"><span class="countdown-number">0</span><span class="countdown-label">хвилин</span></div>'
-      // Optionally update meeting status to completed if it was upcoming
-      return
+function startCountdown(meetingDateString) {
+    if (countdownInterval) {
+        clearInterval(countdownInterval)
     }
 
-    const days = Math.floor(difference / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-    const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+    const targetDateTime = new Date(meetingDateString)
 
-    document.getElementById("days").textContent = days
-    document.getElementById("hours").textContent = hours
-    document.getElementById("minutes").textContent = minutes
-  }
+    const updateCountdown = () => {
+        const now = new Date()
+        const difference = targetDateTime.getTime() - now.getTime()
 
-  updateCountdown()
-  countdownInterval = setInterval(updateCountdown, 60000) // Update every minute
+        if (difference <= 0) {
+            clearInterval(countdownInterval)
+            document.getElementById("countdown").innerHTML =
+                '<div class="countdown-item"><span class="countdown-number">0</span><span class="countdown-label">днів</span></div><div class="countdown-item"><span class="countdown-number">0</span><span class="countdown-label">годин</span></div><div class="countdown-item"><span class="countdown-number">0</span><span class="countdown-label">хвилин</span></div>'
+            return
+        }
+
+        const days = Math.floor(difference / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60))
+
+        document.getElementById("days").textContent = days
+        document.getElementById("hours").textContent = hours
+        document.getElementById("minutes").textContent = minutes
+    }
+
+    updateCountdown()
+    countdownInterval = setInterval(updateCountdown, 60000)
+}
+
+async function fetchWeather(lat, lng) {
+    const resp = await fetch(`/api/weather?lat=${lat}&lon=${lng}`)
+
+    if (!resp.ok) {
+        showNotification("Помилка завантаження погоди...", "error")
+        return
+    }
+
+    return await resp.json()
 }
 
 async function loadWeather(coordinates) {
-  const weatherInfo = document.getElementById("weatherInfo")
-  weatherInfo.innerHTML = `
+    const weatherInfo = document.getElementById("weatherInfo")
+    weatherInfo.innerHTML = `
         <div class="weather-loading">
             <div class="loading-spinner"></div>
             <p>Завантаження прогнозу...</p>
         </div>
     `
-  // Simulate API call to weather service
-  await new Promise((resolve) => setTimeout(resolve, 1500))
 
-  // Mock weather data
-  const mockWeather = {
-    temp: "22°C",
-    description: "Сонячно",
-    icon: "fas fa-sun",
-    humidity: "60%",
-    wind: "5 м/с",
-  }
+    const weather = await fetchWeather(coordinates[0], coordinates[1])
 
-  weatherInfo.innerHTML = `
+    if (!weather) return
+
+    const temp = `${Math.round(weather.main.temp)}°C`
+    const description = weather.weather[0].description
+    const iconCode = weather.weather[0].icon
+    const humidity = `${weather.main.humidity}%`
+    const wind = `${weather.wind.speed} м/с`
+
+    const iconUrl = `https://openweathermap.org/img/wn/${iconCode}@2x.png`
+
+    weatherInfo.innerHTML = `
         <div class="weather-current">
-            <i class="${mockWeather.icon} weather-icon"></i>
+            <img src="${iconUrl}" alt="${description}" class="weather-icon" />
             <div class="weather-details">
-                <div class="weather-temp">${mockWeather.temp}</div>
-                <div class="weather-desc">${mockWeather.description}</div>
+                <div class="weather-temp">${temp}</div>
+                <div class="weather-desc">${description}</div>
             </div>
         </div>
         <div class="weather-extra">
-            <span>Вологість: ${mockWeather.humidity}</span>
-            <span>Вітер: ${mockWeather.wind}</span>
+            <span>Вологість: ${humidity}</span>
+            <span>Вітер: ${wind}</span>
         </div>
     `
 }
 
 function renderMeetingActions(status) {
-  const actionsContainer = document.getElementById("meetingActions")
-  actionsContainer.innerHTML = ""
+    const actionsContainer = document.getElementById("meetingActions")
+    actionsContainer.innerHTML = ""
 
-  if (status === "pending") {
-    actionsContainer.innerHTML = `
+    if (status === "pending") {
+        actionsContainer.innerHTML = `
             <button class="action-btn-large success" onclick="handleMeetingAction('accept')">
                 <i class="fas fa-check"></i> Прийняти зустріч
             </button>
@@ -265,8 +244,8 @@ function renderMeetingActions(status) {
                 <i class="fas fa-times"></i> Відхилити зустріч
             </button>
         `
-  } else if (status === "confirmed") {
-    actionsContainer.innerHTML = `
+    } else if (status === "confirmed") {
+        actionsContainer.innerHTML = `
             <button class="action-btn-large primary" onclick="goToChat()">
                 <i class="fas fa-comment"></i> Написати повідомлення
             </button>
@@ -274,8 +253,8 @@ function renderMeetingActions(status) {
                 <i class="fas fa-ban"></i> Скасувати зустріч
             </button>
         `
-  } else if (status === "completed") {
-    actionsContainer.innerHTML = `
+    } else if (status === "completed") {
+        actionsContainer.innerHTML = `
             <button class="action-btn-large primary" onclick="goToChat()">
                 <i class="fas fa-comment"></i> Написати повідомлення
             </button>
@@ -283,155 +262,147 @@ function renderMeetingActions(status) {
                 <i class="fas fa-star"></i> Оцінити зустріч
             </button>
         `
-  } else if (status === "cancelled") {
-    actionsContainer.innerHTML = `
+    } else if (status === "cancelled") {
+        actionsContainer.innerHTML = `
             <p style="text-align: center; color: #ef4444; font-weight: 600;">Цю зустріч скасовано.</p>
             <button class="action-btn-large secondary" onclick="goBack()">
                 <i class="fas fa-arrow-left"></i> Повернутися до зустрічей
             </button>
         `
-  }
+    }
 }
 
 let currentActionCallback = null
+
 function handleMeetingAction(actionType) {
-  const meeting = mockMeetingDetails[currentMeetingId]
-  let title = ""
-  let message = ""
-  let confirmBtnText = ""
+    let title = ""
+    let message = ""
+    let confirmBtnText = ""
 
-  if (actionType === "accept") {
-    title = "Прийняти зустріч"
-    message = `Ви впевнені, що хочете прийняти зустріч з ${meeting.person.name}?`
-    confirmBtnText = "Прийняти"
-    currentActionCallback = () => {
-      meeting.status = "confirmed"
-      alert("Зустріч підтверджено!")
-      loadMeetingDetails(currentMeetingId)
-      closeConfirmModal()
+    if (actionType === "accept") {
+        title = "Прийняти зустріч"
+        message = `Ви впевнені, що хочете прийняти зустріч з ${meeting.person.name}?`
+        confirmBtnText = "Прийняти"
+        currentActionCallback = () => {
+            meeting.status = "confirmed"
+            alert("Зустріч підтверджено!")
+            loadMeetingDetails(currentMeetingId)
+            closeConfirmModal()
+        }
+    } else if (actionType === "decline") {
+        title = "Відхилити зустріч"
+        message = `Ви впевнені, що хочете відхилити зустріч з ${meeting.person.name}?`
+        confirmBtnText = "Відхилити"
+        currentActionCallback = () => {
+            meeting.status = "cancelled"
+            alert("Зустріч відхилено!")
+            loadMeetingDetails(currentMeetingId)
+            closeConfirmModal()
+        }
+    } else if (actionType === "cancel") {
+        title = "Скасувати зустріч"
+        message = `Ви впевнені, що хочете скасувати зустріч з ${meeting.person.name}?`
+        confirmBtnText = "Скасувати"
+        currentActionCallback = () => {
+            meeting.status = "cancelled"
+            alert("Зустріч скасовано!")
+            loadMeetingDetails(currentMeetingId)
+            closeConfirmModal()
+        }
+    } else if (actionType === "rate") {
+        alert("Функціонал оцінки зустрічі буде додано пізніше!")
+        return
     }
-  } else if (actionType === "decline") {
-    title = "Відхилити зустріч"
-    message = `Ви впевнені, що хочете відхилити зустріч з ${meeting.person.name}?`
-    confirmBtnText = "Відхилити"
-    currentActionCallback = () => {
-      meeting.status = "cancelled"
-      alert("Зустріч відхилено!")
-      loadMeetingDetails(currentMeetingId)
-      closeConfirmModal()
-    }
-  } else if (actionType === "cancel") {
-    title = "Скасувати зустріч"
-    message = `Ви впевнені, що хочете скасувати зустріч з ${meeting.person.name}?`
-    confirmBtnText = "Скасувати"
-    currentActionCallback = () => {
-      meeting.status = "cancelled"
-      alert("Зустріч скасовано!")
-      loadMeetingDetails(currentMeetingId)
-      closeConfirmModal()
-    }
-  } else if (actionType === "rate") {
-    alert("Функціонал оцінки зустрічі буде додано пізніше!")
-    return
-  }
 
-  document.getElementById("confirmTitle").textContent = title
-  document.getElementById("confirmMessage").textContent = message
-  document.getElementById("confirmBtn").textContent = confirmBtnText
-  document.getElementById("confirmModal").classList.add("show")
+    document.getElementById("confirmTitle").textContent = title
+    document.getElementById("confirmMessage").textContent = message
+    document.getElementById("confirmBtn").textContent = confirmBtnText
+    document.getElementById("confirmModal").classList.add("show")
 }
 
 function confirmAction() {
-  if (currentActionCallback) {
-    currentActionCallback()
-  }
+    if (currentActionCallback) {
+        currentActionCallback()
+    }
 }
 
 function closeConfirmModal() {
-  document.getElementById("confirmModal").classList.remove("show")
-  currentActionCallback = null
+    document.getElementById("confirmModal").classList.remove("show")
+    currentActionCallback = null
 }
 
 function openInMaps() {
-  const meeting = mockMeetingDetails[currentMeetingId]
-  if (meeting && meeting.coordinates) {
-    const [lat, lon] = meeting.coordinates
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`
-    window.open(url, "_blank")
-  } else {
-    alert("Координати місця не доступні.")
-  }
-}
+    if (meeting && meeting.location) {
+        const [lat, lon] = meeting.location.split(" ").map(Number)
 
-function callPlace() {
-  const meeting = mockMeetingDetails[currentMeetingId]
-  if (meeting && meeting.phone) {
-    window.location.href = `tel:${meeting.phone}`
-  } else {
-    alert("Номер телефону не доступний.")
-  }
+        if (!isNaN(lat) && !isNaN(lon)) {
+            const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`
+            window.open(url, "_blank")
+        } else {
+            alert("Неправильний формат координат.")
+        }
+    } else {
+        alert("Координати місця не доступні.")
+    }
 }
 
 function toggleMapSize() {
-  const mapElement = document.getElementById("map")
-  mapElement.classList.toggle("expanded")
-  // Invalidate map size to re-render tiles correctly after size change
-  if (map) {
-    map.invalidateSize()
-  }
+    const mapElement = document.getElementById("map")
+    mapElement.classList.toggle("expanded")
+    // Invalidate map size to re-render tiles correctly after size change
+    if (map) {
+        map.invalidateSize()
+    }
 }
 
 function shareMeeting() {
-  const meeting = mockMeetingDetails[currentMeetingId]
-  if (navigator.share) {
-    navigator
-      .share({
-        title: `Зустріч з ${meeting.person.name} на Meetiac`,
-        text: `Запрошую на зустріч ${formatDate(meeting.date)} о ${meeting.time} у ${meeting.place}.`,
-        url: window.location.href,
-      })
-      .then(() => console.log("Successful share"))
-      .catch((error) => console.log("Error sharing", error))
-  } else {
-    alert(`Поділитися деталями зустрічі:
+    if (navigator.share) {
+        navigator
+            .share({
+                title: `Зустріч з ${meeting.person.name} на Meetiac`,
+                text: `Запрошую на зустріч ${formatDate(meeting.date)} о ${meeting.time} у ${meeting.place}.`,
+                url: window.location.href,
+            })
+            .then(() => console.log("Successful share"))
+            .catch((error) => console.log("Error sharing", error))
+    } else {
+        alert(`Поділитися деталями зустрічі:
         Зустріч з ${meeting.person.name}
         Дата: ${formatDate(meeting.date)}
         Час: ${meeting.time}
         Місце: ${meeting.place}, ${meeting.address}
         ${window.location.href}`)
-  }
+    }
 }
 
 function editMeeting() {
-  const meeting = mockMeetingDetails[currentMeetingId]
-  document.getElementById("editDate").value = meeting.date
-  document.getElementById("editTime").value = meeting.time
-  document.getElementById("editPlace").value = meeting.place
-  document.getElementById("editMessage").value = meeting.message
-  document.getElementById("editMeetingModal").classList.add("show")
+    document.getElementById("editDate").value = meeting.date
+    document.getElementById("editTime").value = meeting.time
+    document.getElementById("editPlace").value = meeting.place
+    document.getElementById("editMessage").value = meeting.message
+    document.getElementById("editMeetingModal").classList.add("show")
 }
 
 function closeEditMeeting() {
-  document.getElementById("editMeetingModal").classList.remove("show")
+    document.getElementById("editMeetingModal").classList.remove("show")
 }
 
 async function updateMeeting(event) {
-  event.preventDefault()
-  const meeting = mockMeetingDetails[currentMeetingId]
-  meeting.date = document.getElementById("editDate").value
-  meeting.time = document.getElementById("editTime").value
-  meeting.place = document.getElementById("editPlace").value
-  meeting.message = document.getElementById("editMessage").value
+    event.preventDefault()
+    meeting.date = document.getElementById("editDate").value
+    meeting.time = document.getElementById("editTime").value
+    meeting.place = document.getElementById("editPlace").value
+    meeting.message = document.getElementById("editMessage").value
 
-  // In a real app, you'd send this to the backend
-  showLoading()
-  await new Promise((resolve) => setTimeout(resolve, 1000))
-  alert("Зміни збережено!")
-  closeEditMeeting()
-  loadMeetingDetails(currentMeetingId) // Reload details to reflect changes
-  hideLoading()
+    // In a real app, you'd send this to the backend
+    showLoading()
+    await new Promise((resolve) => setTimeout(resolve, 1000))
+    alert("Зміни збережено!")
+    closeEditMeeting()
+    loadMeetingDetails(currentMeetingId) // Reload details to reflect changes
+    hideLoading()
 }
 
 function goBack() {
-  window.history.back()
+    window.history.back()
 }

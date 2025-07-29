@@ -52,17 +52,14 @@
     <main class="content" id="meetingContent">
         <!-- Meeting Header -->
         <section class="meeting-header">
-            <div class="meeting-status-badge" id="statusBadge">
-                <i class="fas fa-clock"></i>
-                <span>Очікує підтвердження</span>
-            </div>
+
 
             <div class="meeting-participants">
                 <div class="participant">
-                    <div class="participant-avatar" id="myAvatar">
-                        <img src="/placeholder.svg?height=60&width=60&text=Me" alt="Я">
+                    <div class="participant-avatar">
+                        <img id="userAvatar" src="/static/uploads/blank.jpg" alt="Я">
                     </div>
-                    <span class="participant-name">Ви</span>
+                    <span class="participant-name" id="userName">Завантаження...</span>
                 </div>
 
                 <div class="meeting-heart">
@@ -70,8 +67,8 @@
                 </div>
 
                 <div class="participant">
-                    <div class="participant-avatar" id="partnerAvatar">
-                        <img src="/placeholder.svg?height=60&width=60&text=Partner" alt="Партнер">
+                    <div class="participant-avatar">
+                        <img id="partnerAvatar" src="/static/uploads/blank.jpg" alt="Партнер">
                     </div>
                     <span class="participant-name" id="partnerName">Завантаження...</span>
                 </div>
@@ -79,56 +76,74 @@
         </section>
 
         <!-- Meeting Details -->
-        <section class="meeting-details">
+        <section class="meeting-details info-wrapper">
             <div class="detail-card">
                 <div class="detail-header">
-                    <i class="fas fa-calendar-alt"></i>
-                    <h3>Дата та час</h3>
+                    <i class="fas fa-comment"></i>
+                    <h3>Коментарі</h3>
                 </div>
                 <div class="detail-content">
-                    <div class="date-time">
-                        <div class="date" id="meetingDate">Завантаження...</div>
-                        <div class="time" id="meetingTime">--:--</div>
+                    <!-- Повідомлення від іншого користувача (зліва) -->
+                    <div class="chat-bubble left" id="meetMessageContent">
+                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
+                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
+                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
+                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
+                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
+                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
+                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
                     </div>
-                    <div class="countdown" id="countdown">
-                        <div class="countdown-item">
-                            <span class="countdown-number" id="days">0</span>
-                            <span class="countdown-label">днів</span>
+
+                    <!-- Твоє повідомлення (справа) -->
+                    <div class="chat-bubble right" id="reqMessageContent">
+                        Все добре, дякую!
+                    </div>
+                </div>
+            </div>
+            <div class="columns-wrapper">
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Дата та час</h3>
+                    </div>
+                    <div class="detail-content">
+                        <div class="date-time">
+                            <div class="date" id="meetingDate">Завантаження...</div>
+                            <div class="time" id="meetingTime">--:--</div>
                         </div>
-                        <div class="countdown-item">
-                            <span class="countdown-number" id="hours">0</span>
-                            <span class="countdown-label">годин</span>
+                        <div class="countdown" id="countdown">
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="days">0</span>
+                                <span class="countdown-label">днів</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="hours">0</span>
+                                <span class="countdown-label">годин</span>
+                            </div>
+                            <div class="countdown-item">
+                                <span class="countdown-number" id="minutes">0</span>
+                                <span class="countdown-label">хвилин</span>
+                            </div>
                         </div>
-                        <div class="countdown-item">
-                            <span class="countdown-number" id="minutes">0</span>
-                            <span class="countdown-label">хвилин</span>
+                    </div>
+                </div>
+                <!-- Weather -->
+                <div class="detail-card">
+                    <div class="detail-header">
+                        <i class="fas fa-cloud-sun"></i>
+                        <h3>Погода</h3>
+                    </div>
+                    <div class="detail-content">
+                        <div class="weather-info" id="weatherInfo">
+                            <div class="weather-loading">
+                                <div class="loading-spinner"></div>
+                                <p>Завантаження прогнозу...</p>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="detail-card">
-                <div class="detail-header">
-                    <i class="fas fa-map-marker-alt"></i>
-                    <h3>Місце зустрічі</h3>
-                </div>
-                <div class="detail-content">
-                    <div class="location-info">
-                        <div class="place-name" id="placeName">Завантаження...</div>
-                        <div class="place-address" id="placeAddress">Завантаження адреси...</div>
-                        <div class="place-actions">
-                            <button class="action-btn" onclick="openInMaps()">
-                                <i class="fas fa-directions"></i>
-                                Маршрут
-                            </button>
-                            <button class="action-btn" onclick="callPlace()">
-                                <i class="fas fa-phone"></i>
-                                Телефон
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Map -->
             <div class="detail-card">
@@ -148,36 +163,15 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Message -->
-            <div class="detail-card" id="messageCard" style="display: none;">
-                <div class="detail-header">
-                    <i class="fas fa-comment"></i>
-                    <h3>Повідомлення</h3>
-                </div>
-                <div class="detail-content">
-                    <div class="message-content" id="messageContent">
-                        <!-- Message will be loaded dynamically -->
-                    </div>
+                <div class="place-actions">
+                    <button class="action-btn" onclick="openInMaps()">
+                        <i class="fas fa-directions"></i>
+                        Маршрут
+                    </button>
                 </div>
             </div>
 
-            <!-- Weather -->
-            <div class="detail-card">
-                <div class="detail-header">
-                    <i class="fas fa-cloud-sun"></i>
-                    <h3>Погода</h3>
-                </div>
-                <div class="detail-content">
-                    <div class="weather-info" id="weatherInfo">
-                        <div class="weather-loading">
-                            <div class="loading-spinner"></div>
-                            <p>Завантаження прогнозу...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         </section>
 
         <!-- Actions -->

@@ -169,7 +169,7 @@ function switchTab(tab) {
 }
 
 function viewMeetingDetails(id) {
-    window.location.href = `date-details.html?id=${id}`;
+    window.location.href = `meeting/${id}`;
 }
 
 function showLoading(show) {
