@@ -50,7 +50,7 @@ def get_meetings():
 
     users_matches_query = Meeting.query.filter(
         ((Meeting.user1_id == user.user_id) | (Meeting.user2_id == user.user_id))
-    ).order_by(Meeting.meeting_date.asc())
+    ).order_by(Meeting.meeting_date.desc())
 
     pagination = users_matches_query.paginate(page=page, per_page=per_page, error_out=False)
 
@@ -110,3 +110,16 @@ def send_meeting_to_archive():
     meeting.archived = True
     db.session.commit()
     return "ok"
+
+
+@meeting_bp.route('/<int:meeting_id>', methods=['GET'])
+@login_required_api
+def get_meeting(meeting_id):
+    user_id = get_meeting.cred.user.user_id
+
+    meeting = Meeting.query.get(meeting_id)
+
+    if not meeting or not meeting.is_user_belong(user_id):
+        return api_error("User has no permission to view this meeting.", 400)
+
+    return meeting.to_dict(user_id)

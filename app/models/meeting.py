@@ -33,22 +33,23 @@ class Meeting(db.Model):
         user2 = self.user2.to_dict(full=True)
 
         if user_id:
-            if user1["user_id"] == user_id:
-                requested_user = user1
-                match_user = user2
-            else:
-                requested_user = user2
-                match_user = user1
+            is_user1 = user1["user_id"] == user_id
+
+            requested_user = user1 if is_user1 else user2
+            meet_user = user2 if is_user1 else user1
+
+            req_comment = self.user1_comment if is_user1 else self.user2_comment
+            meet_comment = self.user2_comment if is_user1 else self.user1_comment
 
             return {
                 "meeting_id": self.meeting_id,
                 "req_user": requested_user,
-                "meet_user": match_user,
+                "meet_user": meet_user,
                 "created_at": self.created_at,
                 "meeting_date": self.meeting_date,
                 "location": self.location,
-                "user1_comment": self.user1_comment,
-                "user2_comment": self.user2_comment,
+                "req_comment": req_comment,
+                "meet_comment": meet_comment,
                 "result": self.result,
                 "archived": self.archived,
             }
@@ -65,3 +66,6 @@ class Meeting(db.Model):
             "result": self.result,
             "archived": self.archived,
         }
+
+    def is_user_belong(self, user_id:int) -> bool:
+        return user_id == self.user1.user_id or user_id == self.user2.user_id

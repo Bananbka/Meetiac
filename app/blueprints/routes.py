@@ -54,11 +54,10 @@ def meetings():
     return render_template('meetings.html')
 
 
-# @pages_bp.route('/meeting/<int:meeting_id>', methods=['GET'])
-# @login_required
-# def meeting(meeting_id):
-#     meeting = Meeting.query.get_or_404(meeting_id)
-#     render date-details.html
+@pages_bp.route('/meeting/<int:meeting_id>', methods=['GET'])
+@login_required
+def meeting(meeting_id):
+    return render_template("date-details.html")
 
 
 @pages_bp.route('/user-profile/<int:user_id>', methods=['GET'])

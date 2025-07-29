@@ -18,6 +18,7 @@ def create_app():
 
     from app import models
 
+    # Імпорт блупрінтів
     from app.blueprints.routes import pages_bp
     from app.blueprints.api.auth import auth_bp
     from app.blueprints.api.profile import profile_bp
@@ -27,6 +28,8 @@ def create_app():
     from app.blueprints.api.controllers.user_controller import user_bp
     from app.blueprints.api.controllers.match_controller import match_bp
     from app.blueprints.api.controllers.meeting_controller import meeting_bp
+
+    from app.blueprints.api.weather import weather_bp
 
     app.register_blueprint(pages_bp)
     app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -38,5 +41,7 @@ def create_app():
     app.register_blueprint(user_bp, url_prefix='/api/user')
     app.register_blueprint(match_bp, url_prefix='/api/match')
     app.register_blueprint(meeting_bp, url_prefix='/api/meeting')
+
+    app.register_blueprint(weather_bp, url_prefix='/api/weather')
 
     return app
