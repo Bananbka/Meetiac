@@ -9,6 +9,8 @@ from .user_images import UserImage
 from .interest import Interest
 from .preference_signs import PreferenceSign
 from .zodiac_sign import ZodiacSign
+from .zodiac_compatibility import ZodiacCompatibility
+from .zodiac_prediction import ZodiacPrediction
 from .gender import Gender
 from .preference_interest import PreferenceInterest
 from .like import Like
