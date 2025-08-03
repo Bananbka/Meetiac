@@ -177,6 +177,62 @@
     animation: heartBeat 2s ease-in-out infinite;
 }
 
+#comment-card {
+    display: flex;
+    flex-direction: column;
+}
+
+#reqMessageContent {
+    margin-left: auto;
+}
+
+.comment-input {
+    display: flex;
+    align-items: center;
+    background-color: rgb(17, 24, 39);
+    border: 1px solid rgba(236, 72, 153, 0.4);
+    border-radius: 10px;
+    padding: 0.25rem 0.5rem;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+}
+
+.comment-input input {
+    flex: 1;
+    padding: 0.6rem 0.8rem;
+    background-color: transparent;
+    border: none;
+    color: #d1d5db;
+    font-size: 1rem;
+    outline: none;
+}
+
+.comment-input input:focus {
+    border-color: #ec4899;
+}
+
+.comment-input input::placeholder {
+    color: #9ca3af;
+}
+
+.comment-input button {
+    background-color: #ec4899;
+    border: none;
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.comment-input button:hover {
+    background-color: #db2777;
+}
+
+.comment-input button i {
+    font-size: 1rem;
+}
+
 @keyframes heartBeat {
     0%,
     100% {
@@ -726,14 +782,13 @@
     max-width: 600px;
     font-size: 14px;
     position: relative;
-    margin: 10px;
+    margin: 20px 0;
 }
 
 .chat-bubble.left {
     background-color: #f472b6;
     color: #fff;
     align-self: flex-start;
-    margin-left: 20px;
 }
 
 .chat-bubble.left::after {
@@ -750,7 +805,6 @@
     background-color: #ec4899;
     color: #fff;
     align-self: flex-end;
-    margin-right: 20px;
 }
 
 .chat-bubble.right::after {

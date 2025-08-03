@@ -10,18 +10,16 @@ let countdownInterval = null
 const L = window.L
 
 document.addEventListener("DOMContentLoaded", async () => {
-    const pathParts = window.location.pathname.split("/");
-    const currentMeetingId = pathParts[pathParts.length - 1]; // останній елемент — це ID
+    const currentMeetingId = getMeetingId();
 
     if (currentMeetingId) {
         await loadMeetingDetails(currentMeetingId);
         map.invalidateSize()
+        document.getElementById("submit-comment").addEventListener("click", submitComment)
     } else {
         alert("Ідентифікатор зустрічі не знайдено.");
         goBack();
     }
-
-
 })
 
 function showLoading() {
@@ -405,4 +403,37 @@ async function updateMeeting(event) {
 
 function goBack() {
     window.history.back()
+}
+
+async function submitComment() {
+    const comment = document.getElementById("comment-input").value
+
+    if (comment.trim() === "") {
+        showNotification("Коментар не може бути пустим!", "info")
+    }
+
+    const meetingId = getMeetingId();
+    const resp = await fetch(`/api/meeting/comment/${meetingId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            "comment": comment,
+        })
+    })
+
+    if (!resp.ok) {
+        showNotification("Помилка під час надсилання коментаря.", "error")
+        return
+    }
+
+    document.getElementById("reqMessageContent").innerText = comment;
+    showNotification("Коментар залишено!")
+}
+
+
+function getMeetingId() {
+    const pathParts = window.location.pathname.split("/");
+    return pathParts[pathParts.length - 1];
 }

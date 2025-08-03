@@ -77,27 +77,25 @@
 
         <!-- Meeting Details -->
         <section class="meeting-details info-wrapper">
-            <div class="detail-card">
+            <div class="detail-card" id="comments-card">
                 <div class="detail-header">
                     <i class="fas fa-comment"></i>
                     <h3>Коментарі</h3>
                 </div>
                 <div class="detail-content">
-                    <!-- Повідомлення від іншого користувача (зліва) -->
+                    <!-- Повідомлення іншого -->
                     <div class="chat-bubble left" id="meetMessageContent">
-                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
-                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
-                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
-                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
-                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
-                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
-                        НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ НЄГРИ
                     </div>
 
-                    <!-- Твоє повідомлення (справа) -->
+                    <!-- Повідомлення юзера -->
                     <div class="chat-bubble right" id="reqMessageContent">
-                        Все добре, дякую!
                     </div>
+                </div>
+                <div class="comment-input">
+                    <input id="comment-input" type="text" placeholder="Уведіть ваш коментар до зустрічі..."/>
+                    <button type="submit" id="submit-comment">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
                 </div>
             </div>
             <div class="columns-wrapper">
