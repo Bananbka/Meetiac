@@ -105,7 +105,7 @@ function getMeetingType(meeting) {
 }
 
 async function sendMeetingToArchive(id) {
-    const resp = await fetch(`/api/meeting/to-archive?id=${id}`, {method: "PATCH"});
+    const resp = await fetch(`/api/meeting/archive/${id}`, {method: "PATCH"});
     if (!resp.ok) {
         showNotification("Помилка!", "danger")
     }

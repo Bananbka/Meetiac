@@ -3,7 +3,7 @@
 from flask import Blueprint, request, jsonify
 
 from app import db
-from app.models import Meeting
+from app.models import Meeting, MeetingFeedback
 from app.utils.access_utils import login_required_api, api_error
 
 meeting_bp = Blueprint('meeting', __name__)
@@ -82,10 +82,10 @@ def comment_meeting(meeting_id):
 
     meeting = Meeting.query.get(meeting_id)
 
-    is_user1, is_user2 = user.user_id == meeting.user1_id, user.user_id == meeting.user2_id
-    if not any([is_user1, is_user2]):
+    if not meeting.is_user_belong(user.user_id):
         return api_error("User doesn't have permission to comment this meeting.", 400)
 
+    is_user1, is_user2 = user.user_id == meeting.user1_id, user.user_id == meeting.user2_id
     if is_user1:
         meeting.user1_comment = comment
     elif is_user2:
@@ -98,11 +98,14 @@ def comment_meeting(meeting_id):
     return "ok"
 
 
-@meeting_bp.route('/to-archive', methods=['PATCH'])
+@meeting_bp.route('/archive/<int:meeting_id>', methods=['PATCH'])
 @login_required_api
-def send_meeting_to_archive():
-    meeting_id = request.args.get('id')
+def send_meeting_to_archive(meeting_id):
+    user = send_meeting_to_archive.cred.user
+
     meeting = Meeting.query.get(meeting_id)
+    if not meeting.is_user_belong(user.user_id):
+        return api_error("User doesn't have permission to comment this meeting.", 400)
 
     if meeting.archived:
         return "ok"
@@ -123,3 +126,56 @@ def get_meeting(meeting_id):
         return api_error("User has no permission to view this meeting.", 400)
 
     return meeting.to_dict(user_id)
+
+
+@meeting_bp.route('/feedback/<int:meeting_id>', methods=['POST'])
+@login_required_api
+def feedback_meeting(meeting_id):
+    user_id = feedback_meeting.cred.user.user_id
+
+    meeting = Meeting.query.get(meeting_id)
+    if not meeting:
+        return api_error("Meeting doesn't exist.", 404)
+
+    if not meeting.is_user_belong(user_id):
+        return api_error("User has no permission to view this meeting.", 400)
+
+    data = request.get_json()
+    print(data)
+
+    is_already_gave = MeetingFeedback.query.filter_by(user_id=user_id, meeting_id=meeting_id).first()
+    if is_already_gave:
+        return api_error("User already gave feedback.", 400)
+
+    new_feedback = MeetingFeedback(
+        meeting_id=meeting_id,
+        user_id=user_id,
+        comment=data.get('comment'),
+        was_successful=True if data.get('was_successful') == "yes" else False,
+        stay_together=data.get('stay_together'),
+        partner_late=data.get('partner_late'),
+    )
+    db.session.add(new_feedback)
+    db.session.commit()
+
+    return "ok"
+
+@meeting_bp.route('/feedback/<int:meeting_id>', methods=['GET'])
+@login_required_api
+def get_feedback(meeting_id):
+    user_id = get_feedback.cred.user.user_id
+    meeting = Meeting.query.get(meeting_id)
+
+    if not meeting.is_user_belong(user_id):
+        return api_error("User doesn't have permission to view this meeting.", 400)
+
+    feedbacks = MeetingFeedback.query.filter_by(meeting_id=meeting_id).all()
+    feedbacks = [feedback.to_dict() for feedback in feedbacks]
+
+    if not feedbacks:
+        return api_error("No feedback found.", 404)
+
+    return jsonify({
+        "user_id": user_id,
+        "feedbacks": feedbacks
+    })

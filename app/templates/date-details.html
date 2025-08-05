@@ -32,11 +32,8 @@
             </button>
             <h1>Деталі зустрічі</h1>
             <div class="header-actions">
-                <button class="share-btn" onclick="shareMeeting()">
-                    <i class="fas fa-share"></i>
-                </button>
-                <button class="edit-btn" onclick="editMeeting()" id="editBtn" style="display: none;">
-                    <i class="fas fa-edit"></i>
+                <button id="archive-btn">
+                    <i class="fa-solid fa-box-archive"></i>
                 </button>
             </div>
         </div>
@@ -50,10 +47,69 @@
 
     <!-- Content -->
     <main class="content" id="meetingContent">
+        <div class="info-wrapper">
+            <section class="meeting-feedback detail-card" id="feedbacks-section" style="display: none">
+
+            </section>
+            <section class="meeting-feedback detail-card" id="result-form" style="display: none">
+                <div class="detail-header">
+                    <i class="fas fa-star"></i>
+                    <h3>Оцінка зустрічі</h3>
+                </div>
+                <form id="feedbackForm" onsubmit="submitFeedback(event)">
+                    <div class="detail-content">
+                        <!-- Успішність -->
+                        <div class="form-group">
+                            <label class="form-label">Чи була зустріч вдалою?</label>
+                            <div class="success-buttons">
+                                <button type="button" class="btn-option" data-value="yes">
+                                    <i class="fas fa-thumbs-up"></i> Так
+                                </button>
+                                <button type="button" class="btn-option" data-value="no">
+                                    <i class="fas fa-thumbs-down"></i> Ні
+                                </button>
+                            </div>
+                            <input type="hidden" name="was_successful" id="wasSuccessful">
+                        </div>
+
+                        <!-- Причина невдачі (спочатку сховано) -->
+                        <div class="form-group" id="failureReasonGroup" style="display: none; margin-top: 1rem;">
+                            <label class="form-label">Причина невдачі:</label>
+                            <div class="checkbox-wrapper">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" id="partnerLate" name="partner_late">
+                                    <span class="checkmark"><i class="fas fa-check"></i></span>
+                                    Партнер запізнився?
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Коментар -->
+                        <div class="form-group">
+                            <label for="feedbackComment" class="form-label">Коментар:</label>
+                            <textarea id="feedbackComment" name="comment"
+                                      placeholder="Залиште ваші враження..."></textarea>
+                        </div>
+
+                        <!-- Залишитись у парі -->
+                        <div class="form-group checkbox-wrapper">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="stayTogether" name="stay_together">
+                                <span class="checkmark"><i class="fas fa-check"></i></span>
+                                Вважаєте, що закінчили пошуки?
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Надіслати</button>
+                    </div>
+                </form>
+            </section>
+
+        </div>
         <!-- Meeting Header -->
         <section class="meeting-header">
-
-
             <div class="meeting-participants">
                 <div class="participant">
                     <div class="participant-avatar">
@@ -178,57 +234,8 @@
         </section>
     </main>
 
-    <!-- Edit Meeting Modal -->
-    <div class="modal" id="editMeetingModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>Редагувати зустріч</h3>
-                <button class="close-btn" onclick="closeEditMeeting()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <form class="meeting-form" onsubmit="updateMeeting(event)">
-                <div class="form-group">
-                    <label>Дата:</label>
-                    <input type="date" id="editDate" required>
-                </div>
-                <div class="form-group">
-                    <label>Час:</label>
-                    <input type="time" id="editTime" required>
-                </div>
-                <div class="form-group">
-                    <label>Місце:</label>
-                    <input type="text" id="editPlace" placeholder="Назва місця або адреса" required>
-                </div>
-                <div class="form-group">
-                    <label>Повідомлення (необов'язково):</label>
-                    <textarea id="editMessage" placeholder="Додайте повідомлення..."></textarea>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="btn btn-outline" onclick="closeEditMeeting()">Скасувати</button>
-                    <button type="submit" class="btn btn-primary">Зберегти зміни</button>
-                </div>
-            </form>
-        </div>
-    </div>
+    <div>
 
-    <!-- Confirmation Modal -->
-    <div class="modal" id="confirmModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="confirmTitle">Підтвердження</h3>
-                <button class="close-btn" onclick="closeConfirmModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <p id="confirmMessage">Ви впевнені?</p>
-            </div>
-            <div class="form-actions">
-                <button class="btn btn-outline" onclick="closeConfirmModal()">Скасувати</button>
-                <button class="btn btn-primary" id="confirmBtn" onclick="confirmAction()">Підтвердити</button>
-            </div>
-        </div>
     </div>
 </div>
 

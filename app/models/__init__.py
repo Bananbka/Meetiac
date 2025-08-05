@@ -1,6 +1,7 @@
 from .credentials import Credentials
 from .match import Match
 from .meeting import Meeting
+from .meeting_feedback import MeetingFeedback
 from .partner_preference import PartnerPreference
 from .refusal import Refusal
 from .user import User

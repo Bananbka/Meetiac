@@ -5,8 +5,9 @@ let currentMeetingId = null
 let map = null
 let mapMarker = null
 let countdownInterval = null
-
-// Declare L variable before using it
+let isArchived = false
+let feedbacks = [];
+let user_id = null;
 const L = window.L
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -14,13 +15,202 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     if (currentMeetingId) {
         await loadMeetingDetails(currentMeetingId);
-        map.invalidateSize()
-        document.getElementById("submit-comment").addEventListener("click", submitComment)
+        await getFeedbacks()
+        map.invalidateSize();
+
+        setupArchiveButton();
+        setupCommentButton();
+        setupResultOptionButton();
+
+        const isGaveFeedback = isUserGaveFeedback()
+        if (isArchived && meeting.result === null && !isGaveFeedback) {
+            document.getElementById("result-form").style.display = "block";
+            setupSuccessButtons();
+        }
+
+
+        if (feedbacks.length > 0) {
+            loadFeedbacks();
+
+        }
+
+
     } else {
         alert("Ідентифікатор зустрічі не знайдено.");
         goBack();
     }
 })
+
+function loadFeedbacks() {
+    const feedbackSection = document.getElementById("feedbacks-section");
+    feedbackSection.innerHTML = ""; // очищення попереднього вмісту (за потреби)
+
+    for (let i = 0; i < feedbacks.length; i++) {
+        const feedback = feedbacks[i];
+
+        const feedbackElement = document.createElement("div");
+        feedbackElement.classList.add("chat-bubble");
+        if (user_id === feedback.user_id) {
+            feedbackElement.classList.add("right");
+        } else {
+            feedbackElement.classList.add("left");
+        }
+
+        // Формуємо HTML із ключовими полями
+        feedbackElement.innerHTML = feedbackElement.innerHTML = `
+        ${user_id !== feedback.user_id ? "Коментар від вашого партнера після зустрічі:" : "Ваш коментар про цю зустріч:"}
+        <div><strong>Коментар:</strong> ${feedback.comment || "<i>немає</i>"}</div>
+        <div>
+            <strong>Успішна зустріч:</strong> 
+            <i class="fa-solid ${feedback.was_successful ? 'fa-check text-success' : 'fa-xmark text-danger'}"></i>
+            ${feedback.was_successful ? 'Так' : 'Ні'}
+        </div>
+        <div>
+            <strong>Хоче продовжувати:</strong> 
+            <i class="fa-solid ${feedback.stay_together ? 'fa-people-arrows text-success' : 'fa-person-walking text-muted'}"></i>
+            ${feedback.stay_together ? 'Так' : 'Ні'}
+        </div>
+        <div>
+            <strong>Партнер спізнився:</strong> 
+            <i class="fa-solid ${feedback.partner_late ? 'fa-clock text-warning' : 'fa-clock text-muted'}"></i>
+            ${feedback.partner_late ? 'Так' : 'Ні'}
+        </div>
+        <div style="font-size: 0.8em; color: #EEE; margin-top: 5px;">
+            <i class="fa-regular fa-calendar"></i> ${new Date(feedback.created_at).toLocaleString()}
+        </div>
+    `;
+
+        feedbackSection.appendChild(feedbackElement);
+    }
+
+    feedbackSection.style.display = "block";
+}
+
+async function getFeedbacks(meetingId) {
+    meetingId = getMeetingId();
+    const resp = await fetch(`/api/meeting/feedback/${meetingId}`)
+    if (!resp.ok) {
+        return
+    }
+    const data = await resp.json();
+    feedbacks = data.feedbacks;
+    user_id = data.user_id;
+}
+
+function isUserGaveFeedback() {
+    for (let i = 0; i < feedbacks.length; i++) {
+        const feedback = feedbacks[i];
+
+        if (feedback.user_id === user_id) {
+            return true;
+        }
+    }
+    return false;
+}
+
+async function submitFeedback(event) {
+    event.preventDefault();
+
+    const feedback = {
+        was_successful: document.getElementById("wasSuccessful").value,
+        comment: document.getElementById("feedbackComment").value.trim(),
+        stay_together: document.getElementById("stayTogether").checked,
+        partner_late: document.getElementById("partnerLate").checked
+    };
+
+    if (feedback.was_successful !== "yes" && feedback.was_successful !== "no") {
+        showNotification("Виберіть чи зустріч була успішною!")
+        return
+    }
+
+    if (feedback.comment.trim() === "") {
+        showNotification("Залиште коментар!")
+        return
+    }
+
+    setTimeout(() => {
+        window.location.reload();
+    }, 2000)
+
+    const meetingId = getMeetingId();
+    const resp = await fetch(`/api/meeting/feedback/${meetingId}`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            ...feedback
+        })
+    })
+    console.log("Feedback:", feedback);
+    showNotification("Оцінку надіслано! 💖", "success");
+}
+
+function setupSuccessButtons() {
+    const btnOptions = document.querySelectorAll('.btn-option');
+    const wasSuccessfulInput = document.getElementById('wasSuccessful');
+    const failureReasonGroup = document.getElementById('failureReasonGroup');
+
+    btnOptions.forEach(btn => {
+        btn.addEventListener('click', () => {
+            wasSuccessfulInput.value = btn.dataset.value;
+
+            btnOptions.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            if (btn.dataset.value === 'no') {
+                failureReasonGroup.style.display = 'block';
+            } else {
+                failureReasonGroup.style.display = 'none';
+                document.getElementById('partnerLate').checked = false;
+            }
+        });
+    });
+
+    // Якщо вже є вибране значення (наприклад, при редагуванні), відобразити відповідно
+    if (wasSuccessfulInput.value === 'no') {
+        failureReasonGroup.style.display = 'block';
+    }
+}
+
+function setupResultOptionButton() {
+    document.querySelectorAll(".btn-option").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.getElementById("wasSuccessful").value = btn.dataset.value;
+
+            document.querySelectorAll(".btn-option").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+        });
+    });
+}
+
+function setupArchiveButton() {
+    const archiveButton = document.getElementById("archive-btn")
+
+    if (isArchived) {
+        archiveButton.disabled = true;
+        return
+    }
+
+    archiveButton.addEventListener("click", archiveMeeting)
+}
+
+function setupCommentButton() {
+    const commentButton = document.getElementById("submit-comment")
+    const inputComment = document.getElementById("comment-input")
+
+    if (isArchived) {
+        commentButton.addEventListener("click", () => {
+            showNotification("Неможливо прокоментувати архівовану зустріч.")
+        })
+        inputComment.placeholder = "Зустріч архівовано..."
+        inputComment.disabled = true
+        return
+    }
+
+    commentButton.addEventListener("click", submitComment)
+
+}
 
 function showLoading() {
     document.getElementById("loadingOverlay").style.display = "flex"
@@ -53,6 +243,7 @@ async function loadMeetingDetails(meetingId) {
         return
     }
 
+    isArchived = meeting.archived;
 
     // Учасник
     const partner = meeting.meet_user
@@ -87,7 +278,6 @@ async function loadMeetingDetails(meetingId) {
     reqMessageContent.innerHTML = reqMessage ? reqMessage : "*<i>Ви ще не залишили коментаря...</i>*"
 
 
-
     // Мапа
     if (map) {
         map.remove()
@@ -115,8 +305,6 @@ async function loadMeetingDetails(meetingId) {
     // Таймер
     startCountdown(dateObj.toISOString())
 
-    // Кнопка редагування схована
-    document.getElementById("editBtn").style.display = "none"
 
     hideLoading()
 }
@@ -353,33 +541,6 @@ function toggleMapSize() {
     }
 }
 
-function shareMeeting() {
-    if (navigator.share) {
-        navigator
-            .share({
-                title: `Зустріч з ${meeting.person.name} на Meetiac`,
-                text: `Запрошую на зустріч ${formatDate(meeting.date)} о ${meeting.time} у ${meeting.place}.`,
-                url: window.location.href,
-            })
-            .then(() => console.log("Successful share"))
-            .catch((error) => console.log("Error sharing", error))
-    } else {
-        alert(`Поділитися деталями зустрічі:
-        Зустріч з ${meeting.person.name}
-        Дата: ${formatDate(meeting.date)}
-        Час: ${meeting.time}
-        Місце: ${meeting.place}, ${meeting.address}
-        ${window.location.href}`)
-    }
-}
-
-function editMeeting() {
-    document.getElementById("editDate").value = meeting.date
-    document.getElementById("editTime").value = meeting.time
-    document.getElementById("editPlace").value = meeting.place
-    document.getElementById("editMessage").value = meeting.message
-    document.getElementById("editMeetingModal").classList.add("show")
-}
 
 function closeEditMeeting() {
     document.getElementById("editMeetingModal").classList.remove("show")
@@ -433,7 +594,26 @@ async function submitComment() {
 }
 
 
+async function archiveMeeting() {
+    const meetingId = getMeetingId();
+    const resp = await fetch(`/api/meeting/archive/${meetingId}`, {
+        method: "PATCH"
+    })
+
+    if (!resp.ok) {
+        showNotification("Не вдалося архівувати зустріч!", "error")
+        return
+    }
+
+    showNotification("Зустріч архівовано!")
+    setTimeout(() => {
+        window.location.replace("/meetings");
+    }, 2000);
+
+}
+
 function getMeetingId() {
     const pathParts = window.location.pathname.split("/");
     return pathParts[pathParts.length - 1];
 }
+
