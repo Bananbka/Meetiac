@@ -45,6 +45,22 @@ function loadFeedbacks() {
     const feedbackSection = document.getElementById("feedbacks-section");
     feedbackSection.innerHTML = ""; // очищення попереднього вмісту (за потреби)
 
+    if (feedbacks.length > 0) {
+        const feedbackHeader = document.createElement("div");
+        feedbackHeader.classList.add("detail-header");
+
+        const icon = document.createElement("i");
+        icon.className = "fa-solid fa-comments";
+        feedbackHeader.appendChild(icon);
+
+        const header = document.createElement("h3");
+        header.textContent = "Відгуки про зустріч";
+        feedbackHeader.appendChild(header);
+
+        feedbackSection.appendChild(feedbackHeader);
+    }
+
+
     for (let i = 0; i < feedbacks.length; i++) {
         const feedback = feedbacks[i];
 
@@ -52,6 +68,7 @@ function loadFeedbacks() {
         feedbackElement.classList.add("chat-bubble");
         if (user_id === feedback.user_id) {
             feedbackElement.classList.add("right");
+            feedbackElement.style.marginLeft = 'auto';
         } else {
             feedbackElement.classList.add("left");
         }
