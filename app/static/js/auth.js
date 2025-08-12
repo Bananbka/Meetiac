@@ -1,4 +1,5 @@
-// Auth page functionality
+import {showNotification} from "./common.js"
+
 document.addEventListener("DOMContentLoaded", () => {
     initAuthPage()
 })

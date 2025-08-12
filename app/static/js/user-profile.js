@@ -1,12 +1,27 @@
-// Mock data for demonstration
+import {getZodiacCompatibility, goToReactions, showNotification} from "./common.js";
+
 let mockUserProfile = {}
 
 let currentPhotoIndex = 0
 let totalPhotos = 0
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadUserProfile()
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadUserProfile();
+    checkPredictionOverflow();
+    setupButtons();
+
 })
+
+function setupButtons() {
+    const backButton = document.getElementById("back-btn");
+    backButton.addEventListener("click", goToReactions);
+
+    const prevPhotoButton = document.getElementById("prev-photo-btn");
+    prevPhotoButton.addEventListener("click", previousPhoto);
+
+    const nextPhotoButton = document.getElementById("next-photo-btn");
+    nextPhotoButton.addEventListener("click", nextPhoto);
+}
 
 function showLoading() {
     document.getElementById("loadingOverlay").style.display = "flex"
@@ -42,29 +57,17 @@ async function loadUserProfile() {
     document.getElementById("userWeight").textContent = `${user.weight} кг`
     document.getElementById("userGender").textContent = user.gender
 
-    // Zodiac
-    const zodiacIconMap = {
-        aries: "♈",        // Овен
-        taurus: "♉",       // Телець
-        gemini: "♊",       // Близнюки
-        cancer: "♋",       // Рак
-        leo: "♌",          // Лев
-        virgo: "♍",        // Діва
-        libra: "♎",        // Терези
-        scorpio: "♏",      // Скорпіон
-        sagittarius: "♐",  // Стрілець
-        capricorn: "♑",    // Козеріг
-        aquarius: "♒",     // Водолій
-        pisces: "♓"        // Риби
-    }
     const userZodiacElement = document.getElementById("userZodiac");
-    const zodiacSymbol = zodiacIconMap[user.sign.toLowerCase()] || "❓";
 
-    userZodiacElement.innerHTML = `<span class="zodiac-icon">${zodiacSymbol}</span><span>${user.sign}</span>`;
+    const prediction = await getZodiacCompatibility(user.sign);
+    console.log(prediction.percent)
+
+    userZodiacElement.innerHTML = `<span>${prediction.zodiac1}</span> + <span>${prediction.zodiac2}</span>`;
 
     const compatibilityFill = document.querySelector("#compatibility .compatibility-fill")
-    compatibilityFill.style.width = `${user.compatibility}%`
-    document.querySelector("#compatibility .compatibility-percent").textContent = `${user.compatibility}%`
+    compatibilityFill.style.width = `${prediction.percent}%`
+    document.querySelector("#compatibility .compatibility-percent").textContent = `${prediction.percent}%`
+    document.getElementById("userPrediction").textContent = prediction.description
 
     // Interests
     const userInterestsElement = document.getElementById("userInterests")
@@ -124,7 +127,25 @@ function previousPhoto() {
     updatePhotoSlider()
 }
 
-function goBack() {
-    window.history.back()
-}
 
+function checkPredictionOverflow() {
+    const card = document.getElementById("zodiac-card");
+    const prediction = document.getElementById("userPrediction");
+
+    // Якщо кнопка вже є — не створюємо знову
+    if (card.querySelector(".show-more-btn")) return;
+
+    if (prediction.scrollHeight > prediction.clientHeight) {
+        const btn = document.createElement("button");
+        btn.className = "show-more-btn";
+        btn.textContent = "Показати більше";
+        card.appendChild(btn);
+
+        btn.addEventListener("click", () => {
+            card.classList.toggle("expanded");
+            btn.textContent = card.classList.contains("expanded")
+                ? "Показати менше"
+                : "Показати більше";
+        });
+    }
+}

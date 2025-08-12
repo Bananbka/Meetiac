@@ -26,7 +26,7 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <button class="back-btn" onclick="goBack()">
+            <button class="back-btn" id="back-btn">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <h1>Профіль</h1>
@@ -58,10 +58,10 @@
                 <div class="photo-indicators" id="photoIndicators">
                     <!-- Indicators will be generated dynamically -->
                 </div>
-                <button class="photo-nav prev" onclick="previousPhoto()">
+                <button class="photo-nav prev" id="prev-photo-btn">
                     <i class="fas fa-chevron-left"></i>
                 </button>
-                <button class="photo-nav next" onclick="nextPhoto()">
+                <button class="photo-nav next" id="next-photo-btn">
                     <i class="fas fa-chevron-right"></i>
                 </button>
             </div>
@@ -90,15 +90,15 @@
                         <div class="physical-info">
                             <div class="info-item">
                                 <span class="label">Зріст:</span>
-                                <span id="userHeight">170 см</span>
+                                <span id="userHeight">х см</span>
                             </div>
                             <div class="info-item">
                                 <span class="label">Вага:</span>
-                                <span id="userWeight">60 кг</span>
+                                <span id="userWeight">х кг</span>
                             </div>
                             <div class="info-item">
                                 <span class="label">Стать:</span>
-                                <span id="userGender">Жінка</span>
+                                <span id="userGender">х</span>
                             </div>
                         </div>
                     </div>
@@ -116,20 +116,22 @@
                     </div>
 
                     <!-- Zodiac -->
-                <div class="info-card">
+                <div class="info-card" id="zodiac-card">
                     <h3><i class="fas fa-star-of-david"></i> Астрологія</h3>
                     <div class="zodiac-info">
                         <div class="zodiac-sign" id="userZodiac">
-                            <i class="fas fa-gemini"></i>
-                            <span>Близнюки</span>
+                            <span>х</span>
                         </div>
                         <div class="compatibility" id="compatibility">
                             <span class="compatibility-label">Сумісність:</span>
                             <div class="compatibility-bar">
                                 <div class="compatibility-fill" style="width: 75%"></div>
                             </div>
-                            <span class="compatibility-percent">75%</span>
+                            <span class="compatibility-percent">0%</span>
                         </div>
+                        <p class="prediction-text" id="userPrediction">
+
+                        </p>
                     </div>
                 </div>
                 </div>
@@ -144,7 +146,6 @@
 
 </div>
 
-<script src="{{ url_for('static', filename='js/user-profile.js') }}"></script>
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/user-profile.js') }}"></script>
 </body>
 </html>

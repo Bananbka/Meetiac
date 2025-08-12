@@ -44,7 +44,7 @@
                         <i class="fa-solid fa-heart-circle-check"></i>
                         Симпатії
                     </a>
-                     <a href="/meetings" class="btn btn-outline btn-small">
+                    <a href="/meetings" class="btn btn-outline btn-small">
                         <i class="fa-solid fa-calendar"></i>
                         Зустрічі
                     </a>
@@ -84,11 +84,11 @@
 
                 <!-- Action Buttons -->
                 <div class="action-buttons">
-                    <button class="action-btn reject" onclick="handleReject()">
+                    <button class="action-btn reject" id="reject-btn">
                         <i class="fas fa-times"></i>
                     </button>
 
-                    <button class="action-btn like" onclick="handleLike()">
+                    <button class="action-btn like" id="like-btn">
                         <i class="fas fa-heart"></i>
                     </button>
                 </div>
@@ -113,7 +113,7 @@
                 <i class="fas fa-star"></i>
                 <span>Зоряна порада</span>
             </div>
-            <p>Леви та Стрільці мають високу сумісність! Ваші енергії доповнюють одна одну.</p>
+            <p id="zodiac-description">Леви та Стрільці мають високу сумісність! Ваші енергії доповнюють одна одну.</p>
         </div>
     </div>
 
@@ -125,7 +125,7 @@
                 <span>Сортування</span>
             </div>
             <div class="sort-controls">
-                <select id="sortSelect" class="sort-select" onchange="handleSortChange()">
+                <select id="sortSelect" class="sort-select">
                     <option value="default">Звичайне</option>
                     <option value="height-asc">По росту ↑</option>
                     <option value="height-desc">По росту ↓</option>
@@ -135,7 +135,7 @@
                     <option value="age-desc">По віку ↓</option>
                     <option value="shuffle">Перемішати</option>
                 </select>
-                <button class="sort-reset-btn" onclick="resetSort()" title="Скинути сортування">
+                <button class="sort-reset-btn" id="reset-sort-btn" title="Скинути сортування">
                     <i class="fas fa-undo"></i>
                 </button>
             </div>
@@ -164,7 +164,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/discover.js') }}"></script>
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/discover.js') }}"></script>
 </body>
 </html>

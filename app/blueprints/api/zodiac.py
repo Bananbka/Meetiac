@@ -26,11 +26,15 @@ def get_compatibility():
     first_sign = data.get('first_sign')
     second_sign = data.get('second_sign')
 
-    if not all([first_sign, second_sign]):
+    if not first_sign:
         return api_error("Missing sign.", 400)
 
+
     zodiac1 = ZodiacSign.query.filter(ZodiacSign.name == first_sign).first()
-    zodiac2 = ZodiacSign.query.filter(ZodiacSign.name == second_sign).first()
+    if not second_sign:
+        zodiac2 = get_compatibility.cred.user.zodiac_sign
+    else:
+        zodiac2 = ZodiacSign.query.filter(ZodiacSign.name == second_sign).first()
 
     if not all([zodiac1, zodiac2]):
         return api_error("Unknown sign name.", 400)

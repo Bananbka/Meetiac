@@ -1,3 +1,4 @@
+import {showNotification} from "./common.js"
 import {isAdult} from "./auth.js";
 
 // Profile page functionality
@@ -492,11 +493,14 @@ function showFinalDeleteConfirmation() {
   `
 
     modalFooter.innerHTML = `
-    <button class="btn btn-primary" onclick="redirectToHome()">
+    <button class="btn btn-primary" id="home-btn">
       <i class="fas fa-home"></i>
       На головну
     </button>
   `
+
+    const homeBtn = document.getElementById("home-btn");
+    homeBtn.addEventListener("click", redirectToHome)
 
     // Add styles for final confirmation
     const style = document.createElement("style")

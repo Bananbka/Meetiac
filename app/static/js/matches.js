@@ -1,3 +1,7 @@
+import {formatDate} from "./common.js"
+import {showNotification} from "./common.js"
+import {goToDiscover} from "./common.js"
+
 // Mock data for demonstration
 let curMatchesPage = 1
 let mockMatches = {
@@ -11,7 +15,40 @@ let isFilterPanelOpen = false
 document.addEventListener("DOMContentLoaded", () => {
     loadMatches()
     updateStats()
+    setupButtons()
 })
+
+function setupButtons() {
+    const closeMeetingModalButton = document.getElementById("close-meeting-modal");
+    closeMeetingModalButton.addEventListener("click", closeMeetingModal)
+
+    const goToDiscoverButton = document.getElementById("go-to-discover");
+    goToDiscoverButton.addEventListener("click", goToDiscover)
+
+    const loadMoreButton = document.getElementById("loadMoreBtn");
+    loadMoreButton.addEventListener("click", loadMore)
+
+    const goBackButton = document.getElementById("go-back-button");
+    goBackButton.addEventListener("click", goToDiscover)
+
+    const searchButton = document.getElementById("search-btn");
+    searchButton.addEventListener("click", toggleSearch)
+
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("keyup", searchMatches)
+
+    const filterButton = document.getElementById("filter-btn");
+    filterButton.addEventListener('click', toggleFilter)
+
+    const applyFilterButton = document.getElementById("apply-filter-btn");
+    applyFilterButton.addEventListener('click', applyFilters)
+
+    const clearFilterButton = document.getElementById("clear-filter-btn");
+    clearFilterButton.addEventListener('click', resetFilters)
+
+    const clearSearchButton = document.getElementById("clear-search-btn");
+    clearSearchButton.addEventListener("click", clearSearch)
+}
 
 function showLoading() {
     document.getElementById("loadingOverlay").style.display = "flex"
@@ -36,11 +73,11 @@ async function loadMatches(filters = {}) {
     const searchTerm = document.getElementById("searchInput").value.toLowerCase()
     let filteredMatches = [...mockMatches.matches]
 
+
     if (searchTerm) {
         filteredMatches = filteredMatches.filter(
             (match) =>
-                match.name.toLowerCase().includes(searchTerm) ||
-                match.lastMessage.toLowerCase().includes(searchTerm)
+                match.match_user.name.toLowerCase().includes(searchTerm)
         )
     }
 
@@ -107,7 +144,7 @@ async function loadMore() {
 
 function createMatchCard(match) {
     console.log(match)
-    user = match.match_user
+    const user = match.match_user
     const card = document.createElement("div")
     card.className = `match-card`
     card.onclick = () => openMeetingModal(match)
@@ -202,8 +239,7 @@ async function handleUnmatch(matchId) {
     })
     if (resp.ok) {
         showNotification("Успішно розпаровано!", 'success')
-    }
-    else {
+    } else {
         showNotification("Помилка розпарування", 'danger')
     }
 
@@ -211,9 +247,6 @@ async function handleUnmatch(matchId) {
     loadMatches()
 }
 
-function goToDiscover() {
-    window.location.href = 'discover';
-}
 
 function goBack() {
     window.history.back()

@@ -1,3 +1,5 @@
+import {confirmLogout, showNotification, setupLogoutModal, hideLogoutModal, getZodiacCompatibility} from "./common.js"
+
 // Discover page functionality
 let currentProfileIndex = 0
 const likedProfiles = []
@@ -15,13 +17,28 @@ document.addEventListener("DOMContentLoaded", () => {
 async function initDiscoverPage() {
     await uploadProfilesData()
     if (profiles.length === 0) showEmptyProfile()
-    updateProfileCard()
-    updateLikesCount()
-    updateMatchesCount()
+    await updateProfileCard()
+    await updateLikesCount()
+    await updateMatchesCount()
     setupKeyboardNavigation()
     setupTouchGestures()
     setupLogoutModal()
+    setupButtons()
+    setupMoreButton()
+}
 
+function setupButtons() {
+    const resetSortButton = document.getElementById("reset-sort-btn");
+    resetSortButton.addEventListener("click", resetSort)
+
+    const sortSelect = document.getElementById("sortSelect");
+    sortSelect.addEventListener("change", handleSortChange)
+
+    const rejectButton = document.getElementById("reject-btn");
+    rejectButton.addEventListener("click", handleReject);
+
+    const likeButton = document.getElementById("like-btn");
+    likeButton.addEventListener("click", handleLike);
 }
 
 
@@ -45,7 +62,7 @@ function getZodiacName(sign, addEmoji = false) {
     return `${addEmoji ? zodiacData.emj : ""} ${zodiacData.name}`
 }
 
-function updateProfileCard() {
+async function updateProfileCard() {
     const profile = profiles[currentProfileIndex];
 
     if (!profile) return
@@ -54,9 +71,13 @@ function updateProfileCard() {
     const toggleElement = document.getElementById("bioToggle");
     setupBio(bioElement, toggleElement, profile.bio || "");
 
+    const zodiacSign = profile.sign
+    const compData = await getZodiacCompatibility(zodiacSign);
+
     document.getElementById("profileName").textContent = `${profile.name}, ${profile.age}`;
-    document.getElementById("profileZodiac").textContent = getZodiacName(profile.sign, true);
-    document.getElementById("compatibilityScore").textContent = profile.compatibility;
+    document.getElementById("profileZodiac").textContent = getZodiacName(zodiacSign, true);
+    document.getElementById("compatibilityScore").textContent = compData.percent;
+    document.getElementById("zodiac-description").textContent = compData.description;
     document.getElementById("profileImage").src = profile.images[0];
 
     const interestsContainer = document.getElementById("profileInterests");
@@ -99,8 +120,8 @@ async function handleLike() {
         card.style.opacity = "1"
     }, 300)
 
-    updateLikesCount()
-    updateMatchesCount()
+    await updateLikesCount()
+    await updateMatchesCount()
 }
 
 async function handleReject() {
@@ -180,6 +201,7 @@ async function updateLikesCount() {
     const likesElement = document.getElementById("likesCount")
     const likeResponse = await fetch(`/api/discover/like-count`)
     const likeData = await likeResponse.json()
+    console.log(likeData)
     if (likesElement) {
         likesElement.textContent = likeData || 0
     }
@@ -506,3 +528,29 @@ function playMatchAnimation() {
         overlay.remove();
     }, 3000);
 }
+
+function setupMoreButton() {
+    const tipCard = document.querySelector(".tip-card");
+    const desc = document.getElementById("zodiac-description");
+
+    // Створюємо кнопку
+    const btn = document.createElement("button");
+    btn.className = "show-more-btn";
+    btn.textContent = "Показати більше";
+
+    // Перевірка, чи текст виходить за межі блоку
+    console.log(desc.scrollHeight);
+    console.log(desc.clientHeight);
+    if (desc.scrollHeight > desc.clientHeight) {
+        tipCard.appendChild(btn);
+    }
+
+    btn.addEventListener("click", () => {
+        tipCard.classList.toggle("expanded");
+        btn.textContent = tipCard.classList.contains("expanded")
+            ? "Показати менше"
+            : "Показати більше";
+    });
+}
+
+

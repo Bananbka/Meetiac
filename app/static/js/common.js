@@ -1,4 +1,4 @@
-﻿function showNotification(message, type = "info") {
+﻿export function showNotification(message, type = "info") {
     // Remove existing notifications
     const existingNotification = document.querySelector(".notification")
     if (existingNotification) {
@@ -73,7 +73,7 @@ function removeNotification(notification) {
     }, 300)
 }
 
-function setupLogoutModal() {
+export function setupLogoutModal() {
     // Close modal when clicking outside
     document.addEventListener("click", (event) => {
         const modal = document.getElementById("logoutModal")
@@ -99,13 +99,13 @@ function showLogoutModal() {
     document.body.style.overflow = "hidden"
 }
 
-function hideLogoutModal() {
+export function hideLogoutModal() {
     const modal = document.getElementById("logoutModal")
     modal.classList.remove("show")
     document.body.style.overflow = ""
 }
 
-async function confirmLogout() {
+export async function confirmLogout() {
     const confirmBtn = document.getElementById("confirmLogoutBtn")
     const logoutText = confirmBtn.querySelector(".logout-text")
 
@@ -161,7 +161,75 @@ async function confirmLogout() {
     }
 }
 
-function formatDate(dateString) {
+export function formatDate(dateString) {
     const date = new Date(dateString)
     return date.toLocaleDateString("uk-UA")
+}
+
+export async function getZodiacCompatibility(partnerSign) {
+    const resp = await fetch(`/api/zodiac/compatibility?first_sign=${partnerSign}`)
+
+    if (!resp.ok) {
+        showNotification("Помилка при отриманні сумісності", "error")
+        return
+    }
+
+    const data = await resp.json()
+    const percent = data.percent;
+    const description = data.description;
+    const zodiac1 = translateZodiacName(data.sign1);
+    const zodiac2 = translateZodiacName(data.sign2);
+
+    return {
+        percent,
+        description,
+        zodiac1,
+        zodiac2,
+    }
+}
+
+export function translateZodiacName(engName) {
+    if (!engName || typeof engName !== "string") {
+        throw new Error("Invalid zodiac name");
+    }
+
+    const translations = {
+        Aries: "Овен",
+        Taurus: "Телець",
+        Gemini: "Близнюки",
+        Cancer: "Рак",
+        Leo: "Лев",
+        Virgo: "Діва",
+        Libra: "Терези",
+        Scorpio: "Скорпіон",
+        Sagittarius: "Стрілець",
+        Capricorn: "Козоріг",
+        Aquarius: "Водолій",
+        Pisces: "Риби"
+    };
+
+    const normalizedName = engName.trim().charAt(0).toUpperCase() + engName.trim().slice(1).toLowerCase();
+
+    return translations[normalizedName] || engName;
+}
+
+
+export function goToMeetings() {
+    window.location.replace("/meetings");
+}
+
+
+export function goToMatches() {
+    window.location.replace("/matches");
+}
+
+export function goToDiscover() {
+    window.location.replace("/discover");
+}
+
+export function goToProfile() {
+    window.location.replace('/profile');
+}
+export function goToReactions() {
+    window.location.replace('/reactions');
 }

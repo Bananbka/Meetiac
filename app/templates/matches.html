@@ -27,15 +27,15 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <button class="back-btn" onclick="goBack()">
+            <button class="back-btn" id="go-back-button">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <h1>Збіги</h1>
             <div class="header-actions">
-                <button class="search-btn" onclick="toggleSearch()">
+                <button class="search-btn" id="search-btn">
                     <i class="fas fa-search"></i>
                 </button>
-                <button class="filter-btn" onclick="toggleFilter()">
+                <button class="filter-btn" id="filter-btn">
                     <i class="fas fa-filter"></i>
                 </button>
             </div>
@@ -46,8 +46,8 @@
     <div class="search-bar" id="searchBar">
         <div class="search-input-container">
             <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Пошук збігів..." onkeyup="searchMatches()">
-            <button class="clear-search" onclick="clearSearch()" style="display: none;">
+            <input type="text" id="searchInput" placeholder="Пошук збігів...">
+            <button class="clear-search" id="clear-search-btn" style="display: none;">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -65,8 +65,8 @@
                 </select>
             </div>
             <div class="filter-actions">
-                <button class="btn btn-outline" onclick="resetFilters()">Скинути</button>
-                <button class="btn btn-primary" onclick="applyFilters()">Застосувати</button>
+                <button class="btn btn-outline" id="clear-filter-btn">Скинути</button>
+                <button class="btn btn-primary" id='apply-filter-btn'>Застосувати</button>
             </div>
         </div>
     </div>
@@ -98,13 +98,13 @@
             <i class="fas fa-heart-broken"></i>
             <h3>Поки що немає збігів</h3>
             <p>Продовжуйте лайкати профілі, щоб знайти свою половинку!</p>
-            <button class="btn btn-primary" onclick="goToDiscover()">Почати пошук</button>
+            <button class="btn btn-primary" id="go-to-discover">Почати пошук</button>
         </div>
     </main>
 
     <!-- Load More Button -->
     <div class="load-more-container" id="loadMoreContainer" style="display: none;">
-        <button class="btn btn-outline" id="loadMoreBtn" onclick="loadMore()">
+        <button class="btn btn-outline" id="loadMoreBtn">
             <span class="load-more-text">Завантажити ще</span>
             <div class="load-more-spinner" style="display: none;"></div>
         </button>
@@ -116,7 +116,7 @@
   <div class="modal-content">
     <div class="modal-header">
       <h2>Запропонувати зустріч</h2>
-      <button onclick="closeMeetingModal()" class="close-btn">&times;</button>
+      <button id="close-meeting-modal" class="close-btn">&times;</button>
     </div>
 
     <form id="meetingForm">
@@ -135,8 +135,7 @@
     </form>
   </div>
 </div>
-<script src="{{ url_for('static', filename='js/matches.js') }}"></script>
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/matches.js') }}"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>

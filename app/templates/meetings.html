@@ -26,12 +26,12 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <button class="back-btn" onclick="goBack()">
+            <button class="back-btn" id="to-discover-btn">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <h1>Зустрічі</h1>
             <div class="header-actions">
-                <button class="calendar-btn" onclick="toggleCalendarView()">
+                <button class="calendar-btn" id="toggle-calendar-btn">
                     <i class="fas fa-calendar-alt"></i>
                 </button>
             </div>
@@ -40,12 +40,12 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" data-tab="upcoming" onclick="switchTab('upcoming')">
+        <button class="tab-btn active" data-tab="upcoming" id="switch-to-upcoming-btn">
             <i class="fas fa-clock"></i>
             <span>Заплановані</span>
             <div class="badge" id="upcomingBadge">2</div>
         </button>
-        <button class="tab-btn" data-tab="archive" onclick="switchTab('archive')">
+        <button class="tab-btn" data-tab="archive" id="switch-to-archive-btn">
             <i class="fa-solid fa-box-archive"></i>
             <span>Архівовані</span>
             <div class="badge" id="archiveBadge">1</div>
@@ -55,11 +55,11 @@
     <!-- Calendar View -->
     <div class="calendar-view" id="calendarView" style="display: none;">
         <div class="calendar-header">
-            <button class="calendar-nav" onclick="previousMonth()">
+            <button class="calendar-nav" id="prev-month-btn">
                 <i class="fas fa-chevron-left"></i>
             </button>
             <h3 id="calendarMonth">Січень 2024</h3>
-            <button class="calendar-nav" onclick="nextMonth()">
+            <button class="calendar-nav" id="next-month-btn">
                 <i class="fas fa-chevron-right"></i>
             </button>
         </div>
@@ -85,7 +85,7 @@
                 <i class="fas fa-calendar-plus"></i>
                 <h3>Немає запланованих зустрічей</h3>
                 <p>Запросіть когось на побачення!</p>
-                <button class="btn btn-primary" onclick="goToMatches()">Переглянути збіги</button>
+                <button class="btn btn-primary" id="to-matches-btn">Переглянути збіги</button>
             </div>
         </div>
 
@@ -103,7 +103,7 @@
     </main>
 
     <div class="load-more-container" id="loadMoreContainer" style="display: none;">
-        <button class="btn btn-outline" id="loadMoreBtn" onclick="loadMore()">
+        <button class="btn btn-outline" id="loadMoreBtn">
             <span class="load-more-text">Завантажити ще</span>
             <div class="load-more-spinner" style="display: none;"></div>
         </button>
@@ -111,7 +111,6 @@
 </div>
 
 
-<script src="{{ url_for('static', filename='js/meetings.js') }}"></script>
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/meetings.js') }}"></script>
 </body>
 </html>

@@ -26,12 +26,12 @@
     <!-- Header -->
     <header class="header">
         <div class="header-content">
-            <button class="back-btn" onclick="goBack()">
+            <button class="back-btn" id="to-discover-btn">
                 <i class="fas fa-arrow-left"></i>
             </button>
             <h1>Лайки</h1>
             <div class="header-actions">
-                <button class="filter-btn" onclick="toggleFilter()">
+                <button class="filter-btn" id="toggle-filter-btn">
                     <i class="fas fa-filter"></i>
                 </button>
             </div>
@@ -40,12 +40,12 @@
 
     <!-- Tabs -->
     <div class="tabs">
-        <button class="tab-btn active" data-tab="likes" onclick="switchTab('likes')">
+        <button class="tab-btn active" data-tab="likes" id="switch-to-likes-btn">
             <i class="fas fa-heart"></i>
             <span>Лайки</span>
             <div class="badge" id="likesBadge">0</div>
         </button>
-        <button class="tab-btn active" data-tab="dislikes" onclick="switchTab('dislikes')">
+        <button class="tab-btn active" data-tab="dislikes" id="switch-to-dislikes-btn">
             <i class="fas fa-heart-crack"></i>
             <span>Дизайки</span>
             <div class="badge" id="dislikesBadge">0</div>
@@ -74,8 +74,8 @@
                 </select>
             </div>
             <div class="filter-actions">
-                <button class="btn btn-outline" onclick="resetFilters()">Скинути</button>
-                <button class="btn btn-primary" onclick="applyFilters()">Застосувати</button>
+                <button class="btn btn-outline" id="reset-filters-btn">Скинути</button>
+                <button class="btn btn-primary" id="apply-filters-btn">Застосувати</button>
             </div>
         </div>
     </div>
@@ -96,17 +96,17 @@
             <i class="fas fa-search"></i>
             <h3>Тут поки нікого...</h3>
             <p>Почніть шукати цікавих людей!</p>
-            <button class="btn btn-primary" onclick="goToDiscover()">Почати пошук</button>
+            <button class="btn btn-primary" id="go-to-discover-btn">Почати пошук</button>
         </div>
     </main>
 
     <!-- Load More Button -->
     <div class="load-more-container" id="loadMoreContainer" style="display: none;">
-        <button class="btn btn-outline" id="loadMoreBtn" onclick="loadMore()">
+        <button class="btn btn-outline" id="loadMoreBtn">
             <span class="load-more-text">Завантажити ще</span>
             <div class="load-more-spinner" style="display: none;"></div>
         </button>
-        <button class="btn btn-outline" id="clearLikesBtn" onclick="clearAll()">
+        <button class="btn btn-outline" id="clearLikesBtn">
             <span class="load-more-text">Очистити</span>
             <div class="load-more-spinner" style="display: none;"></div>
         </button>
@@ -132,15 +132,13 @@
                 </div>
             </div>
             <div class="match-actions">
-                <button class="btn btn-outline" onclick="closeMatchModal()">Продовжити</button>
-                <button class="btn btn-primary" onclick="startChatFromMatch()">Написати повідомлення</button>
+                <button class="btn btn-outline" id="close-modal-btn">Продовжити</button>
             </div>
         </div>
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/likes.js') }}"></script>
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/likes.js') }}"></script>
 
 </body>
 </html>

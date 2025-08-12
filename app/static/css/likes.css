@@ -305,10 +305,14 @@
 }
 
 .like-card-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 0.8rem;
+}
+
+.like-card-actions button {
+    flex: 1;
 }
 
 .action-btn-small {
@@ -559,5 +563,12 @@
 
     .load-more-container {
         flex-direction: column;
+    }
+}
+
+@media(max-width: 764px) {
+
+    .likes-grid {
+        grid-template-columns: 1fr 1fr;
     }
 }

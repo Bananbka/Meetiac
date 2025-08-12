@@ -1,3 +1,5 @@
+import {formatDate, showNotification, goToDiscover, goToProfile} from "./common.js";
+
 // Mock data for demonstration
 let mockLikes = [];
 let mockDislikes = [];
@@ -10,7 +12,46 @@ let currentTab = 'likes';
 // DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
     switchTab("likes")
+    setupButtons()
 })
+
+
+function setupButtons() {
+    const toDiscoverButton = document.getElementById("to-discover-btn");
+    toDiscoverButton.addEventListener("click", goToDiscover);
+
+    const goToDiscoverButton = document.getElementById("go-to-discover-btn");
+    goToDiscoverButton.addEventListener("click", goToDiscover);
+
+    const toggleFilterButton = document.getElementById("toggle-filter-btn");
+    toggleFilterButton.addEventListener("click", toggleFilter);
+
+    const applyFilterButton = document.getElementById("apply-filters-btn");
+    applyFilterButton.addEventListener("click", applyFilters)
+
+    const resetFilterButton = document.getElementById("reset-filters-btn");
+    resetFilterButton.addEventListener("click", resetFilters)
+
+    const clearLikesBtn = document.getElementById("clearLikesBtn");
+    clearLikesBtn.addEventListener("click", clearAll)
+
+    const closeMatchButton = document.getElementById("close-modal-btn");
+    closeMatchButton.addEventListener("click", closeMatchModal)
+
+    const switchToLikesButton = document.getElementById("switch-to-likes-btn");
+    switchToLikesButton.addEventListener("click", () => {
+        switchTab("likes")
+    })
+
+    const switchToDislikesButton = document.getElementById("switch-to-dislikes-btn");
+    switchToDislikesButton.addEventListener("click", () => {
+        switchTab("dislikes")
+    })
+
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    loadMoreBtn.addEventListener("click", loadMore)
+
+}
 
 function showLoading() {
     document.getElementById("loadingOverlay").style.display = "flex"
@@ -121,7 +162,6 @@ async function loadMore() {
 function createLikeCard(like) {
     const card = document.createElement("div")
     card.className = "like-card"
-    card.onclick = () => goToUserProfile(like.to_user.user_id)
 
     const imageDiv = document.createElement("div")
     imageDiv.className = "like-card-image"
@@ -163,17 +203,18 @@ function createLikeCard(like) {
             goToUserProfile(like.to_user.user_id)
         }
         actionsDiv.appendChild(viewProfileBtn)
+        card.onclick = () => goToUserProfile(like.to_user.user_id)
     }
 
     const deleteLikeBtn = document.createElement("button")
     deleteLikeBtn.className = "action-btn-small like"
     deleteLikeBtn.textContent = "Видалити"
-    deleteLikeBtn.onclick = (e) => {
+    deleteLikeBtn.onclick = async (e) => {
         e.stopPropagation()
         if (currentTab === "likes") {
-            deleteLike(like.id)
+            await deleteLike(like.id)
         } else if (currentTab === "dislikes") {
-            deleteDislike(like.id)
+            await deleteDislike(like.id)
         }
     }
 
@@ -274,13 +315,6 @@ function goToUserProfile(userId) {
     window.location.href = `user-profile/${userId}`
 }
 
-function goToProfile() {
-    window.location.href = 'profile'
-}
-
-function goToDiscover() {
-    window.location.href = 'discover'
-}
 
 function closeMatchModal() {
     document.getElementById("matchModal").classList.remove("show")

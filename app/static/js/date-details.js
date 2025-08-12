@@ -1,3 +1,5 @@
+import {showNotification} from "./common.js";
+
 // Mock data for demonstration
 let meeting = {};
 

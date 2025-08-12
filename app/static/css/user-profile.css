@@ -527,7 +527,36 @@
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     gap: 1rem;
+    align-items: start
 }
+
+.card-grid .info-card {
+    min-height: 290px;
+}
+
+.prediction-text {
+    max-height: 4.5em; /* приблизно 3 рядки */
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.3s ease;
+}
+
+.info-card.expanded .prediction-text {
+    max-height: none;
+}
+
+.show-more-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: #b8468a;
+    font-weight: 500;
+    display: inline-block;
+}
+
 
 @media (max-width: 1015px) {
     .info-wrapper {

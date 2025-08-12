@@ -1,4 +1,4 @@
-// meetings.js
+import {goToDiscover, showNotification} from "./common.js";
 
 let currentTab = "upcoming";
 let isCalendarView = false;
@@ -8,11 +8,34 @@ let pagination = {};
 
 function initMeetingsPage() {
     loadMeetings();
-    setupEventListeners();
+    setupButtons();
 }
 
-function setupEventListeners() {
-    // Add necessary listeners here
+function setupButtons() {
+    const toDiscoverButton = document.getElementById("to-discover-btn");
+    toDiscoverButton.addEventListener("click", goToDiscover);
+
+    const switchToUpcomingButton = document.getElementById("switch-to-upcoming-btn");
+    switchToUpcomingButton.addEventListener("click", ()=>{switchTab("upcoming")});
+
+    const switchToArchiveButton = document.getElementById("switch-to-archive-btn");
+    switchToArchiveButton.addEventListener("click", ()=>{switchTab("archive")});
+
+    const toggleCalendarButton = document.getElementById("toggle-calendar-btn");
+    toggleCalendarButton.addEventListener("click", toggleCalendarView);
+
+    const prevMonthButton = document.getElementById("prev-month-btn");
+    prevMonthButton.addEventListener("click", previousMonth)
+
+    const nextMonthButton = document.getElementById("next-month-btn");
+    nextMonthButton.addEventListener("click", nextMonth)
+
+    const loadMoreBtn = document.getElementById("loadMoreBtn");
+    loadMoreBtn.addEventListener("click", loadMore);
+
+    const toMatchesButton = document.getElementById("to-matches-btn");
+    toMatchesButton.addEventListener("click", goToMatches)
+
 }
 
 let currentPage = 1;
