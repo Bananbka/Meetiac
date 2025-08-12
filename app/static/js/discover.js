@@ -1,4 +1,4 @@
-import {confirmLogout, showNotification, setupLogoutModal, hideLogoutModal, getZodiacCompatibility} from "./common.js"
+import {confirmLogout, showLogoutModal, showNotification, setupLogoutModal, hideLogoutModal, getZodiacCompatibility} from "./common.js"
 
 // Discover page functionality
 let currentProfileIndex = 0
@@ -39,6 +39,15 @@ function setupButtons() {
 
     const likeButton = document.getElementById("like-btn");
     likeButton.addEventListener("click", handleLike);
+
+    const showLogoutButton = document.getElementById("show-logout-modal-btn");
+    showLogoutButton.addEventListener("click", showLogoutModal);
+
+    const hideLogoutButton = document.getElementById("hide-logout-modal-btn");
+    hideLogoutButton.addEventListener("click", hideLogoutModal);
+
+    const confirmLogoutBtn = document.getElementById("confirmLogoutBtn");
+    confirmLogoutBtn.addEventListener("click", confirmLogout);
 }
 
 

@@ -1,4 +1,4 @@
-import {showNotification} from "./common.js"
+import {showNotification, hideLogoutModal, showLogoutModal, confirmLogout} from "./common.js"
 import {isAdult} from "./auth.js";
 
 // Profile page functionality
@@ -26,6 +26,18 @@ async function initProfilePage() {
     setupLogoutModal()
     await setupProfileData();
     await setupPreferencesData();
+    setupButtons();
+}
+
+function setupButtons() {
+    const confirmLogoutBtn = document.getElementById("confirmLogoutBtn")
+    confirmLogoutBtn.addEventListener("click", confirmLogout)
+
+    const hideLogoutBtn = document.getElementById("hideLogoutBtn")
+    hideLogoutBtn.addEventListener("click", hideLogoutModal)
+
+    const showLogoutBtn = document.getElementById("showLogoutBtn")
+    showLogoutBtn.addEventListener("click", showLogoutModal)
 }
 
 async function setupInterestsGrid() {
@@ -583,73 +595,6 @@ function setupLogoutModal() {
     })
 }
 
-function showLogoutModal() {
-    const modal = document.getElementById("logoutModal")
-    modal.classList.add("show")
-    document.body.style.overflow = "hidden"
-}
-
-function hideLogoutModal() {
-    const modal = document.getElementById("logoutModal")
-    modal.classList.remove("show")
-    document.body.style.overflow = ""
-}
-
-export async function confirmLogout() {
-    const confirmBtn = document.getElementById("confirmLogoutBtn")
-    const logoutText = confirmBtn.querySelector(".logout-text")
-
-    // Show loading state
-    confirmBtn.disabled = true
-    logoutText.innerHTML = `
-    <div class="logout-loading">
-      <div class="logout-spinner"></div>
-      Виходимо...
-    </div>
-  `
-
-    try {
-        // Send logout request to backend
-        const response = await fetch("/api/auth/logout", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("authToken") || ""}`,
-            },
-            credentials: "include",
-        })
-
-        if (response.ok) {
-            // Clear local storage
-            localStorage.removeItem("meetiacProfile")
-            localStorage.removeItem("userSession")
-
-            // Clear cookies if any
-            document.cookie.split(";").forEach((c) => {
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
-            })
-
-            // Show success message
-            showNotification("До побачення! 👋", "success")
-
-            // Hide modal and redirect
-            hideLogoutModal()
-            setTimeout(() => {
-                window.location.href = ""
-            }, 1500)
-        } else {
-            throw new Error("Logout failed")
-        }
-    } catch (error) {
-        console.error("Logout error:", error)
-
-        showNotification("Сесію завершено локально", "warning")
-        hideLogoutModal()
-        setTimeout(() => {
-            window.location.href = ""
-        }, 1500)
-    }
-}
 
 async function setupProfileData() {
     const res = await fetch("/api/profile/get-profile-data");

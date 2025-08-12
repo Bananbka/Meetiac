@@ -93,7 +93,7 @@ export function setupLogoutModal() {
     })
 }
 
-function showLogoutModal() {
+export function showLogoutModal() {
     const modal = document.getElementById("logoutModal")
     modal.classList.add("show")
     document.body.style.overflow = "hidden"

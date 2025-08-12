@@ -48,7 +48,7 @@
                         <i class="fa-solid fa-calendar"></i>
                         Зустрічі
                     </a>
-                    <button class="btn btn-outline btn-small logout-btn" onclick="showLogoutModal()">
+                    <button class="btn btn-outline btn-small logout-btn" id="show-logout-modal-btn">
                         <i class="fas fa-sign-out-alt"></i>
                         Вийти
                     </button>
@@ -153,10 +153,10 @@
                 <p>Ви впевнені, що хочете завершити сесію? Ви завжди можете повернутися пізніше.</p>
             </div>
             <div class="logout-modal-actions">
-                <button class="btn logout-btn-cancel" onclick="hideLogoutModal()">
+                <button class="btn logout-btn-cancel" id="hide-logout-modal-btn">
                     Скасувати
                 </button>
-                <button class="btn logout-btn-confirm" id="confirmLogoutBtn" onclick="confirmLogout()">
+                <button class="btn logout-btn-confirm" id="confirmLogoutBtn" >
                     <span class="logout-text">Вийти</span>
                 </button>
             </div>
