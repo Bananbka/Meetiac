@@ -16,3 +16,4 @@ from .gender import Gender
 from .preference_interest import PreferenceInterest
 from .like import Like
 from .dislike import Dislike
+from .restore_code import RestoreCode

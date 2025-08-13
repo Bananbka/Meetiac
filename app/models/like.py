@@ -1,4 +1,4 @@
-﻿from app.database import db
+﻿from app.database import db, default_utc_now
 
 
 class Like(db.Model):
@@ -7,7 +7,7 @@ class Like(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     from_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
     to_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    created_at = db.Column(db.DateTime, default=db.func.now(), nullable=False)
+    created_at = db.Column(db.DateTime, default=default_utc_now, nullable=False)
 
     from_user = db.relationship('User', foreign_keys=[from_user_id])
     to_user = db.relationship('User', foreign_keys=[to_user_id])

@@ -1,6 +1,6 @@
 ﻿from datetime import datetime, UTC
 
-from app.database import db
+from app.database import db, default_utc_now
 
 
 class MeetingFeedback(db.Model):
@@ -14,7 +14,7 @@ class MeetingFeedback(db.Model):
     stay_together = db.Column(db.Boolean, default=False)
     partner_late = db.Column(db.Boolean, default=False)
 
-    created_at = db.Column(db.DateTime, default=datetime.now(UTC))
+    created_at = db.Column(db.DateTime, default=default_utc_now)
 
     meeting = db.relationship('Meeting', backref=db.backref('feedback', uselist=False, cascade='all, delete-orphan'))
 
