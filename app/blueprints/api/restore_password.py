@@ -54,11 +54,10 @@ RESTORE_MESSAGE = """
 """
 
 
-@restore_bp.route('/get-code', methods=['GET'])
+@restore_bp.route('/get-code', methods=['POST'])
 def get_restore_code():
-    email = request.form.get('email')
-    email = "nikitaz9251015@gmail.com"
-
+    data = request.get_json()
+    email = data.get('email')
     creds = Credentials.query.filter_by(login=email).first()
 
     if not creds:
@@ -82,8 +81,9 @@ def get_restore_code():
 
 @restore_bp.route('/restore-account', methods=['POST'])
 def restore_account():
-    email = request.form.get('email')
-    code = request.form.get('code')
+    data = request.get_json()
+    email = data.get('email')
+    code = data.get('code')
 
     creds = Credentials.query.filter_by(login=email).first()
     if not creds:
