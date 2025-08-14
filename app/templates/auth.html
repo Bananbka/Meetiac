@@ -62,7 +62,7 @@
                             </div>
                             <button type="submit" class="btn btn-primary btn-full">Увійти</button>
                             <div class="forgot-password">
-                                <a href="#">Забули пароль?</a>
+                                <a href="#" id="forgot-password-link">Забули пароль?</a>
                             </div>
                         </form>
                     </div>
@@ -133,6 +133,101 @@
     </div>
 </div>
 
+<!-- Restore Password Modal -->
+<div class="modal" id="restore-modal" aria-hidden="true">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-dialog">
+        <button class="modal-close" title="Закрити" data-close>
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+
+        <div class="modal-header">
+            <h3><i class="fa-solid fa-key"></i> Відновлення паролю</h3>
+        </div>
+
+        <div class="modal-body">
+            <!-- Step 1: email -->
+            <div class="step" data-step="1">
+                <p>Введіть email свого акаунта. Ми надішлемо код підтвердження.</p>
+                <form id="restore-email-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="restore-email">Email</label>
+                        <input type="email" id="restore-email" placeholder="your@email.com" required>
+                    </div>
+                    <div class="form-error" id="restore-email-error" aria-live="polite"></div>
+                    <button type="submit" class="btn btn-primary btn-full" id="send-code-btn">
+                        Надіслати код
+                    </button>
+                </form>
+            </div>
+
+            <!-- Step 2: code -->
+            <div class="step hidden" data-step="2">
+                <p>Ми відправили 6-значний код на <b id="restore-email-preview"></b>.</p>
+                <form id="restore-code-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="restore-code">Код з пошти</label>
+                        <input type="text" id="restore-code" inputmode="numeric" pattern="[0-9]*" maxlength="6"
+                               placeholder="XXXXXX" required>
+                    </div>
+                    <div class="muted">
+                        Діє ще: <span id="code-timer">15:00</span>
+                    </div>
+                    <div class="form-error" id="restore-code-error" aria-live="polite"></div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="back-to-email">
+                            <i class="fa-solid fa-arrow-left"></i> Назад
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="verify-code-btn">
+                            Підтвердити код
+                        </button>
+                        <button type="button" class="btn btn-link" id="resend-code-btn">
+                            Надіслати код ще раз
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 3: new password -->
+            <div class="step hidden" data-step="3">
+                <p>Введіть новий пароль для свого акаунта.</p>
+                <form id="restore-password-form" class="auth-form">
+                    <div class="form-group">
+                        <label for="new-password">Новий пароль</label>
+                        <input type="password" id="new-password" required minlength="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-password-confirm">Підтвердіть пароль</label>
+                        <input type="password" id="new-password-confirm" required minlength="1">
+                    </div>
+                    <div class="form-error" id="restore-password-error" aria-live="polite"></div>
+
+                    <div class="btn-row">
+                        <button type="button" class="btn" id="back-to-code">
+                            <i class="fa-solid fa-arrow-left"></i> Назад
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="set-password-btn">
+                            Змінити пароль
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Step 4: success -->
+            <div class="step hidden" data-step="4">
+                <div class="success-box">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h4>Готово!</h4>
+                    <p>Пароль успішно змінено. Тепер можете увійти з новим паролем.</p>
+                    <button type="button" class="btn btn-primary btn-full" data-close>Повернутися до входу</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script type="module" src="{{ url_for('static', filename='js/auth.js') }}"></script>
+<script src="{{ url_for('static', filename='js/restore-modal.js') }}"></script>
 </body>
 </html>
