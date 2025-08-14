@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         setupArchiveButton();
         setupCommentButton();
+        setupOpenMapButton();
         setupResultOptionButton();
 
         const isGaveFeedback = isUserGaveFeedback()
@@ -636,3 +637,7 @@ function getMeetingId() {
     return pathParts[pathParts.length - 1];
 }
 
+
+function setupOpenMapButton() {
+    document.getElementById("open-map-button").addEventListener("click", openInMaps)
+}
