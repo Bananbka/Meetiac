@@ -1,4 +1,4 @@
-import {showNotification} from "./common.js";
+import {goToMeetings, showNotification} from "./common.js";
 
 // Mock data for demonstration
 let meeting = {};
@@ -24,6 +24,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupCommentButton();
         setupOpenMapButton();
         setupResultOptionButton();
+        setupReviewForm();
+        setupMapToggleButton();
+        setupGoBackButton();
 
         const isGaveFeedback = isUserGaveFeedback()
         if (isArchived && meeting.result === null && !isGaveFeedback) {
@@ -640,4 +643,16 @@ function getMeetingId() {
 
 function setupOpenMapButton() {
     document.getElementById("open-map-button").addEventListener("click", openInMaps)
+}
+
+function setupReviewForm() {
+    document.getElementById("feedbackForm").addEventListener("submit", (event)=>submitFeedback(event))
+}
+
+function setupMapToggleButton() {
+    document.getElementById("map-toggle-button").addEventListener("click", toggleMapSize)
+}
+
+function setupGoBackButton() {
+    document.getElementById("go-back-button").addEventListener("click", goToMeetings)
 }
