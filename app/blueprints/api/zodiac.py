@@ -58,9 +58,9 @@ def get_prediction():
     zodiac_name = request.args.get('sign')
 
     if not zodiac_name:
-        return api_error("Missing sign.", 400)
-
-    zodiac = ZodiacSign.query.filter(ZodiacSign.name == zodiac_name).first()
+        zodiac = get_prediction.cred.user.zodiac_sign
+    else:
+        zodiac = ZodiacSign.query.filter(ZodiacSign.name == zodiac_name).first()
 
     if not zodiac:
         return api_error("Unknown sign.", 400)

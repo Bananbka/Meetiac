@@ -166,6 +166,17 @@ export function formatDate(dateString) {
     return date.toLocaleDateString("uk-UA")
 }
 
+export async function getZodiacPrediction(sign) {
+    const resp = await fetch(`/api/zodiac/prediction${sign ? `?sign=${sign}` : ""}`)
+
+    if (!resp.ok) {
+        showNotification("Помилка при отримуванні передбачення", "error")
+        return
+    }
+
+    return await resp.json()
+}
+
 export async function getZodiacCompatibility(partnerSign) {
     const resp = await fetch(`/api/zodiac/compatibility?first_sign=${partnerSign}`)
 

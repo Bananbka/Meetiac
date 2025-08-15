@@ -1,4 +1,13 @@
-import {confirmLogout, showLogoutModal, showNotification, setupLogoutModal, hideLogoutModal, getZodiacCompatibility} from "./common.js"
+import {
+    confirmLogout,
+    showLogoutModal,
+    showNotification,
+    setupLogoutModal,
+    hideLogoutModal,
+    getZodiacCompatibility,
+    getZodiacPrediction,
+    translateZodiacName
+} from "./common.js"
 
 // Discover page functionality
 let currentProfileIndex = 0
@@ -20,11 +29,22 @@ async function initDiscoverPage() {
     await updateProfileCard()
     await updateLikesCount()
     await updateMatchesCount()
+    await setupPrediction();
     setupKeyboardNavigation()
     setupTouchGestures()
     setupLogoutModal()
     setupButtons()
-    setupMoreButton()
+    setupMoreButton("tip-card-desc", "zodiac-description")
+    setupMoreButton("tip-card-pred", "zodiac-prediction")
+}
+
+async function setupPrediction() {
+    const data = await getZodiacPrediction()
+
+    const zodiacName = translateZodiacName(data.sign)
+    const prediction = data.prediction_ua;
+
+    document.getElementById("zodiac-prediction").innerText = `Передбачення для ${zodiacName}\n\n${prediction}`
 }
 
 function setupButtons() {
@@ -538,9 +558,9 @@ function playMatchAnimation() {
     }, 3000);
 }
 
-function setupMoreButton() {
-    const tipCard = document.querySelector(".tip-card");
-    const desc = document.getElementById("zodiac-description");
+function setupMoreButton(tipCardId, elementId) {
+    const tipCard = document.getElementById(tipCardId);
+    const desc = document.getElementById(elementId);
 
     // Створюємо кнопку
     const btn = document.createElement("button");
@@ -548,8 +568,7 @@ function setupMoreButton() {
     btn.textContent = "Показати більше";
 
     // Перевірка, чи текст виходить за межі блоку
-    console.log(desc.scrollHeight);
-    console.log(desc.clientHeight);
+
     if (desc.scrollHeight > desc.clientHeight) {
         tipCard.appendChild(btn);
     }

@@ -551,14 +551,19 @@
     animation: spin 1s linear infinite;
 }
 
-#zodiac-description {
+#zodiac-description, #zodiac-prediction {
     max-height: 4.5em; /* ~3 рядки */
     overflow: hidden;
     transition: max-height 0.3s ease;
 }
 
-.tip-card.expanded #zodiac-description {
+.tip-card.expanded #zodiac-description,
+.tip-card.expanded #zodiac-prediction {
     max-height: 1000px; /* досить велика висота для розгортання */
+}
+
+.tip-card {
+    margin-bottom: 24px;
 }
 
 .show-more-btn {

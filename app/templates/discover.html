@@ -58,6 +58,27 @@
     </header>
 
     <div class="container discover-container">
+        <div class="sort-section">
+            <div class="sort-header">
+                <i class="fas fa-sort"></i>
+                <span>Сортування</span>
+            </div>
+            <div class="sort-controls">
+                <select id="sortSelect" class="sort-select">
+                    <option value="default">Звичайне</option>
+                    <option value="height-asc">По росту ↑</option>
+                    <option value="height-desc">По росту ↓</option>
+                    <option value="weight-asc">По вазі ↑</option>
+                    <option value="weight-desc">По вазі ↓</option>
+                    <option value="age-asc">По віку ↑</option>
+                    <option value="age-desc">По віку ↓</option>
+                    <option value="shuffle">Перемішати</option>
+                </select>
+                <button class="sort-reset-btn" id="reset-sort-btn" title="Скинути сортування">
+                    <i class="fas fa-undo"></i>
+                </button>
+            </div>
+        </div>
         <!-- Profile Card -->
         <div class="profile-card" id="profileCard">
             <div class="profile-image">
@@ -108,39 +129,22 @@
         </div>
 
         <!-- Tips -->
-        <div class="tip-card">
+        <div class="tip-card" id="tip-card-desc">
             <div class="tip-header">
                 <i class="fas fa-star"></i>
                 <span>Зоряна порада</span>
             </div>
             <p id="zodiac-description">Леви та Стрільці мають високу сумісність! Ваші енергії доповнюють одна одну.</p>
         </div>
-    </div>
-
-    <div class="container discover-container">
-        <!-- Sort Selector -->
-        <div class="sort-section">
-            <div class="sort-header">
-                <i class="fas fa-sort"></i>
-                <span>Сортування</span>
+        <div class="tip-card" id="tip-card-pred">
+            <div class="tip-header">
+                <i class="fa-solid fa-calendar-day"></i>
+                <span>Передбачення на день</span>
             </div>
-            <div class="sort-controls">
-                <select id="sortSelect" class="sort-select">
-                    <option value="default">Звичайне</option>
-                    <option value="height-asc">По росту ↑</option>
-                    <option value="height-desc">По росту ↓</option>
-                    <option value="weight-asc">По вазі ↑</option>
-                    <option value="weight-desc">По вазі ↓</option>
-                    <option value="age-asc">По віку ↑</option>
-                    <option value="age-desc">По віку ↓</option>
-                    <option value="shuffle">Перемішати</option>
-                </select>
-                <button class="sort-reset-btn" id="reset-sort-btn" title="Скинути сортування">
-                    <i class="fas fa-undo"></i>
-                </button>
-            </div>
+            <p id="zodiac-prediction">Все буде добре!</p>
         </div>
     </div>
+
 
     <!-- Logout Modal -->
     <div class="logout-modal" id="logoutModal">
@@ -156,7 +160,7 @@
                 <button class="btn logout-btn-cancel" id="hide-logout-modal-btn">
                     Скасувати
                 </button>
-                <button class="btn logout-btn-confirm" id="confirmLogoutBtn" >
+                <button class="btn logout-btn-confirm" id="confirmLogoutBtn">
                     <span class="logout-text">Вийти</span>
                 </button>
             </div>
