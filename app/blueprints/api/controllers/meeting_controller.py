@@ -141,7 +141,6 @@ def feedback_meeting(meeting_id):
         return api_error("User has no permission to view this meeting.", 400)
 
     data = request.get_json()
-    print(data)
 
     is_already_gave = MeetingFeedback.query.filter_by(user_id=user_id, meeting_id=meeting_id).first()
     if is_already_gave:
@@ -160,6 +159,7 @@ def feedback_meeting(meeting_id):
 
     return "ok"
 
+
 @meeting_bp.route('/feedback/<int:meeting_id>', methods=['GET'])
 @login_required_api
 def get_feedback(meeting_id):
@@ -173,7 +173,7 @@ def get_feedback(meeting_id):
     feedbacks = [feedback.to_dict() for feedback in feedbacks]
 
     if not feedbacks:
-        return api_error("No feedback found.", 404)
+        feedbacks = []
 
     return jsonify({
         "user_id": user_id,

@@ -2,6 +2,7 @@
 
 from app.models import Like, Dislike, User
 from app.utils.access_utils import login_required_api
+from app.utils.user_utils import get_user_sort_query
 
 reaction_bp = Blueprint('reactions', __name__)
 
@@ -12,7 +13,7 @@ def likes():
     user = likes.cred.user
 
     sort_param = request.args.get("sort", "-id")
-    sort_query = User.get_user_sort_query(sort_param)
+    sort_query = get_user_sort_query(sort_param)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
@@ -46,7 +47,7 @@ def dislikes():
     user = dislikes.cred.user
 
     sort_param = request.args.get("sort", "-id")
-    sort_query = User.get_user_sort_query(sort_param)
+    sort_query = get_user_sort_query(sort_param)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)

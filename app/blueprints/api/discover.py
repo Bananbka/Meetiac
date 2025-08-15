@@ -7,6 +7,7 @@ from app import db
 from app.models import PartnerPreference, User, Like, Dislike, Match, Interest, UserInterest
 from app.utils.access_utils import login_required_api, api_error
 from app.utils.likes_utils import available_to_act
+from app.utils.user_utils import build_discover_query, get_user_sort_query
 
 discover_bp = Blueprint('discover', __name__)
 
@@ -16,81 +17,19 @@ discover_bp = Blueprint('discover', __name__)
 def discover():
     creds = discover.cred
     user = creds.user
-    today = date.today()
-
-    prefs = PartnerPreference.query.filter_by(user_id=user.user_id).first()
-
-    liked_subquery = db.session.query(Like.to_user_id).filter(Like.from_user_id == user.user_id)
-    disliked_subquery = db.session.query(Dislike.to_user_id).filter(Dislike.from_user_id == user.user_id)
-
-    query = User.query.filter(
-        User.user_id != user.user_id,
-        User.is_active == True,
-        ~User.user_id.in_(liked_subquery),
-        ~User.user_id.in_(disliked_subquery)
-    )
-
-    print(prefs)
-
-    if prefs:
-        if prefs.gender_obj.name != "any":
-            query = query.filter(User.gender == prefs.gender_id)
-
-        if prefs.min_age is not None:
-            max_birth = date(today.year - prefs.min_age, today.month, today.day)
-            query = query.filter(User.birth_date <= max_birth)
-
-        if prefs.max_age is not None:
-            min_birth = date(today.year - prefs.max_age, today.month, today.day)
-            query = query.filter(User.birth_date >= min_birth)
-
-        if prefs.min_height is not None:
-            query = query.filter(User.height >= prefs.min_height)
-
-        if prefs.max_height is not None:
-            query = query.filter(User.height <= prefs.max_height)
-
-        if prefs.min_weight is not None:
-            query = query.filter(User.weight >= prefs.min_weight)
-
-        if prefs.max_weight is not None:
-            query = query.filter(User.weight <= prefs.max_weight)
-
-        if prefs.zodiac_signs:
-            zodiac_ids = [z.sign_id for z in prefs.zodiac_signs]
-            query = query.filter(User.sign_id.in_(zodiac_ids))
-
-        if prefs.interests:
-            interest_ids = [i.interest_id for i in prefs.interests]
-
-            match_case = case(
-                (Interest.interest_id.in_(interest_ids), 1),
-                else_=0
-            )
-
-            query = (
-                query
-                .outerjoin(UserInterest, User.user_id == UserInterest.user_id)
-                .outerjoin(Interest, Interest.interest_id == UserInterest.interest_id)
-                .group_by(User.user_id)
-                .add_columns(func.sum(match_case).label("match_count"))
-                .order_by(desc("match_count"))
-            )
+    query, prefs = build_discover_query(user, include_likes=True)
 
     sort = request.args.get("sort", "-id", type=str)
-    sort_query = User.get_user_sort_query(sort)
+    sort_query = get_user_sort_query(sort)
 
     page = request.args.get("page", 1, type=int)
     per_page = request.args.get("per_page", 10, type=int)
     pagination = query.order_by(sort_query).paginate(page=page, per_page=per_page, error_out=False)
-    suitable_users = pagination.items
 
     includes = request.args.get('includes')
     include_list = includes.split(',') if includes else None
 
-    print(suitable_users)
-
-    users_data = [(u[0] if prefs else u).to_dict(include_list) for u in suitable_users]
+    users_data = [(u[0] if prefs else u).to_dict(include_list) for u in pagination.items]
 
     return jsonify({
         "users": users_data,
@@ -103,6 +42,16 @@ def discover():
             "has_prev": pagination.has_prev
         }
     })
+
+
+@discover_bp.route('/candidates-count', methods=['GET'])
+@login_required_api
+def candidates_count():
+    creds = discover.cred
+    user = creds.user
+    query, _ = build_discover_query(user, include_likes=False)
+    total_count = query.count()
+    return str(total_count)
 
 
 @discover_bp.route('/like', methods=['PUT'])
@@ -188,7 +137,17 @@ def clear_dislikes():
 def clear_likes():
     user = clear_likes.cred.user
 
-    Like.query.filter_by(from_user_id=user.user_id).delete()
+    # Отримуємо ID всіх користувачів, з якими є матч
+    matched_user_ids = db.session.query(Match.user1_id).filter(Match.user2_id == user.user_id).union(
+        db.session.query(Match.user2_id).filter(Match.user1_id == user.user_id)
+    ).subquery()
+
+    # Видаляємо лайки тільки тих користувачів, з якими ще немає матчу
+    Like.query.filter(
+        Like.from_user_id == user.user_id,
+        ~Like.to_user_id.in_(matched_user_ids)
+    ).delete(synchronize_session=False)
+
     db.session.commit()
 
     return "ok"
@@ -197,9 +156,27 @@ def clear_likes():
 @discover_bp.route('/clear-like/<int:like_id>', methods=['DELETE'])
 @login_required_api
 def clear_like(like_id):
-    Like.query.filter_by(id=like_id).delete()
-    db.session.commit()
+    # Знаходимо лайк
+    user_like = Like.query.get(like_id)
+    if not user_like:
+        return api_error("Like not found", 404)
 
+    from_user = user_like.from_user_id
+    to_user = user_like.to_user_id
+
+    # Видаляємо лайк
+    db.session.delete(user_like)
+
+    # Видаляємо матч, якщо він існує
+    match = Match.query.filter(
+        ((Match.user1_id == from_user) & (Match.user2_id == to_user)) |
+        ((Match.user1_id == to_user) & (Match.user2_id == from_user))
+    ).first()
+
+    if match:
+        db.session.delete(match)
+
+    db.session.commit()
     return "ok"
 
 

@@ -18,9 +18,10 @@ let currentSortType = "default"
 let profiles = [];
 let currentPage = 1;
 let hasNext = true;
+let total = 0;
 
-document.addEventListener("DOMContentLoaded", () => {
-    initDiscoverPage()
+document.addEventListener("DOMContentLoaded", async () => {
+    await initDiscoverPage()
 })
 
 async function initDiscoverPage() {
@@ -29,6 +30,7 @@ async function initDiscoverPage() {
     await updateProfileCard()
     await updateLikesCount()
     await updateMatchesCount()
+    await updateTotalCount();
     await setupPrediction();
     setupKeyboardNavigation()
     setupTouchGestures()
@@ -36,6 +38,15 @@ async function initDiscoverPage() {
     setupButtons()
     setupMoreButton("tip-card-desc", "zodiac-description")
     setupMoreButton("tip-card-pred", "zodiac-prediction")
+}
+
+async function updateTotalCount() {
+    const candidatesElement = document.getElementById("totalCount");
+    const candidatesResponse = await fetch(`/api/discover/candidates-count`)
+    const candidatesData = await candidatesResponse.json()
+    if (candidatesElement) {
+        candidatesElement.textContent = candidatesData || 0
+    }
 }
 
 async function setupPrediction() {
@@ -55,10 +66,14 @@ function setupButtons() {
     sortSelect.addEventListener("change", handleSortChange)
 
     const rejectButton = document.getElementById("reject-btn");
-    rejectButton.addEventListener("click", handleReject);
+    if (rejectButton) {
+        rejectButton.addEventListener("click", handleReject);
+    }
 
     const likeButton = document.getElementById("like-btn");
-    likeButton.addEventListener("click", handleLike);
+    if (likeButton) {
+        likeButton.addEventListener("click", handleLike);
+    }
 
     const showLogoutButton = document.getElementById("show-logout-modal-btn");
     showLogoutButton.addEventListener("click", showLogoutModal);
@@ -128,6 +143,7 @@ async function uploadProfilesData(sorting = "-id") {
 
     const data = await response.json();
     hasNext = data.pagination.has_next;
+    total = data.pagination.total;
     profiles = data.users;
 
 }
@@ -230,7 +246,6 @@ async function updateLikesCount() {
     const likesElement = document.getElementById("likesCount")
     const likeResponse = await fetch(`/api/discover/like-count`)
     const likeData = await likeResponse.json()
-    console.log(likeData)
     if (likesElement) {
         likesElement.textContent = likeData || 0
     }
@@ -346,18 +361,19 @@ function showEmptyProfile() {
     
                     <!-- Action Buttons -->
                     <div class="action-buttons">
-                        <button class="action-btn reject" onclick="handleReject()">
+                        <button class="action-btn reject" id="reject-btn">
                             <i class="fas fa-times"></i>
                         </button>
 
-                        <button class="action-btn like" onclick="handleLike()">
+                        <button class="action-btn like" id="like-btn">
                             <i class="fas fa-heart"></i>
                         </button>
                     </div>
                 </div>
             `
             if (profiles.length === 0) showEmptyProfile()
-            updateProfileCard()
+            await updateProfileCard()
+            setupButtons()
         })
     }
 }

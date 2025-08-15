@@ -92,23 +92,3 @@ class User(db.Model):
                     (today.month, today.day) < (self.birth_date.month, self.birth_date.day)
             )
         return None
-
-    @staticmethod
-    def get_user_sort_query(sort_param: str):
-        is_desc = sort_param.startswith("-")
-        sort_by = sort_param[1:] if is_desc else sort_param
-
-        if sort_by == "height":
-            sort_query = User.height.desc() if is_desc else User.height.asc()
-        elif sort_by == "weight":
-            sort_query = User.weight.desc() if is_desc else User.weight.asc()
-        elif sort_by == "age":
-            sort_query = User.birth_date.asc() if is_desc else User.birth_date.desc()  # реверс
-        elif sort_by == "id":
-            sort_query = User.user_id.desc() if is_desc else User.user_id.asc()
-        elif sort_by == "shuffle":
-            sort_query = func.random()
-        else:
-            sort_query = User.user_id.desc() if is_desc else User.user_id.asc()
-
-        return sort_query
