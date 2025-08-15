@@ -1,6 +1,7 @@
 ﻿from flask import Flask
 from flask_migrate import Migrate
 
+from app.blueprints.api.admin import admin_bp
 from app.blueprints.api.reactions import reaction_bp
 from app.database import db
 from app.config import Config
@@ -42,6 +43,7 @@ def create_app():
     app.register_blueprint(discover_bp, url_prefix='/api/discover')
     app.register_blueprint(reaction_bp, url_prefix='/api/reactions')
     app.register_blueprint(restore_bp, url_prefix='/api/restore')
+    app.register_blueprint(admin_bp, url_prefix='/api/admin')
 
     app.register_blueprint(user_bp, url_prefix='/api/user')
     app.register_blueprint(match_bp, url_prefix='/api/match')
