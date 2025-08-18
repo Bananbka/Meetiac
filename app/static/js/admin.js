@@ -134,6 +134,8 @@ async function updateStats() {
     const activeUsersPercentEl = document.getElementById("activeUsersPercent")
     const totalMatchesEl = document.getElementById("totalMatches")
     const matchesTodayEl = document.getElementById("matchesToday")
+    const refusalCountEl = document.getElementById("refusalCount")
+    const couplesCountEl = document.getElementById("couplesCount")
 
     const usersStats = await fetchUserStats();
     if (usersStats) {
@@ -152,29 +154,23 @@ async function updateStats() {
         if (matchesTodayEl) matchesTodayEl.textContent = matchesStats.today_matches
     }
 
+    const refusalStats = await fetchRefusalCount();
+    if (refusalStats) {
+        refusalCountEl.innerText = refusalStats
+    }
+
+    const couplesStats = await fetchSuccessfulCouplesCount()
+    if (couplesStats) {
+        couplesCountEl.innerText = couplesStats
+    }
+
     await updateRegisterStats();
     await updateZodiacStats();
+    await updateQuartalStats();
+    await updateRecentRegistrations();
+    await updateGenderStats();
 }
 
-async function fetchUserStats() {
-    const resp = await fetch("/api/admin/get-user-stats")
-
-    if (!resp.ok) {
-        showNotification("Помилка отримання статистики про юзерів", "error")
-        return
-    }
-    return await resp.json()
-}
-
-async function fetchMatchStats() {
-    const resp = await fetch("/api/admin/get-match-stats")
-
-    if (!resp.ok) {
-        showNotification("Помилка отримання статистики про збіги", "error")
-        return
-    }
-    return await resp.json()
-}
 
 const daysMap = {
     mon: "Пн",
@@ -225,6 +221,155 @@ async function updateZodiacStats() {
     });
 }
 
+const quartalMap = {
+    "1": "first",
+    "2": "second",
+    "3": "third",
+    "4": "fourth"
+}
+
+async function updateQuartalStats() {
+    const statsData = await fetchQuartalStats();
+
+    const maxVal = Math.max(...statsData.map(q => q.active_users_count), 1);
+    statsData.forEach(q => {
+        const id = quartalMap[q.quarter];
+
+        const percent = (q.active_users_count / maxVal * 100).toFixed(2);
+        const barEl = document.getElementById(`${id}`);
+        if (barEl) {
+            barEl.style.height = `${percent}%`;
+        }
+
+        const numEl = document.getElementById(`${id}-num`);
+        if (numEl) {
+            numEl.textContent = q.active_users_count;
+        }
+
+        const regEl = document.getElementById(`${id}-reg`);
+        if (regEl) {
+            regEl.textContent = q.registered_count;
+        }
+    });
+}
+
+async function updateRecentRegistrations() {
+    const statsData = await fetchRecentRegistrations();
+
+    // беремо максимум для масштабу висоти барів
+    const maxVal = Math.max(statsData.last_6_months, statsData.last_month, 1);
+
+    // шестимісячний бар
+    const sixMonthBar = document.getElementById("six-month");
+    if (sixMonthBar) {
+        const percent = (statsData.last_6_months / maxVal * 100).toFixed(2);
+        sixMonthBar.style.width = `${percent}%`;
+        const numEl = document.getElementById("six-month-num");
+        if (numEl) numEl.textContent = statsData.last_6_months;
+    }
+
+    // одномісячний бар
+    const oneMonthBar = document.getElementById("one-month");
+    if (oneMonthBar) {
+        const percent = (statsData.last_month / maxVal * 100).toFixed(2);
+        oneMonthBar.style.width = `${percent}%`;
+        const numEl = document.getElementById("one-month-num");
+        if (numEl) numEl.textContent = statsData.last_month;
+    }
+}
+
+const genderEmojis = {
+    male: {emj: "👨", name: "Чоловік"},
+    female: {emj: "👩", name: "Жінка"},
+    other: {emj: "🧑", name: "Інше"}
+};
+
+async function updateGenderStats() {
+    const genderData = await fetchGenderStats();
+    const genderStatsContainer = document.querySelector(".gender-stats");
+
+    if (!genderData) return;
+
+    const maxVal = Math.max(...Object.values(genderData), 1);
+
+    Object.entries(genderData).forEach(([gender, count]) => {
+        const emj = genderEmojis[gender]["emj"] || "❓";
+        const name = genderEmojis[gender]["name"];
+        const percent = (count / maxVal) * 100;
+
+        const item = document.createElement("div");
+        item.classList.add("zodiac-item");
+
+        item.innerHTML = `
+            <span class="zodiac-sign">${emj}</span>
+            <span class="zodiac-name">${name}</span>
+            <div class="zodiac-bar">
+                <div class="zodiac-fill" style="width: ${percent}%"></div>
+            </div>
+            <span class="zodiac-count">${count}</span>
+        `;
+
+        genderStatsContainer.appendChild(item);
+    });
+}
+
+async function fetchGenderStats() {
+    const resp = await fetch("/api/admin/get-conducted-meetings-by-gender");
+
+    if (!resp.ok) {
+        showNotification("Помилка отримання статистики зустрічей за ґендером", "error");
+        return null;
+    }
+    return await resp.json();
+}
+
+async function fetchRecentRegistrations() {
+    const resp = await fetch("/api/admin/get-recent-registrations");
+    if (!resp.ok) {
+        showNotification("Помилка отримання статистики реєстрацій", "error");
+        return {last_6_months: 0, last_month: 0};
+    }
+    return await resp.json();
+}
+
+async function fetchRefusalCount() {
+    const resp = await fetch("/api/admin/get-refusal-count");
+    if (!resp.ok) {
+        showNotification("Помилка отримання кількості відмов", "error");
+        return
+    }
+    return await resp.json();
+}
+
+async function fetchSuccessfulCouplesCount() {
+    const resp = await fetch("/api/admin/get-successful-couples");
+    if (!resp.ok) {
+        showNotification("Помилка отримання кількості пар", "error");
+        return
+    }
+    return await resp.json();
+}
+
+async function fetchUserStats() {
+    const resp = await fetch("/api/admin/get-user-stats")
+
+    if (!resp.ok) {
+        showNotification("Помилка отримання статистики про юзерів", "error")
+        return
+    }
+    return await resp.json()
+}
+
+async function fetchMatchStats() {
+    const resp = await fetch("/api/admin/get-match-stats")
+
+    if (!resp.ok) {
+        showNotification("Помилка отримання статистики про збіги", "error")
+        return
+    }
+    return await resp.json()
+}
+
 async function fetchRegistrationStats() {
     const resp = await fetch("/api/admin/get-registration-stats")
 
@@ -241,6 +386,16 @@ async function fetchZodiacStats() {
 
     if (!resp.ok) {
         showNotification("Помилка отримання статистики про знаки зодіаків", "error")
+        return
+    }
+    return await resp.json()
+}
+
+async function fetchQuartalStats() {
+    const resp = await fetch("/api/admin/get-quarterly-clients")
+
+    if (!resp.ok) {
+        showNotification("Помилка отримання статистики про клієнтів за квартал", "error")
         return
     }
     return await resp.json()

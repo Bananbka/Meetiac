@@ -7,7 +7,6 @@ from app.database import db
 from app.models import User, Meeting, Like, Dislike, MeetingFeedback, Refusal, Match, Gender, ZodiacSign
 
 
-# 1
 def get_quarterly_clients():
     current_year = datetime.now().year
 
@@ -44,7 +43,6 @@ def get_quarterly_clients():
     return results
 
 
-# 2
 def get_successful_couples_info():
     feedbacks = MeetingFeedback.query.filter(MeetingFeedback.stay_together == True).all()
     results = []
@@ -86,7 +84,6 @@ def get_successful_couples_info():
     return results
 
 
-# 3
 def get_planned_meetings():
     today = datetime.now()
     next_month = today.replace(day=1) + timedelta(days=32)
@@ -100,7 +97,6 @@ def get_planned_meetings():
     return [m.to_dict() for m in meetings]
 
 
-# 4
 def get_recent_registrations():
     today = date.today()
     last_month = today.replace(day=1) - timedelta(days=1)
@@ -118,7 +114,6 @@ def get_recent_registrations():
     return {"last_month": last_month_count, "last_6_months": six_months_count}
 
 
-# 5
 def get_attendance_by_gender():
     users = db.session.query(User).join(MeetingFeedback, User.user_id == MeetingFeedback.user_id) \
         .filter(MeetingFeedback.partner_late == False).all()
@@ -133,12 +128,10 @@ def get_attendance_by_gender():
     return attendance_by_gender
 
 
-# 7
 def get_refusal_count():
     return str(Refusal.query.count())
 
 
-# 9
 def get_successful_couples():
     users = db.session.query(distinct(MeetingFeedback.user_id)).filter(
         MeetingFeedback.stay_together == True
@@ -146,7 +139,6 @@ def get_successful_couples():
     return str(len(users))
 
 
-# 10
 def get_conducted_meetings_by_gender():
     q = db.session.query(
         User.gender,
@@ -158,7 +150,6 @@ def get_conducted_meetings_by_gender():
     return {Gender.query.get(gender).name: count for gender, count in q}
 
 
-# Далі уже нормальні функції для себе, а не для умови курсової
 def get_user_stats():
     today = date.today()
 

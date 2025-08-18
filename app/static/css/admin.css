@@ -111,7 +111,7 @@
 /* Stats Overview */
 .stats-overview {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
@@ -242,6 +242,7 @@
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
+    max-height: 600px;
 }
 
 .chart-header {
@@ -254,6 +255,12 @@
     font-weight: 600;
 }
 
+.chart-header p {
+    font-size: 0.7rem;
+    line-height: 1rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
 .chart-placeholder {
     display: flex;
     height: 100%;
@@ -263,13 +270,14 @@
 
 .chart-bars {
     display: flex;
-    align-items: end;
+    align-items: flex-end; /* вирівнювання по низу */
     gap: 1rem;
-    height: 100%;
+    width: 100%; /* контейнер займає всю ширину */
+    height: 300px; /* або будь-яка висота для графіка */
 }
 
 .bar {
-    width: 6rem;
+    flex: 1; /* рівна ширина всіх барів */
     background: linear-gradient(to top, #ec4899, #f472b6);
     border-radius: 0.25rem 0.25rem 0 0;
     display: flex;
@@ -280,6 +288,32 @@
     font-size: 0.75rem;
     font-weight: 600;
     flex-direction: column;
+}
+
+.chart-bars-horizontal {
+    display: flex;
+    flex-direction: column;  /* кожен бар – рядок */
+    gap: 1rem;
+    width: 100%;
+    height: 100%;             /* контейнер займає всю висоту батьківського */
+}
+
+.bar-horizontal {
+    flex: 1;                  /* кожен бар займає однакову частку висоти */
+    background: linear-gradient(to right, #ec4899, #f472b6);
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* текст зліва всередині бару */
+    padding-left: 0.5rem;
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.add-bar-text {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
 }
 
 .zodiac-stats {
