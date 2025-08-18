@@ -18,6 +18,7 @@ class User(db.Model):
     sign_id = db.Column(db.Integer, db.ForeignKey('zodiac_sign.sign_id'))
     bio = db.Column(db.Text)
     is_active = db.Column(db.Boolean, default=True)
+    is_admin = db.Column(db.Boolean, default=False)
 
     credentials = db.relationship('Credentials', backref='user', cascade="all, delete-orphan", uselist=False)
     preferences = db.relationship('PartnerPreference', backref='user', cascade="all, delete-orphan")
