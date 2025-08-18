@@ -199,6 +199,21 @@ export async function getZodiacCompatibility(partnerSign) {
     }
 }
 
+export const zodiacsNames = {
+    aquarius: {name: "Водолій", emj: "♒️"},
+    pisces: {name: "Риби", emj: "♓️"},
+    aries: {name: "Овен", emj: "♈️"},
+    taurus: {name: "Телець", emj: "♉️"},
+    gemini: {name: "Близнюки", emj: "♊️"},
+    cancer: {name: "Рак", emj: "♋️"},
+    leo: {name: "Лев", emj: "♌️"},
+    virgo: {name: "Діва", emj: "♍️"},
+    libra: {name: "Терези", emj: "♎️"},
+    scorpio: {name: "Скорпіон", emj: "♏️"},
+    sagittarius: {name: "Стрілець", emj: "♐️"},
+    capricorn: {name: "Козеріг", emj: "♑️"}
+}
+
 export function translateZodiacName(engName) {
     if (!engName || typeof engName !== "string") {
         throw new Error("Invalid zodiac name");
@@ -241,6 +256,7 @@ export function goToDiscover() {
 export function goToProfile() {
     window.location.replace('/profile');
 }
+
 export function goToReactions() {
     window.location.replace('/reactions');
 }

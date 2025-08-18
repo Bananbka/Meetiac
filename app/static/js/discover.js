@@ -6,7 +6,8 @@ import {
     hideLogoutModal,
     getZodiacCompatibility,
     getZodiacPrediction,
-    translateZodiacName
+    translateZodiacName,
+    zodiacsNames
 } from "./common.js"
 
 // Discover page functionality
@@ -85,21 +86,6 @@ function setupButtons() {
     confirmLogoutBtn.addEventListener("click", confirmLogout);
 }
 
-
-const zodiacsNames = {
-    aquarius: {name: "Водолій", emj: "♒️"},
-    pisces: {name: "Риби", emj: "♓️"},
-    aries: {name: "Овен", emj: "♈️"},
-    taurus: {name: "Телець", emj: "♉️"},
-    gemini: {name: "Близнюки", emj: "♊️"},
-    cancer: {name: "Рак", emj: "♋️"},
-    leo: {name: "Лев", emj: "♌️"},
-    virgo: {name: "Діва", emj: "♍️"},
-    libra: {name: "Терези", emj: "♎️"},
-    scorpio: {name: "Скорпіон", emj: "♏️"},
-    sagittarius: {name: "Стрілець", emj: "♐️"},
-    capricorn: {name: "Козеріг", emj: "♑️"}
-}
 
 function getZodiacName(sign, addEmoji = false) {
     const zodiacData = zodiacsNames[sign];

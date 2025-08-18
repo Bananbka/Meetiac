@@ -229,10 +229,7 @@ def get_zodiac_stats():
     )
 
     distribution = {
-        zodiac: {
-            "percent": round(count / total * 100, 2),
-            "count": count
-        }
+        zodiac: count
         for zodiac, count in zodiac_counts
     }
 
@@ -261,7 +258,7 @@ def get_registrations_last_week():
     result = {}
     for i in range(7):
         d = week_ago + timedelta(days=i)
-        weekday = weekdays[d.weekday()]  # 0=Пн ... 6=Нд
+        weekday = weekdays[d.weekday()]
         result[weekday] = registrations_dict.get(d, 0)
 
     return result

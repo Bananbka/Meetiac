@@ -28,10 +28,6 @@
                         <i class="fas fa-users"></i>
                         Користувачі
                     </button>
-                    <button class="nav-item" data-section="reports">
-                        <i class="fas fa-flag"></i>
-                        Скарги
-                    </button>
                 </div>
                 <div class="admin-actions">
                     <a href="/" class="btn btn-outline btn-small">
@@ -57,30 +53,30 @@
 
             <!-- Stats Grid -->
             <div class="stats-overview">
-                <div class="stat-card large">
+                <div class="stat-card">
                     <div class="stat-icon users">
                         <i class="fas fa-users"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number" id="totalUsers">1,247</div>
+                        <div class="stat-number" id="totalUsers">0</div>
                         <div class="stat-label">Всього користувачів</div>
                         <div class="stat-change positive">
                             <i class="fas fa-arrow-up"></i>
-                            +<span id="newUsersToday">23</span> сьогодні
+                            +<span id="newUsersToday">0</span> сьогодні
                         </div>
                     </div>
                 </div>
 
-                <div class="stat-card large">
+                <div class="stat-card">
                     <div class="stat-icon active">
                         <i class="fas fa-user-check"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number" id="activeUsers">892</div>
+                        <div class="stat-number" id="activeUsers">0</div>
                         <div class="stat-label">Активні користувачі</div>
                         <div class="stat-change positive">
                             <i class="fas fa-arrow-up"></i>
-                            71.5% від загальної кількості
+                            <span id="activeUsersPercent">0</span>% від загальної кількості
                         </div>
                     </div>
                 </div>
@@ -90,49 +86,10 @@
                         <i class="fas fa-heart"></i>
                     </div>
                     <div class="stat-content">
-                        <div class="stat-number" id="totalMatches">3,456</div>
+                        <div class="stat-number" id="totalMatches">0</div>
                         <div class="stat-label">Всього збігів</div>
                         <div class="stat-change positive">
-                            +<span id="matchesToday">89</span> сьогодні
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon messages">
-                        <i class="fas fa-comments"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" id="totalMessages">12,847</div>
-                        <div class="stat-label">Повідомлень</div>
-                        <div class="stat-change positive">
-                            +<span id="messagesToday">234</span> сьогодні
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon reports">
-                        <i class="fas fa-flag"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" id="reportedUsers">12</div>
-                        <div class="stat-label">Скарги</div>
-                        <div class="stat-change neutral">
-                            Потребують розгляду
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon banned">
-                        <i class="fas fa-ban"></i>
-                    </div>
-                    <div class="stat-content">
-                        <div class="stat-number" id="bannedUsers">8</div>
-                        <div class="stat-label">Заблоковані</div>
-                        <div class="stat-change negative">
-                            0.6% від загальної кількості
+                            +<span id="matchesToday">0</span> сьогодні
                         </div>
                     </div>
                 </div>
@@ -146,13 +103,13 @@
                     </div>
                     <div class="chart-placeholder">
                         <div class="chart-bars">
-                            <div class="bar" style="height: 60%"><span>Пн</span></div>
-                            <div class="bar" style="height: 80%"><span>Вт</span></div>
-                            <div class="bar" style="height: 45%"><span>Ср</span></div>
-                            <div class="bar" style="height: 90%"><span>Чт</span></div>
-                            <div class="bar" style="height: 70%"><span>Пт</span></div>
-                            <div class="bar" style="height: 95%"><span>Сб</span></div>
-                            <div class="bar" style="height: 85%"><span>Нд</span></div>
+                            <div id="mon" class="bar" style="height: 0.1%"><span>Пн</span><span id="mon-num">0</span></div>
+                            <div id="tue" class="bar" style="height: 0.1%"><span>Вт</span><span id="tue-num">0</span></div>
+                            <div id="wed" class="bar" style="height: 0.1%"><span>Ср</span><span id="wed-num">0</span></div>
+                            <div id="thu" class="bar" style="height: 0.1%"><span>Чт</span><span id="thu-num">0</span></div>
+                            <div id="fri" class="bar" style="height: 0.1%"><span>Пт</span><span id="fri-num">0</span></div>
+                            <div id="sat" class="bar" style="height: 0.1%"><span>Сб</span><span id="sat-num">0</span></div>
+                            <div id="sun" class="bar" style="height: 0.1%"><span>Нд</span><span id="sun-num">0</span></div>
                         </div>
                     </div>
                 </div>
@@ -162,38 +119,7 @@
                         <h3>Розподіл за знаками зодіаку</h3>
                     </div>
                     <div class="zodiac-stats">
-                        <div class="zodiac-item">
-                            <span class="zodiac-sign">♈</span>
-                            <span class="zodiac-name">Овен</span>
-                            <div class="zodiac-bar">
-                                <div class="zodiac-fill" style="width: 85%"></div>
-                            </div>
-                            <span class="zodiac-count">106</span>
-                        </div>
-                        <div class="zodiac-item">
-                            <span class="zodiac-sign">♉</span>
-                            <span class="zodiac-name">Телець</span>
-                            <div class="zodiac-bar">
-                                <div class="zodiac-fill" style="width: 92%"></div>
-                            </div>
-                            <span class="zodiac-count">115</span>
-                        </div>
-                        <div class="zodiac-item">
-                            <span class="zodiac-sign">♊</span>
-                            <span class="zodiac-name">Близнюки</span>
-                            <div class="zodiac-bar">
-                                <div class="zodiac-fill" style="width: 78%"></div>
-                            </div>
-                            <span class="zodiac-count">97</span>
-                        </div>
-                        <div class="zodiac-item">
-                            <span class="zodiac-sign">♋</span>
-                            <span class="zodiac-name">Рак</span>
-                            <div class="zodiac-bar">
-                                <div class="zodiac-fill" style="width: 88%"></div>
-                            </div>
-                            <span class="zodiac-count">110</span>
-                        </div>
+
                     </div>
                 </div>
             </div>
@@ -238,7 +164,6 @@
                         <th>Остання активність</th>
                         <th>Збіги</th>
                         <th>Лайки</th>
-                        <th>Скарги</th>
                         <th>Дії</th>
                     </tr>
                     </thead>
@@ -246,76 +171,6 @@
                     <!-- Users will be populated by JavaScript -->
                     </tbody>
                 </table>
-            </div>
-        </section>
-
-        <!-- Reports Section -->
-        <section class="admin-section" id="reports">
-            <div class="section-header">
-                <h1>Скарги користувачів</h1>
-                <p>Розгляд та модерація скарг</p>
-            </div>
-
-            <div class="reports-grid">
-                <div class="report-card">
-                    <div class="report-header">
-                        <div class="report-type spam">Спам</div>
-                        <div class="report-date">20.01.2024</div>
-                    </div>
-                    <div class="report-content">
-                        <div class="report-users">
-                            <span>Скарга від: <strong>Анна П.</strong></span>
-                            <span>На користувача: <strong>Олексій К.</strong></span>
-                        </div>
-                        <p class="report-description">
-                            Користувач надсилає однакові повідомлення всім користувачам
-                        </p>
-                    </div>
-                    <div class="report-actions">
-                        <button class="btn btn-outline btn-small">Відхилити</button>
-                        <button class="btn btn-primary btn-small">Заблокувати</button>
-                    </div>
-                </div>
-
-                <div class="report-card">
-                    <div class="report-header">
-                        <div class="report-type inappropriate">Неприйнятний контент</div>
-                        <div class="report-date">19.01.2024</div>
-                    </div>
-                    <div class="report-content">
-                        <div class="report-users">
-                            <span>Скарга від: <strong>Марія С.</strong></span>
-                            <span>На користувача: <strong>Дмитро Л.</strong></span>
-                        </div>
-                        <p class="report-description">
-                            Неприйнятні фотографії в профілі
-                        </p>
-                    </div>
-                    <div class="report-actions">
-                        <button class="btn btn-outline btn-small">Відхилити</button>
-                        <button class="btn btn-primary btn-small">Попередження</button>
-                    </div>
-                </div>
-
-                <div class="report-card">
-                    <div class="report-header">
-                        <div class="report-type harassment">Домагання</div>
-                        <div class="report-date">18.01.2024</div>
-                    </div>
-                    <div class="report-content">
-                        <div class="report-users">
-                            <span>Скарга від: <strong>Ірина В.</strong></span>
-                            <span>На користувача: <strong>Сергій М.</strong></span>
-                        </div>
-                        <p class="report-description">
-                            Продовжує писати після відмови, нав'язливі повідомлення
-                        </p>
-                    </div>
-                    <div class="report-actions">
-                        <button class="btn btn-outline btn-small">Відхилити</button>
-                        <button class="btn btn-danger btn-small">Заблокувати назавжди</button>
-                    </div>
-                </div>
             </div>
         </section>
     </div>
@@ -397,7 +252,6 @@
     </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/admin.js') }}"></script>
-<script src="{{ url_for('static', filename='js/common.js') }}"></script>
+<script type="module" src="{{ url_for('static', filename='js/admin.js') }}"></script>
 </body>
 </html>
