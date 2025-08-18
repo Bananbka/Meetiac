@@ -64,11 +64,6 @@ class User(db.Model):
             data["bio"] = self.bio
 
         if "images" in fields:
-            # data["images"] = ['static/uploads/user_2_0.png', 'static/uploads/user_2_1.png',
-            #                   'static/uploads/user_2_2.png']
-            # import random
-            # random.shuffle(data["images"])
-
             if len(self.images) != 0:
                 data["images"] = [img.image_path for img in self.images]
             else:

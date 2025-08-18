@@ -9,32 +9,34 @@ from app.models import User, Meeting, Like, Dislike, MeetingFeedback, Refusal, M
 
 # 1
 def get_quarterly_clients():
+    current_year = datetime.now().year
+
     quarters = db.session.query(
-        extract('year', User.registration_date).label('year'),
         func.ceil(extract('month', User.registration_date) / 3).label('quarter')
+    ).filter(
+        extract('year', User.registration_date) == current_year
     ).distinct().all()
 
     results = []
-    for year, quarter in quarters:
+    for (quarter,) in quarters:
         registered_count = db.session.query(User).filter(
-            extract('year', User.registration_date) == year,
+            extract('year', User.registration_date) == current_year,
             func.ceil(extract('month', User.registration_date) / 3) == quarter
         ).count()
 
         active_like_users = db.session.query(distinct(Like.from_user_id)).filter(
-            extract('year', Like.created_at) == year,
+            extract('year', Like.created_at) == current_year,
             func.ceil(extract('month', Like.created_at) / 3) == quarter
         )
 
         active_dislike_users = db.session.query(distinct(Dislike.from_user_id)).filter(
-            extract('year', Dislike.created_at) == year,
+            extract('year', Dislike.created_at) == current_year,
             func.ceil(extract('month', Dislike.created_at) / 3) == quarter
         )
 
         active_users = set([u[0] for u in active_like_users.union(active_dislike_users).all()])
 
         results.append({
-            "year": int(year),
             "quarter": int(quarter),
             "registered_count": registered_count,
             "active_users_count": len(active_users)
@@ -92,7 +94,8 @@ def get_planned_meetings():
 
     meetings = Meeting.query.filter(
         Meeting.meeting_date >= today,
-        Meeting.meeting_date < next_month + timedelta(days=31)
+        Meeting.meeting_date < next_month + timedelta(days=31),
+        Meeting.archived == False
     ).all()
     return [m.to_dict() for m in meetings]
 
@@ -117,19 +120,22 @@ def get_recent_registrations():
 
 # 5
 def get_attendance_by_gender():
-    q = db.session.query(
-        User.gender,
-        func.count(MeetingFeedback.feedback_id).label('attended_count')
-    ).join(MeetingFeedback, User.user_id == MeetingFeedback.user_id) \
-        .filter(MeetingFeedback.partner_late == False) \
-        .group_by(User.gender).all()
+    users = db.session.query(User).join(MeetingFeedback, User.user_id == MeetingFeedback.user_id) \
+        .filter(MeetingFeedback.partner_late == False).all()
 
-    return {Gender.query.get(gender).name: count for gender, count in q}
+    attendance_by_gender = {}
+    for user in users:
+        gender_name = user.gender_obj.name
+        if gender_name not in attendance_by_gender:
+            attendance_by_gender[gender_name] = []
+        attendance_by_gender[gender_name].append(user.to_dict(["gender"]))
+
+    return attendance_by_gender
 
 
 # 7
 def get_refusal_count():
-    return Refusal.query.count()
+    return str(Refusal.query.count())
 
 
 # 9
@@ -137,7 +143,7 @@ def get_successful_couples():
     users = db.session.query(distinct(MeetingFeedback.user_id)).filter(
         MeetingFeedback.stay_together == True
     ).all()
-    return len(users)
+    return str(len(users))
 
 
 # 10
