@@ -1,7 +1,7 @@
 ﻿from flask import Blueprint, render_template, redirect, url_for, session
 
 from app.models import Meeting, Like
-from app.utils.access_utils import login_required
+from app.utils.access_utils import login_required, admin_access_required
 
 pages_bp = Blueprint('pages', __name__)
 
@@ -26,6 +26,7 @@ def discover():
 
 @pages_bp.route('/admin', methods=['GET'])
 @login_required
+@admin_access_required
 def admin():
     return render_template('admin.html')
 
