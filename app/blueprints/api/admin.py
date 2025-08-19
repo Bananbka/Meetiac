@@ -53,7 +53,6 @@ def quarterly_clients():
     return get_quarterly_clients()
 
 
-# Окремо
 @admin_bp.route("/get-successful-couples-info", methods=["GET"])
 @login_required_api
 @admin_access_required_api
@@ -61,7 +60,6 @@ def successful_couples_info():
     return get_successful_couples_info()
 
 
-# Окремо
 @admin_bp.route("/get-planned-meetings", methods=["GET"])
 @login_required_api
 @admin_access_required_api

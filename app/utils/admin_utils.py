@@ -1,7 +1,7 @@
 ﻿from datetime import datetime, timedelta, date
-from operator import or_
+from operator import or_, and_
 
-from sqlalchemy import extract, func, distinct
+from sqlalchemy import extract, func, distinct, case
 
 from app.database import db
 from app.models import User, Meeting, Like, Dislike, MeetingFeedback, Refusal, Match, Gender, ZodiacSign
@@ -115,9 +115,29 @@ def get_recent_registrations():
 
 
 def get_attendance_by_gender():
-    users = db.session.query(User).join(MeetingFeedback, User.user_id == MeetingFeedback.user_id) \
-        .filter(MeetingFeedback.partner_late == False).all()
+    # 1. Беремо всі фідбеки з partner_late=True
+    late_feedbacks = db.session.query(MeetingFeedback).filter_by(partner_late=True).all()
 
+    # 2. Визначаємо user_id, які пропускали зустрічі
+    skipped_user_ids = set()
+    for fb in late_feedbacks:
+        meeting = fb.meeting
+        # partner_id = той, хто НЕ залишав фідбек
+        partner_id = meeting.user1_id if fb.user_id != meeting.user1_id else meeting.user2_id
+        skipped_user_ids.add(partner_id)
+
+    # 3. Беремо всі унікальні user_id, які були на мітах
+    all_meetings = db.session.query(Meeting.user1_id, Meeting.user2_id).all()
+    all_user_ids = set()
+    for u1, u2 in all_meetings:
+        all_user_ids.add(u1)
+        all_user_ids.add(u2)
+
+    # 4. Вилучаємо тих, хто пропускав зустрічі
+    attended_user_ids = all_user_ids - skipped_user_ids
+
+    # 5. Беремо дані про юзерів та групуємо по гендеру
+    users = db.session.query(User).filter(User.user_id.in_(attended_user_ids)).all()
     attendance_by_gender = {}
     for user in users:
         gender_name = user.gender_obj.name

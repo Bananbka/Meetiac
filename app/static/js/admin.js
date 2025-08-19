@@ -169,6 +169,10 @@ async function updateStats() {
     await updateQuartalStats();
     await updateRecentRegistrations();
     await updateGenderStats();
+
+    await updateSuccessfulCouples();
+    await updatePlannedMeetings();
+    await updateAttendanceByGender();
 }
 
 
@@ -311,6 +315,166 @@ async function updateGenderStats() {
 
         genderStatsContainer.appendChild(item);
     });
+}
+
+async function updateSuccessfulCouples() {
+    const couplesData = await fetchSuccessfulCouples();
+    const listContainer = document.querySelector(".matches-list");
+
+    if (!couplesData) return;
+
+    listContainer.innerHTML = ""; // очистка
+
+    couplesData.forEach(({match, meeting}) => {
+        const u1 = match.match_user;
+        const u2 = match.req_user;
+
+        // форматування дати
+        const date = new Date(meeting.meeting_date).toLocaleString("uk-UA", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+        // місце
+        const location = meeting.location?.replace(" ", ", ") || "—";
+
+        const item = document.createElement("div");
+        item.classList.add("meeting-item");
+
+        item.innerHTML = `
+            <div class="avatars">
+                <img src="${u1.images[0] || 'static/default.png'}" class="avatar">
+                <img src="${u2.images[0] || 'static/default.png'}" class="avatar">
+            </div>
+            <div class="meeting-info">
+                <div class="meeting-names">
+                    <span>${u1.name} (${u1.age}р, ♑)</span>
+                    ❤️
+                    <span>${u2.name} (${u2.age}р, ♑)</span>
+                </div>
+                <div class="meeting-meta">
+                    ${date}
+                </div>
+            </div>
+        `;
+
+        listContainer.appendChild(item);
+    });
+}
+
+async function updatePlannedMeetings() {
+    const meetingsData = await fetchPlannedMeetings();
+    const listContainer = document.querySelector(".meetings-list");
+
+    if (!meetingsData) return;
+
+    listContainer.innerHTML = ""; // очистка перед заповненням
+
+    meetingsData.forEach(({meet_user, req_user, meeting_date, location}) => {
+        // форматування дати
+        const date = new Date(meeting_date).toLocaleString("uk-UA", {
+            day: "2-digit",
+            month: "long",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+
+        // форматування місця
+        const loc = location?.replace(" ", ", ") || "—";
+
+        const item = document.createElement("div");
+        item.classList.add("meeting-item");
+
+        item.innerHTML = `
+            <div class="avatars">
+                <img src="${meet_user.images[0] || 'static/default.png'}" class="avatar">
+                <img src="${req_user.images[0] || 'static/default.png'}" class="avatar">
+            </div>
+            <div class="meeting-info">
+                <div class="meeting-names">
+                    <span>${meet_user.name} (${meet_user.age}р, ♑)</span>
+                    🤝
+                    <span>${req_user.name} (${req_user.age}р, ♑)</span>
+                </div>
+                <div class="meeting-meta">
+                    ${date}
+                </div>
+            </div>
+        `;
+
+        listContainer.appendChild(item);
+    });
+}
+
+async function updateAttendanceByGender() {
+    const attendanceData = await fetchAttendanceByGender();
+    const listContainer = document.querySelector(".gender-list");
+
+    if (!attendanceData) return;
+
+    listContainer.innerHTML = ""; // очистка перед заповненням
+
+    const genders = ["female", "male", "other"];
+
+    genders.forEach(gender => {
+        const users = attendanceData[gender];
+        if (!users || users.length === 0) return;
+
+        // Додаємо заголовок по гендеру
+        const genderHeader = document.createElement("div");
+        genderHeader.classList.add("gender-header");
+        genderHeader.textContent = gender === "female" ? "Жінки" : gender === "male" ? "Чоловіки" : "Інші";
+        listContainer.appendChild(genderHeader);
+
+        users.forEach(user => {
+            const item = document.createElement("div");
+            item.classList.add("meeting-item");
+            item.innerHTML = `
+                <div class="meeting-names">
+                    ${user.name} ${genderEmoji(user.gender)}
+                </div>
+            `;
+            listContainer.appendChild(item);
+        });
+    });
+}
+
+// функція для емодзі за гендером
+function genderEmoji(gender) {
+    if (gender === "female") return "♀️";
+    if (gender === "male") return "♂️";
+    return "⚧";
+}
+
+async function fetchAttendanceByGender() {
+    const resp = await fetch("/api/admin/get-attendance-by-gender");
+    if (!resp.ok) {
+        showNotification("Помилка отримання даних про відвідуваність", "error");
+        return null;
+    }
+    return await resp.json();
+}
+
+async function fetchPlannedMeetings() {
+    const resp = await fetch("/api/admin/get-planned-meetings");
+    if (!resp.ok) {
+        showNotification("Помилка отримання запланованих зустрічей", "error");
+        return null;
+    }
+    return await resp.json();
+}
+
+async function fetchSuccessfulCouples() {
+    const resp = await fetch("/api/admin/get-successful-couples-info");
+    if (!resp.ok) {
+        showNotification("Помилка отримання успішних зустрічей", "error");
+        return null;
+    }
+    return await resp.json();
 }
 
 async function fetchGenderStats() {
