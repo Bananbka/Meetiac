@@ -3,7 +3,7 @@
 from flask import Blueprint, request, jsonify
 
 from app import db
-from app.models import Meeting, MeetingFeedback
+from app.models import Meeting, MeetingFeedback, User
 from app.utils.access_utils import login_required_api, api_error
 
 meeting_bp = Blueprint('meeting', __name__)
@@ -179,3 +179,37 @@ def get_feedback(meeting_id):
         "user_id": user_id,
         "feedbacks": feedbacks
     })
+
+
+@meeting_bp.route('/<int:meeting_id>', methods=['POST'])
+def update_meeting(meeting_id):
+    meeting = Meeting.query.get_or_404(meeting_id)
+    data = request.json or {}
+
+    if "meeting_date" in data:
+        meeting.meeting_date = data["meeting_date"]
+    if "location" in data:
+        meeting.location = data["location"]
+    if "user1_comment" in data:
+        meeting.user1_comment = data["user1_comment"]
+    if "user2_comment" in data:
+        meeting.user2_comment = data["user2_comment"]
+    if "result" in data:
+        meeting.result = data["result"]
+    if "archived" in data:
+        meeting.archived = bool(data["archived"])
+    if "user1_id" in data:
+        user1 = User.query.get(data["user1_id"])
+        if not user1:
+            return api_error(f"User with id {data['user1_id']} not found", 404)
+        meeting.user1_id = data["user1_id"]
+    if "user2_id" in data:
+        user2 = User.query.get(data["user2_id"])
+        if not user2:
+            return api_error(f"User with id {data['user2_id']} not found", 404)
+        meeting.user2_id = data["user2_id"]
+    if meeting.user1_id == meeting.user2_id:
+        return api_error("user1_id and user2_id cannot be the same", 400)
+
+    db.session.commit()
+    return jsonify({"message": "Meeting updated", "meeting_id": meeting.meeting_id})

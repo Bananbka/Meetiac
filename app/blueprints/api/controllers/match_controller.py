@@ -1,7 +1,7 @@
 ﻿from flask import Blueprint, jsonify, request
 
 from app import db
-from app.models import Match, Like
+from app.models import Match, Like, User
 from app.utils.access_utils import login_required_api, api_error
 
 match_bp = Blueprint('match', __name__)
@@ -76,3 +76,29 @@ def delete_match(match_id):
     db.session.commit()
 
     return "ok"
+
+
+@match_bp.route('/<int:match_id>', methods=['POST'])
+def update_match(match_id):
+    match = Match.query.get_or_404(match_id)
+    data = request.json or {}
+
+    if "comment" in data:
+        match.comment = data["comment"]
+    if "archived" in data:
+        match.archived = bool(data["archived"])
+    if "user1_id" in data:
+        user1 = User.query.get(data["user1_id"])
+        if not user1:
+            return api_error(f"User with id {data['user1_id']} not found", 404)
+        match.user1_id = data["user1_id"]
+    if "user2_id" in data:
+        user2 = User.query.get(data["user2_id"])
+        if not user2:
+            return api_error(f"User with id {data['user2_id']} not found", 404)
+        match.user2_id = data["user2_id"]
+    if match.user1_id == match.user2_id:
+        return api_error("user1_id and user2_id cannot be the same", 400)
+
+    db.session.commit()
+    return jsonify({"message": "Match updated", "match_id": match.match_id})

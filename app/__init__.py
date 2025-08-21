@@ -2,6 +2,7 @@
 from flask_migrate import Migrate
 
 from app.blueprints.api.admin import admin_bp
+from app.blueprints.api.controllers.credentials_controller import creds_bp
 from app.blueprints.api.reactions import reaction_bp
 from app.database import db
 from app.config import Config
@@ -48,6 +49,7 @@ def create_app():
     app.register_blueprint(user_bp, url_prefix='/api/user')
     app.register_blueprint(match_bp, url_prefix='/api/match')
     app.register_blueprint(meeting_bp, url_prefix='/api/meeting')
+    app.register_blueprint(creds_bp, url_prefix='/api/credentials')
 
     app.register_blueprint(weather_bp, url_prefix='/api/weather')
 
