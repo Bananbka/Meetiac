@@ -2,7 +2,8 @@
 
 from app import db
 from app.models import Match, Like, User
-from app.utils.access_utils import login_required_api, api_error
+from app.utils.access_utils import login_required_api, api_error, admin_access_required_api
+from app.utils.admin_utils import paginate_query
 
 match_bp = Blueprint('match', __name__)
 
@@ -79,6 +80,8 @@ def delete_match(match_id):
 
 
 @match_bp.route('/<int:match_id>', methods=['POST'])
+@login_required_api
+@admin_access_required_api
 def update_match(match_id):
     match = Match.query.get_or_404(match_id)
     data = request.json or {}
@@ -102,3 +105,10 @@ def update_match(match_id):
 
     db.session.commit()
     return jsonify({"message": "Match updated", "match_id": match.match_id})
+
+
+@match_bp.route('/', methods=['GET'])
+@login_required_api
+@admin_access_required_api
+def get_admin_matches():
+    return paginate_query(Match.query, lambda m: m.to_dict())

@@ -4,7 +4,8 @@ from flask import Blueprint, request, jsonify
 
 from app import db
 from app.models import Meeting, MeetingFeedback, User
-from app.utils.access_utils import login_required_api, api_error
+from app.utils.access_utils import login_required_api, api_error, admin_access_required_api
+from app.utils.admin_utils import paginate_query
 
 meeting_bp = Blueprint('meeting', __name__)
 
@@ -182,6 +183,8 @@ def get_feedback(meeting_id):
 
 
 @meeting_bp.route('/<int:meeting_id>', methods=['POST'])
+@login_required_api
+@admin_access_required_api
 def update_meeting(meeting_id):
     meeting = Meeting.query.get_or_404(meeting_id)
     data = request.json or {}
@@ -213,3 +216,10 @@ def update_meeting(meeting_id):
 
     db.session.commit()
     return jsonify({"message": "Meeting updated", "meeting_id": meeting.meeting_id})
+
+
+@meeting_bp.route('/', methods=['GET'])
+@login_required_api
+@admin_access_required_api
+def get_admin_meetings():
+    return paginate_query(Meeting.query, lambda m: m.to_dict())

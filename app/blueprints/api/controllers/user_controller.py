@@ -2,12 +2,14 @@
 
 from app.database import db
 from app.models import User
-from app.utils.access_utils import api_error
+from app.utils.access_utils import api_error, login_required_api, admin_access_required_api
+from app.utils.admin_utils import paginate_query
 
 user_bp = Blueprint('user', __name__)
 
 
 @user_bp.route('/<int:user_id>', methods=['GET'])
+@login_required_api
 def user(user_id):
     is_detailed = request.args.get('is_detailed')
 
@@ -20,6 +22,8 @@ def user(user_id):
 
 
 @user_bp.route('/<int:user_id>', methods=['POST'])
+@login_required_api
+@admin_access_required_api
 def update_user(user_id):
     user_data = User.query.get_or_404(user_id)
     data = request.json or {}
@@ -44,3 +48,10 @@ def update_user(user_id):
 
     db.session.commit()
     return jsonify({"message": "User updated", "user_id": user_data.user_id})
+
+
+@user_bp.route('/', methods=['GET'])
+@login_required_api
+@admin_access_required_api
+def get_users():
+    return paginate_query(User.query, lambda u: u.to_dict(full=True))

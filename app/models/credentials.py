@@ -21,3 +21,14 @@ class Credentials(UserMixin, db.Model):
 
     def get_id(self):
         return str(self.key_id)
+
+    def to_dict(self, full=False):
+        data = {
+            "key_id": self.key_id,
+            "login": self.login,
+            "access_right": self.access_right,
+            "user_id": self.user_id
+        }
+        if full:
+            data["user"] = self.user.to_dict(fields=["gender", "sign", "is_active"]) if self.user else None
+        return data

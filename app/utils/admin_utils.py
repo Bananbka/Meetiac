@@ -1,6 +1,7 @@
 ﻿from datetime import datetime, timedelta, date
 from operator import or_, and_
 
+from flask import request, jsonify
 from sqlalchemy import extract, func, distinct, case
 
 from app.database import db
@@ -279,3 +280,24 @@ def get_registrations_last_week():
         result[weekday] = registrations_dict.get(d, 0)
 
     return result
+
+
+def paginate_query(query, serializer, default_per_page=10):
+    """
+    Універсальний хелпер для пагінації.
+
+    :param query: SQLAlchemy query (наприклад User.query)
+    :param serializer: функція або lambda для перетворення item -> dict
+    :param default_per_page: кількість елементів на сторінці
+    """
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", default_per_page, type=int)
+
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return jsonify({
+        "total": pagination.total,
+        "page": pagination.page,
+        "pages": pagination.pages,
+        "items": [serializer(item) for item in pagination.items]
+    })
