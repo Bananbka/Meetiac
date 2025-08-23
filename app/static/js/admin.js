@@ -319,7 +319,7 @@ function filterCredentials() {
     const searchTerm = document.getElementById("credentialsSearch").value.toLowerCase()
 
     const filteredCredentials = credentials.filter((credential) => {
-        return credential.email.toLowerCase().includes(searchTerm)
+        return credential.login.toLowerCase().includes(searchTerm)
     })
 
     renderCredentialsCards(filteredCredentials)
@@ -417,21 +417,6 @@ function renderUsersTable(usersToRender = users) {
     })
 }
 
-function getStatusText(status) {
-    const statusMap = {
-        active: "Активний",
-        inactive: "Неактивний",
-        banned: "Заблокований",
-        confirmed: "Підтверджено",
-        completed: "Завершено",
-        cancelled: "Скасовано",
-        rejected: "Відхилено",
-        accepted: "Прийнято",
-        expired: "Закінчився"
-    }
-    return statusMap[status] || status
-}
-
 function renderMeetingsCards(meetingsToRender = meetings) {
     const container = document.getElementById("meetingsContainer")
     if (!container) return
@@ -452,8 +437,8 @@ function renderMeetingsCards(meetingsToRender = meetings) {
 
         card.innerHTML = `
             <div class="meeting-card-header">
-                <h4>Зустріч #${meeting.id || ''}</h4>
-                <span class="status-badge ${meeting.status}">${getStatusText(meeting.status)}</span>
+                <h4>Зустріч #${meeting.meeting_id || ''}</h4>
+                <span class="status-badge ${meeting.archived}">${meeting.archived ? "Активна" : "Архівована"}</span>
             </div>
             <div class="meeting-card-content">
                 <p><strong>Запросив:</strong> ${meeting.req_user ? meeting.req_user.name : 'Невідомо'}</p>
@@ -462,11 +447,11 @@ function renderMeetingsCards(meetingsToRender = meetings) {
                 <p><strong>Дата:</strong> ${meetingDate}</p>
             </div>
             <div class="meeting-card-actions">
-                <button class="action-btn edit" data-id="${meeting.id}" title="Редагувати">
+                <button class="action-btn edit" data-id="${meeting.meeting_id}" title="Редагувати">
                     <i class="fas fa-edit"></i>
                 </button>
                 <button class="action-btn ${meeting.status === 'cancelled' ? 'restore' : 'cancel'}" 
-                        data-id="${meeting.id}" 
+                        data-id="${meeting.meeting_id}" 
                         data-action="${meeting.status === 'cancelled' ? 'restore' : 'cancel'}"
                         title="${meeting.status === 'cancelled' ? 'Відновити' : 'Скасувати'}">
                     <i class="fas fa-${meeting.status === 'cancelled' ? 'undo' : 'times'}"></i>
@@ -510,18 +495,17 @@ function renderCredentialsCards(credentialsToRender = credentials) {
 
         card.innerHTML = `
             <div class="credential-card-header">
-                <h4>Обліковий запис #${credential.id || ''}</h4>
+                <h4>Обліковий запис #${credential.key_id || ''}</h4>
             </div>
             <div class="credential-card-content">
-                <p><strong>Email:</strong> ${credential.email || ''}</p>
+                <p><strong>Email:</strong> ${credential.login || ''}</p>
                 <p><strong>Користувач ID:</strong> ${credential.user_id || 'Не прив\'язано'}</p>
-                <p><strong>Створено:</strong> ${formatDate(credential.created_at)}</p>
             </div>
             <div class="credential-card-actions">
-                <button class="action-btn edit" data-id="${credential.id}" title="Редагувати">
+                <button class="action-btn edit" data-id="${credential.key_id}" title="Редагувати">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="action-btn reset" data-id="${credential.id}" title="Скинути пароль">
+                <button class="action-btn reset" data-id="${credential.key_id}" title="Скинути пароль">
                     <i class="fas fa-key"></i>
                 </button>
             </div>
@@ -556,7 +540,7 @@ function renderMatchesCards(matchesToRender = matches) {
         card.innerHTML = `
     <div class="match-card-header">
         <h4>Збіг #${match.match_id}</h4>
-        <span class="status-badge ${match.status}">${getStatusText(match.status)}</span>
+        <span class="status-badge ${match.status}">${match.archived ? "Активна" : "Архівована"}</span>
     </div>
     <div class="match-card-content">
         <div class="match-users">
@@ -574,7 +558,7 @@ function renderMatchesCards(matchesToRender = matches) {
                 <p>${match.match_user?.name || 'Невідомо'}</p>
             </div>
         </div>
-        <p><strong>Оцінка збігу:</strong> ${match.score || 'Н/Д'}</p>
+        <p><strong>Оцінка збігу:</strong> ${`${match.score}%` || 'Н/Д'}</p>
         <p><strong>Створено:</strong> ${formatDate(match.created_at)}</p>
     </div>
     <div class="match-card-actions">
@@ -1147,7 +1131,7 @@ async function saveUserChanges() {
 
 // Meeting editing functions
 function editMeeting(meetingId) {
-    const meeting = meetings.find(m => m.id === meetingId)
+    const meeting = meetings.find(m => m.meeting_id === meetingId)
     if (!meeting) return
 
     // Create modal if it doesn't exist
@@ -1194,7 +1178,7 @@ function editMeeting(meetingId) {
     }
 
     // Fill form with meeting data
-    document.getElementById('editMeetingId').value = meeting.id
+    document.getElementById('editMeetingId').value = meeting.meeting_id
     document.getElementById('editMeetingStatus').value = meeting.status
     document.getElementById('editMeetingLocation').value = meeting.location || ''
 
@@ -1247,7 +1231,7 @@ async function saveMeetingChanges() {
         }
 
         // Update meeting in local array
-        const meetingIndex = meetings.findIndex(m => m.id === parseInt(meetingId))
+        const meetingIndex = meetings.findIndex(m => m.meeting_id === parseInt(meetingId))
         if (meetingIndex !== -1) {
             meetings[meetingIndex] = {...meetings[meetingIndex], ...meetingData}
         }
@@ -1283,7 +1267,7 @@ async function cancelMeeting(meetingId) {
         }
 
         // Update meeting in local array
-        const meetingIndex = meetings.findIndex(m => m.id === meetingId)
+        const meetingIndex = meetings.findIndex(m => m.meeting_id === meetingId)
         if (meetingIndex !== -1) {
             meetings[meetingIndex].status = 'cancelled'
         }
@@ -1314,7 +1298,7 @@ async function restoreMeeting(meetingId) {
         }
 
         // Update meeting in local array
-        const meetingIndex = meetings.findIndex(m => m.id === meetingId)
+        const meetingIndex = meetings.findIndex(m => m.meeting_id === meetingId)
         if (meetingIndex !== -1) {
             meetings[meetingIndex].status = 'pending'
         }
@@ -1332,7 +1316,7 @@ async function restoreMeeting(meetingId) {
 
 // Credential editing functions
 function editCredential(credentialId) {
-    const credential = credentials.find(c => c.id === credentialId)
+    const credential = credentials.find(c => c.key_id === credentialId)
     if (!credential) return
 
     // Create modal if it doesn't exist
@@ -1366,8 +1350,8 @@ function editCredential(credentialId) {
     }
 
     // Fill form with credential data
-    document.getElementById('editCredentialId').value = credential.id
-    document.getElementById('editCredentialEmail').value = credential.email
+    document.getElementById('editCredentialId').value = credential.key_id
+    document.getElementById('editCredentialEmail').value = credential.login
     document.getElementById('editCredentialUserId').value = credential.user_id || ''
 
     // Show modal
@@ -1450,7 +1434,7 @@ async function resetPassword(credentialId) {
 
 // Match editing functions
 function editMatch(matchId) {
-    const match = matches.find(m => m.id === matchId)
+    const match = matches.find(m => m.match_id === matchId)
     if (!match) return
 
     // Create modal if it doesn't exist
@@ -1568,7 +1552,7 @@ async function deleteMatch(matchId) {
         }
 
         // Remove match from local array
-        matches = matches.filter(m => m.id !== matchId)
+        matches = matches.filter(m => m.match_id !== matchId)
 
         // Re-render matches
         renderMatchesCards()

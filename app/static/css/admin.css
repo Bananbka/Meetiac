@@ -161,18 +161,6 @@
     overflow: hidden;
 }
 
-.credential-card::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(236, 72, 153, 0.1) 0%, transparent 70%);
-    transform: scale(0);
-    transition: transform 0.4s ease;
-}
-
 .credential-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 15px rgba(236, 72, 153, 0.2);
@@ -282,17 +270,6 @@
     overflow: hidden;
 }
 
-.meeting-card::before {
-    content: "";
-    position: absolute;
-    top: -50%;
-    left: -50%;
-    width: 100%;
-    height: 200%;
-    background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
-    transform: scale(0);
-    transition: transform 0.4s ease;
-}
 
 .meeting-card:hover {
     transform: translateY(-5px);
@@ -347,9 +324,9 @@
     background: rgba(17, 24, 39, 0.8);
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
     transition: all 0.3s ease;
-    border: 1px solid rgba(16,185,129,0.3);
+    border: 1px solid rgba(16, 185, 129, 0.3);
     margin-bottom: 1.5rem;
     position: relative;
     overflow: hidden;
@@ -357,8 +334,8 @@
 
 .match-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 10px 20px rgba(16,185,129,0.25);
-    border-color: rgba(16,185,129,0.6);
+    box-shadow: 0 10px 20px rgba(16, 185, 129, 0.25);
+    border-color: rgba(16, 185, 129, 0.6);
 }
 
 .match-card-header {
@@ -366,7 +343,7 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding-bottom: 0.75rem;
 }
 
@@ -384,18 +361,32 @@
     font-weight: 600;
     text-transform: uppercase;
 }
-.status-badge.active { background: rgba(16,185,129,0.2); color: #10b981; }
-.status-badge.pending { background: rgba(234,179,8,0.2); color: #eab308; }
-.status-badge.rejected { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.status-badge.pending {
+    background: rgba(234, 179, 8, 0.2);
+    color: #eab308;
+}
+
+.status-badge.rejected {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
 
 .match-card-content {
     color: #d1d5db;
     margin-bottom: 1.25rem;
 }
+
 .match-card-content p {
     margin: 0.4rem 0;
     font-size: 0.9rem;
 }
+
 .match-card-content strong {
     color: #10b981;
     font-weight: 600;
@@ -411,24 +402,33 @@
 .match-user {
     text-align: center;
 }
+
 .match-avatar {
     width: 70px;
     height: 70px;
     border-radius: 50%;
     object-fit: cover;
     border: 2px solid #10b981;
-    box-shadow: 0 0 10px rgba(16,185,129,0.4);
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
     margin-bottom: 0.5rem;
 }
+
 .match-arrow {
     font-size: 1.5rem;
     margin: 0 1rem;
     color: #f472b6;
     animation: pulse 1.5s infinite;
 }
+
 @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.2); opacity: 1; }
+    0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
 }
 
 .match-card-actions {
@@ -436,9 +436,10 @@
     justify-content: flex-end;
     gap: 0.5rem;
 }
+
 .action-btn {
     border: none;
-    background: rgba(31,41,55,0.8);
+    background: rgba(31, 41, 55, 0.8);
     color: #d1d5db;
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
@@ -446,8 +447,16 @@
     transition: all 0.25s ease;
     font-size: 1rem;
 }
-.action-btn.edit:hover { background: rgba(16,185,129,0.2); color: #10b981; }
-.action-btn.delete:hover { background: rgba(239,68,68,0.2); color: #ef4444; }
+
+.action-btn.edit:hover {
+    background: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+}
+
+.action-btn.delete:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
 
 /* Стилі для статусних значків у картках */
 .card-badge {
@@ -1381,7 +1390,6 @@
     margin-left: -10px; /* перекриття */
     z-index: 1;
 }
-
 
 
 /* Responsive Design */

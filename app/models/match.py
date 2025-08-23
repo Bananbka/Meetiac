@@ -1,6 +1,8 @@
 ﻿from datetime import date
+from operator import or_, and_
 
 from app.database import db
+from app.models.zodiac_compatibility import ZodiacCompatibility
 
 
 class Match(db.Model):
@@ -29,6 +31,22 @@ class Match(db.Model):
         user1 = self.user1.to_dict(full=True)
         user2 = self.user2.to_dict(full=True)
 
+        comp_data = (
+            ZodiacCompatibility.query.filter(
+                or_(
+                    and_(
+                        ZodiacCompatibility.sign1_id == self.user1.sign_id,
+                        ZodiacCompatibility.sign2_id == self.user2.sign_id,
+                    ),
+                    and_(
+                        ZodiacCompatibility.sign1_id == self.user2.sign_id,
+                        ZodiacCompatibility.sign2_id == self.user1.sign_id,
+                    ),
+                )
+            )
+            .first()
+        )
+
         if user_id:
             if user1["user_id"] == user_id:
                 requested_user = user1
@@ -44,6 +62,7 @@ class Match(db.Model):
                 "created_at": self.created_at,
                 "archived": self.archived,
                 "comment": self.comment,
+                "score": comp_data.percent
             }
 
         return {
@@ -53,4 +72,5 @@ class Match(db.Model):
             "created_at": self.created_at,
             "archived": self.archived,
             "comment": self.comment,
+            "score": comp_data.percent
         }
