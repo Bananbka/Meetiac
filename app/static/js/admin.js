@@ -60,10 +60,6 @@ function setupEditButtons() {
             const credentialId = parseInt(event.target.dataset.id);
             editCredential(credentialId);
         }
-        if (event.target.matches('[data-action="reset-password"]')) {
-            const credentialId = parseInt(event.target.dataset.id);
-            resetPassword(credentialId);
-        }
 
         // Кнопки для пар
         if (event.target.matches('[data-action="edit-match"]')) {
@@ -450,11 +446,8 @@ function renderMeetingsCards(meetingsToRender = meetings) {
                 <button class="action-btn edit" data-id="${meeting.meeting_id}" title="Редагувати">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="action-btn ${meeting.status === 'cancelled' ? 'restore' : 'cancel'}" 
-                        data-id="${meeting.meeting_id}" 
-                        data-action="${meeting.status === 'cancelled' ? 'restore' : 'cancel'}"
-                        title="${meeting.status === 'cancelled' ? 'Відновити' : 'Скасувати'}">
-                    <i class="fas fa-${meeting.status === 'cancelled' ? 'undo' : 'times'}"></i>
+                <button class="action-btn delete" data-id="${meeting.meeting_id}" title="Видалити">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         `
@@ -463,16 +456,8 @@ function renderMeetingsCards(meetingsToRender = meetings) {
         const editBtn = card.querySelector('.action-btn.edit');
         editBtn.addEventListener('click', () => editMeeting(parseInt(editBtn.dataset.id)));
 
-        const actionBtn = card.querySelector('.action-btn.cancel, .action-btn.restore');
-        actionBtn.addEventListener('click', () => {
-            const id = parseInt(actionBtn.dataset.id);
-            const action = actionBtn.dataset.action;
-            if (action === 'cancel') {
-                cancelMeeting(id);
-            } else if (action === 'restore') {
-                restoreMeeting(id);
-            }
-        });
+        const deleteBtn = card.querySelector('.action-btn.delete');
+        deleteBtn.addEventListener('click', () => deleteMatch(parseInt(deleteBtn.dataset.id)));
 
         container.appendChild(card)
     })
@@ -505,8 +490,8 @@ function renderCredentialsCards(credentialsToRender = credentials) {
                 <button class="action-btn edit" data-id="${credential.key_id}" title="Редагувати">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="action-btn reset" data-id="${credential.key_id}" title="Скинути пароль">
-                    <i class="fas fa-key"></i>
+                <button class="action-btn delete" data-id="${credential.key_id}" title="Видалити">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         `
@@ -515,8 +500,8 @@ function renderCredentialsCards(credentialsToRender = credentials) {
         const editBtn = card.querySelector('.action-btn.edit');
         editBtn.addEventListener('click', () => editCredential(parseInt(editBtn.dataset.id)));
 
-        const resetBtn = card.querySelector('.action-btn.reset');
-        resetBtn.addEventListener('click', () => resetPassword(parseInt(resetBtn.dataset.id)));
+        const deleteBtn = card.querySelector('.action-btn.delete');
+        deleteBtn.addEventListener('click', () => deleteMatch(parseInt(deleteBtn.dataset.id)));
 
         container.appendChild(card)
     })
@@ -1142,36 +1127,43 @@ function editMeeting(meetingId) {
         modal.className = 'modal'
         modal.innerHTML = `
             <div class="modal-content">
-                <span class="close" onclick="closeEditMeetingModal()">&times;</span>
-                <h2>Редагувати зустріч</h2>
-                <form id="editMeetingForm">
-                    <input type="hidden" id="editMeetingId">
-                    <div class="form-group">
-                        <label for="editMeetingStatus">Статус:</label>
-                        <select id="editMeetingStatus" class="form-control">
-                            <option value="pending">Очікує</option>
-                            <option value="confirmed">Підтверджено</option>
-                            <option value="completed">Завершено</option>
-                            <option value="cancelled">Скасовано</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editMeetingLocation">Місце:</label>
-                        <input type="text" id="editMeetingLocation" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="editMeetingDate">Дата:</label>
-                        <input type="datetime-local" id="editMeetingDate" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="editMeetingNotes">Нотатки:</label>
-                        <textarea id="editMeetingNotes" class="form-control"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-primary" onclick="saveMeetingChanges()">Зберегти</button>
-                        <button type="button" class="btn btn-secondary" onclick="closeEditMeetingModal()">Скасувати</button>
-                    </div>
-                </form>
+                <div class="modal-header">
+                    <h2>Редагувати зустріч</h2> 
+                    <button class="modal-close" onclick="document.getElementById('editMeetingModal').style.display='none'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMeetingForm">
+                        <input type="hidden" id="editMeetingId">
+                        <div class="form-group">
+                            <label for="editMeetingStatus">Статус:</label>
+                            <select id="editMeetingStatus" class="form-control">
+                                <option value="pending">Очікує</option>
+                                <option value="confirmed">Підтверджено</option>
+                                <option value="completed">Завершено</option>
+                                <option value="cancelled">Скасовано</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMeetingLocation">Місце:</label>
+                            <input type="text" id="editMeetingLocation" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="editMeetingDate">Дата:</label>
+                            <input type="datetime-local" id="editMeetingDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="editMeetingNotes">Нотатки:</label>
+                            <textarea id="editMeetingNotes" class="form-control"></textarea>
+                        </div>
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('editMeetingModal').style.display='none'">Скасувати</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMeetingChanges()">Зберегти</button>
+                </div>
             </div>
         `
         document.body.appendChild(modal)
@@ -1192,7 +1184,7 @@ function editMeeting(meetingId) {
     document.getElementById('editMeetingNotes').value = meeting.notes || ''
 
     // Show modal
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 }
 
 function closeEditMeetingModal() {
@@ -1327,23 +1319,29 @@ function editCredential(credentialId) {
         modal.className = 'modal'
         modal.innerHTML = `
             <div class="modal-content">
-                <span class="close" onclick="closeEditCredentialModal()">&times;</span>
-                <h2>Редагувати обліковий запис</h2>
-                <form id="editCredentialForm">
-                    <input type="hidden" id="editCredentialId">
-                    <div class="form-group">
-                        <label for="editCredentialEmail">Email:</label>
-                        <input type="email" id="editCredentialEmail" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="editCredentialUserId">ID користувача:</label>
-                        <input type="number" id="editCredentialUserId" class="form-control">
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-primary" onclick="saveCredentialChanges()">Зберегти</button>
-                        <button type="button" class="btn btn-secondary" onclick="closeEditCredentialModal()">Скасувати</button>
-                    </div>
-                </form>
+                <div class="modal-header">
+                    <h2>Редагувати обліковий запис</h2>
+                    <button class="modal-close" onclick="document.getElementById('editCredentialModal').style.display='none'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCredentialForm">
+                        <input type="hidden" id="editCredentialId">
+                        <div class="form-group">
+                            <label for="editCredentialEmail">Email:</label>
+                            <input type="email" id="editCredentialEmail" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="editCredentialUserId">ID користувача:</label>
+                            <input type="number" id="editCredentialUserId" class="form-control">
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('editCredentialModal').style.display='none'">Скасувати</button>
+                    <button type="button" class="btn btn-primary" onclick="saveCredentialChanges()">Зберегти</button>
+                </div>
             </div>
         `
         document.body.appendChild(modal)
@@ -1355,7 +1353,7 @@ function editCredential(credentialId) {
     document.getElementById('editCredentialUserId').value = credential.user_id || ''
 
     // Show modal
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 }
 
 function closeEditCredentialModal() {
@@ -1409,29 +1407,6 @@ async function saveCredentialChanges() {
     }
 }
 
-async function resetPassword(credentialId) {
-    if (!confirm('Ви впевнені, що хочете скинути пароль для цього облікового запису? Користувачу буде надіслано новий пароль на email.')) return
-
-    try {
-        const response = await fetch(`/api/credentials/${credentialId}/reset-password`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        })
-
-        if (!response.ok) {
-            throw new Error('Failed to reset password')
-        }
-
-        // Show success notification
-        showNotification('Пароль скинуто. Новий пароль надіслано на email користувача.', 'success')
-    } catch (error) {
-        console.error('Error resetting password:', error)
-        showNotification('Не вдалося скинути пароль', 'error')
-    }
-}
-
 // Match editing functions
 function editMatch(matchId) {
     const match = matches.find(m => m.match_id === matchId)
@@ -1445,32 +1420,38 @@ function editMatch(matchId) {
         modal.className = 'modal'
         modal.innerHTML = `
             <div class="modal-content">
-                <span class="close" onclick="closeEditMatchModal()">&times;</span>
-                <h2>Редагувати збіг</h2>
-                <form id="editMatchForm">
-                    <input type="hidden" id="editMatchId">
-                    <div class="form-group">
-                        <label for="editMatchStatus">Статус:</label>
-                        <select id="editMatchStatus" class="form-control">
-                            <option value="pending">Очікує</option>
-                            <option value="accepted">Прийнято</option>
-                            <option value="rejected">Відхилено</option>
-                            <option value="expired">Закінчився</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editMatchScore">Оцінка збігу:</label>
-                        <input type="number" id="editMatchScore" class="form-control" min="0" max="100">
-                    </div>
-                    <div class="form-group">
-                        <label for="editMatchNotes">Нотатки:</label>
-                        <textarea id="editMatchNotes" class="form-control"></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-primary" onclick="saveMatchChanges()">Зберегти</button>
-                        <button type="button" class="btn btn-secondary" onclick="closeEditMatchModal()">Скасувати</button>
-                    </div>
-                </form>
+                <div class="modal-header">
+                    <h2>Редагувати збіг</h2>
+                    <button class="modal-close" onclick="document.getElementById('editMatchModal').style.display='none'">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="editMatchForm">
+                        <input type="hidden" id="editMatchId">
+                        <div class="form-group">
+                            <label for="editMatchStatus">Статус:</label>
+                            <select id="editMatchStatus" class="form-control">
+                                <option value="pending">Очікує</option>
+                                <option value="accepted">Прийнято</option>
+                                <option value="rejected">Відхилено</option>
+                                <option value="expired">Закінчився</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="editMatchScore">Оцінка збігу:</label>
+                            <input type="number" id="editMatchScore" class="form-control" min="0" max="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="editMatchNotes">Нотатки:</label>
+                            <textarea id="editMatchNotes" class="form-control"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="document.getElementById('editMatchModal').style.display='none'">Скасувати</button>
+                    <button type="button" class="btn btn-primary" onclick="saveMatchChanges()">Зберегти</button>
+                </div>
             </div>
         `
         document.body.appendChild(modal)
@@ -1483,7 +1464,7 @@ function editMatch(matchId) {
     document.getElementById('editMatchNotes').value = match.notes || ''
 
     // Show modal
-    modal.style.display = 'block'
+    modal.style.display = 'flex'
 }
 
 function closeEditMatchModal() {
