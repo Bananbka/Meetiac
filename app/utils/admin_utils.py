@@ -1,4 +1,5 @@
-﻿from datetime import datetime, timedelta, date
+﻿import re
+from datetime import datetime, timedelta, date
 from operator import or_, and_
 
 from flask import request, jsonify
@@ -6,6 +7,8 @@ from sqlalchemy import extract, func, distinct, case
 
 from app.database import db
 from app.models import User, Meeting, Like, Dislike, MeetingFeedback, Refusal, Match, Gender, ZodiacSign
+
+EMAIL_REGEX = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 
 
 def get_quarterly_clients():
@@ -301,3 +304,7 @@ def paginate_query(query, serializer, default_per_page=10):
         "pages": pagination.pages,
         "items": [serializer(item) for item in pagination.items]
     })
+
+
+def is_valid_email(email: str) -> bool:
+    return EMAIL_REGEX.match(email) is not None

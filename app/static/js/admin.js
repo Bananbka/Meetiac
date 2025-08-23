@@ -15,6 +15,8 @@ let users = []
 let meetings = []
 let credentials = []
 let matches = []
+let mapInstance;
+let mapMarker;
 
 // Pagination state
 let usersPagination = {page: 1, totalPages: 1, limit: 10}
@@ -82,11 +84,26 @@ function setupEditButtons() {
             saveUserChanges();
         }
         if (event.target.matches('#editMeetingModal .close') ||
-            event.target.matches('#editMeetingModal .btn-outline')) {
+            event.target.matches('#editMeetingModal .btn-outline') ||
+            event.target.closest('#editMeetingModal .modal-close')) {
             closeEditMeetingModal();
+        }
+        if (event.target.matches('#editMatchModal .btn-outline') ||
+            event.target.closest('#editMatchModal .modal-close')) {
+            closeEditMatchModal();
+        }
+        if (event.target.matches('#editCredentialModal .btn-outline') ||
+            event.target.closest('#editCredentialModal .modal-close')) {
+            closeEditCredentialModal();
         }
         if (event.target.matches('#editMeetingModal .btn-primary')) {
             saveMeetingChanges();
+        }
+        if (event.target.matches('#editMatchModal .btn-primary')) {
+            saveMatchChanges();
+        }
+        if (event.target.matches('#editCredentialModal .btn-primary')) {
+            saveCredentialChanges();
         }
         if (event.target.matches('#logoutModal .logout-btn-cancel')) {
             hideLogoutModal();
@@ -463,6 +480,13 @@ function renderMeetingsCards(meetingsToRender = meetings) {
     })
 }
 
+const roles = {
+    guest: "Гість",
+    authorized: "Користувач",
+    operator: "Оператор",
+    admin: "Адміністратор"
+};
+
 function renderCredentialsCards(credentialsToRender = credentials) {
     const container = document.getElementById("credentialsContainer")
     if (!container) return
@@ -475,6 +499,7 @@ function renderCredentialsCards(credentialsToRender = credentials) {
     }
 
     credentialsToRender.forEach((credential) => {
+    console.log(credential)
         const card = document.createElement("div")
         card.className = "credential-card"
 
@@ -483,8 +508,9 @@ function renderCredentialsCards(credentialsToRender = credentials) {
                 <h4>Обліковий запис #${credential.key_id || ''}</h4>
             </div>
             <div class="credential-card-content">
-                <p><strong>Email:</strong> ${credential.login || ''}</p>
-                <p><strong>Користувач ID:</strong> ${credential.user_id || 'Не прив\'язано'}</p>
+                <p><strong>ID:</strong> ${credential.user_id || 'Не прив\'язано'}</p>
+                <p><strong>Пошта:</strong> ${credential.login || ''}</p>
+                <p><strong>Роль:</strong> ${credential.access_right ? roles[credential.access_right] : 'Відсутня'}</p>
             </div>
             <div class="credential-card-actions">
                 <button class="action-btn edit" data-id="${credential.key_id}" title="Редагувати">
@@ -1116,75 +1142,123 @@ async function saveUserChanges() {
 
 // Meeting editing functions
 function editMeeting(meetingId) {
-    const meeting = meetings.find(m => m.meeting_id === meetingId)
-    if (!meeting) return
+    const meeting = meetings.find(m => m.meeting_id === meetingId);
+    if (!meeting) return;
 
     // Create modal if it doesn't exist
-    let modal = document.getElementById('editMeetingModal')
+    let modal = document.getElementById('editMeetingModal');
     if (!modal) {
-        modal = document.createElement('div')
-        modal.id = 'editMeetingModal'
-        modal.className = 'modal'
+        modal = document.createElement('div');
+        modal.id = 'editMeetingModal';
+        modal.className = 'modal';
         modal.innerHTML = `
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Редагувати зустріч</h2> 
-                    <button class="modal-close" onclick="document.getElementById('editMeetingModal').style.display='none'">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="editMeetingForm">
-                        <input type="hidden" id="editMeetingId">
-                        <div class="form-group">
-                            <label for="editMeetingStatus">Статус:</label>
-                            <select id="editMeetingStatus" class="form-control">
-                                <option value="pending">Очікує</option>
-                                <option value="confirmed">Підтверджено</option>
-                                <option value="completed">Завершено</option>
-                                <option value="cancelled">Скасовано</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="editMeetingLocation">Місце:</label>
-                            <input type="text" id="editMeetingLocation" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="editMeetingDate">Дата:</label>
-                            <input type="datetime-local" id="editMeetingDate" class="form-control">
-                        </div>
-                        <div class="form-group">
-                            <label for="editMeetingNotes">Нотатки:</label>
-                            <textarea id="editMeetingNotes" class="form-control"></textarea>
-                        </div>
-                        
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('editMeetingModal').style.display='none'">Скасувати</button>
-                    <button type="button" class="btn btn-primary" onclick="saveMeetingChanges()">Зберегти</button>
-                </div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Редагувати зустріч</h2> 
+                <button class="modal-close">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-        `
-        document.body.appendChild(modal)
+            <div class="modal-body">
+                <form id="editMeetingForm">
+                    <input type="hidden" id="editMeetingId">
+
+                    <div class="form-group">
+                        <label for="editMeetingDate">Дата:</label>
+                        <input type="datetime-local" id="editMeetingDate" class="form-control">
+                    </div>
+
+                    <!-- Map block -->
+                    <div class="form-group">
+                        <label>Місце:</label>
+                        <div id="editMeetingMap" style="height: 250px; border-radius: 8px;"></div>
+                        <input type="hidden" id="editMeetingLocation">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editMeetingUser1Comment">Коментар користувача 1:</label>
+                        <textarea id="editMeetingUser1Comment" class="form-control"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editMeetingUser2Comment">Коментар користувача 2:</label>
+                        <textarea id="editMeetingUser2Comment" class="form-control"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editMeetingResult">Результат:</label>
+                        <select id="editMeetingResult" class="form-control">
+                            <option value="">—</option>
+                            <option value="success">Успіх</option>
+                            <option value="fail">Неуспіх</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="editMeetingArchived"> Архівувати
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline">Скасувати</button>
+                <button type="button" class="btn btn-primary">Зберегти</button>
+            </div>
+        </div>
+        `;
+        document.body.appendChild(modal);
     }
 
     // Fill form with meeting data
-    document.getElementById('editMeetingId').value = meeting.meeting_id
-    document.getElementById('editMeetingStatus').value = meeting.status
-    document.getElementById('editMeetingLocation').value = meeting.location || ''
+    document.getElementById('editMeetingId').value = meeting.meeting_id;
+    document.getElementById('editMeetingUser1Comment').value = meeting.user1_comment || '';
+    document.getElementById('editMeetingUser2Comment').value = meeting.user2_comment || '';
+    document.getElementById('editMeetingResult').value = meeting.result || '';
+    document.getElementById('editMeetingArchived').checked = !!meeting.archived;
 
     if (meeting.meeting_date) {
-        const date = new Date(meeting.meeting_date)
-        document.getElementById('editMeetingDate').value = date.toISOString().slice(0, 16)
+        const date = new Date(meeting.meeting_date);
+        document.getElementById('editMeetingDate').value = date.toISOString().slice(0, 16);
     } else {
-        document.getElementById('editMeetingDate').value = ''
+        document.getElementById('editMeetingDate').value = '';
     }
 
-    document.getElementById('editMeetingNotes').value = meeting.notes || ''
+    // Видаляємо стару карту і маркер, якщо існують
+    if (mapInstance) {
+        mapInstance.remove();
+        mapInstance = null;
+        mapMarker = null;
+    }
+
+    // Ініціалізація карти
+    setTimeout(() => {
+        mapInstance = L.map('editMeetingMap').setView([50.4501, 30.5234], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(mapInstance);
+
+        // Створюємо маркер для поточного місця
+        if (meeting.location) {
+            const coords = meeting.location.split(' ').map(Number);
+            if (!isNaN(coords[0]) && !isNaN(coords[1])) {
+                const [lat, lng] = coords;
+                mapMarker = L.marker([lat, lng]).addTo(mapInstance);
+                mapInstance.setView([lat, lng], 14);
+                document.getElementById('editMeetingLocation').value = `${lat} ${lng}`;
+            }
+        }
+
+        // Клік по карті оновлює маркер і поле
+        mapInstance.on('click', function (e) {
+            if (mapMarker) mapMarker.setLatLng(e.latlng);
+            else mapMarker = L.marker(e.latlng).addTo(mapInstance);
+            document.getElementById('editMeetingLocation').value = `${e.latlng.lat} ${e.latlng.lng}`;
+        });
+    }, 200);
 
     // Show modal
-    modal.style.display = 'flex'
+    modal.style.display = 'flex';
 }
 
 function closeEditMeetingModal() {
@@ -1192,53 +1266,50 @@ function closeEditMeetingModal() {
     if (modal) modal.style.display = 'none'
 }
 
+function closeEditMatchModal() {
+    const modal = document.getElementById('editMatchModal')
+    if (modal) modal.style.display = 'none'
+}
+
 async function saveMeetingChanges() {
-    const meetingId = document.getElementById('editMeetingId').value
-    const status = document.getElementById('editMeetingStatus').value
-    const location = document.getElementById('editMeetingLocation').value
-    const meetingDate = document.getElementById('editMeetingDate').value
-    const notes = document.getElementById('editMeetingNotes').value
-
+    const meetingId = document.getElementById('editMeetingId').value;
     const meetingData = {
-        status,
-        location,
-        notes
-    }
-
-    if (meetingDate) {
-        meetingData.meeting_date = new Date(meetingDate).toISOString()
-    }
+        meeting_date: document.getElementById('editMeetingDate').value || null,
+        location: document.getElementById('editMeetingLocation').value || null,
+        user1_comment: document.getElementById('editMeetingUser1Comment').value,
+        user2_comment: document.getElementById('editMeetingUser2Comment').value,
+        result: document.getElementById('editMeetingResult').value,
+        archived: document.getElementById('editMeetingArchived').checked
+    };
 
     try {
         const response = await fetch(`/api/meeting/${meetingId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(meetingData)
-        })
+        });
 
-        if (!response.ok) {
-            throw new Error('Failed to update meeting')
+        if (!response.ok) throw new Error('Не вдалося оновити зустріч');
+
+        const updatedMeeting = await response.json();
+
+        // Оновлюємо локальний масив meetings
+        const index = meetings.findIndex(m => m.meeting_id == meetingId);
+        if (index !== -1) {
+            meetings[index] = {...meetings[index], ...meetingData};
         }
 
-        // Update meeting in local array
-        const meetingIndex = meetings.findIndex(m => m.meeting_id === parseInt(meetingId))
-        if (meetingIndex !== -1) {
-            meetings[meetingIndex] = {...meetings[meetingIndex], ...meetingData}
-        }
+        // Перерендерюємо картки
+        renderMeetingsCards();
 
-        // Re-render meetings
-        renderMeetingsCards()
+        // Закриваємо модалку
+        closeEditMeetingModal();
 
-        // Close modal
-        closeEditMeetingModal()
+        showNotification('Зустріч успішно оновлено', 'success');
 
-        // Show success notification
-        showNotification('Зустріч успішно оновлено', 'success')
-    } catch (error) {
-        console.error('Error updating meeting:', error)
-        showNotification('Не вдалося оновити зустріч', 'error')
+    } catch (err) {
+        console.error(err);
+        showNotification('Не вдалося оновити зустріч', 'error');
     }
 }
 
@@ -1321,7 +1392,7 @@ function editCredential(credentialId) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Редагувати обліковий запис</h2>
-                    <button class="modal-close" onclick="document.getElementById('editCredentialModal').style.display='none'">
+                    <button class="modal-close"">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -1329,18 +1400,27 @@ function editCredential(credentialId) {
                     <form id="editCredentialForm">
                         <input type="hidden" id="editCredentialId">
                         <div class="form-group">
-                            <label for="editCredentialEmail">Email:</label>
-                            <input type="email" id="editCredentialEmail" class="form-control">
+                            <label for="editCredentialLogin">Пошта</label>
+                            <input type="email" id="editCredentialLogin" class="form-control" required>
                         </div>
                         <div class="form-group">
-                            <label for="editCredentialUserId">ID користувача:</label>
-                            <input type="number" id="editCredentialUserId" class="form-control">
+                            <label for="editCredentialPassword">Новий пароль:</label>
+                            <input type="password" id="editCredentialPassword" class="form-control" placeholder="Залиште порожнім, щоб не змінювати">
+                        </div>
+                        <div class="form-group">
+                            <label for="editCredentialAccess">Права доступу:</label>
+                            <select id="editCredentialAccess" class="form-control">
+                                <option value="guest">Гість</option>
+                                <option value="authorized">Користувач</option>
+                                <option value="operator">Оператор</option>
+                                <option value="admin">Адміністратор</option>
+                            </select>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('editCredentialModal').style.display='none'">Скасувати</button>
-                    <button type="button" class="btn btn-primary" onclick="saveCredentialChanges()">Зберегти</button>
+                    <button type="button" class="btn btn-outline"">Скасувати</button>
+                    <button type="button" class="btn btn-primary">Зберегти</button>
                 </div>
             </div>
         `
@@ -1349,11 +1429,16 @@ function editCredential(credentialId) {
 
     // Fill form with credential data
     document.getElementById('editCredentialId').value = credential.key_id
-    document.getElementById('editCredentialEmail').value = credential.login
-    document.getElementById('editCredentialUserId').value = credential.user_id || ''
+    document.getElementById('editCredentialLogin').value = credential.login
+    document.getElementById('editCredentialPassword').value = ''
+    document.getElementById('editCredentialAccess').value = credential.access_right || 'guest'
 
     // Show modal
     modal.style.display = 'flex'
+}
+
+function isValidEmail(email) {
+    return /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email);
 }
 
 function closeEditCredentialModal() {
@@ -1363,20 +1448,23 @@ function closeEditCredentialModal() {
 
 async function saveCredentialChanges() {
     const credentialId = document.getElementById('editCredentialId').value
-    const email = document.getElementById('editCredentialEmail').value
-    const userId = document.getElementById('editCredentialUserId').value
+    const login = document.getElementById('editCredentialLogin').value
+    const password = document.getElementById('editCredentialPassword').value
+    const accessRight = document.getElementById('editCredentialAccess').value
 
-    const credentialData = {
-        email
+    if (!isValidEmail(login)) {
+        showNotification("Введіть правильну пошту")
+        return
     }
 
-    if (userId) {
-        credentialData.user_id = parseInt(userId)
+    const credentialData = {login, access_right: accessRight}
+    if (password.trim() !== '') {
+        credentialData.password = password
     }
 
     try {
         const response = await fetch(`/api/credentials/${credentialId}`, {
-            method: 'PUT',
+            method: 'POST', // бо бекенд чекає POST
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -1388,18 +1476,13 @@ async function saveCredentialChanges() {
         }
 
         // Update credential in local array
-        const credentialIndex = credentials.findIndex(c => c.id === parseInt(credentialId))
+        const credentialIndex = credentials.findIndex(c => c.key_id === parseInt(credentialId))
         if (credentialIndex !== -1) {
             credentials[credentialIndex] = {...credentials[credentialIndex], ...credentialData}
         }
 
-        // Re-render credentials
         renderCredentialsCards()
-
-        // Close modal
         closeEditCredentialModal()
-
-        // Show success notification
         showNotification('Обліковий запис успішно оновлено', 'success')
     } catch (error) {
         console.error('Error updating credential:', error)
@@ -1408,11 +1491,10 @@ async function saveCredentialChanges() {
 }
 
 // Match editing functions
-function editMatch(matchId) {
+async function editMatch(matchId) {
     const match = matches.find(m => m.match_id === matchId)
     if (!match) return
 
-    // Create modal if it doesn't exist
     let modal = document.getElementById('editMatchModal')
     if (!modal) {
         modal = document.createElement('div')
@@ -1422,97 +1504,148 @@ function editMatch(matchId) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h2>Редагувати збіг</h2>
-                    <button class="modal-close" onclick="document.getElementById('editMatchModal').style.display='none'">
+                    <button class="modal-close">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
                 <div class="modal-body">
                     <form id="editMatchForm">
                         <input type="hidden" id="editMatchId">
+
                         <div class="form-group">
-                            <label for="editMatchStatus">Статус:</label>
-                            <select id="editMatchStatus" class="form-control">
-                                <option value="pending">Очікує</option>
-                                <option value="accepted">Прийнято</option>
-                                <option value="rejected">Відхилено</option>
-                                <option value="expired">Закінчився</option>
-                            </select>
+                            <label for="editMatchUser1">Користувач 1:</label>
+                            <select id="editMatchUser1" class="form-control" size="10"></select>
                         </div>
                         <div class="form-group">
-                            <label for="editMatchScore">Оцінка збігу:</label>
-                            <input type="number" id="editMatchScore" class="form-control" min="0" max="100">
+                            <label for="editMatchUser2">Користувач 2:</label>
+                            <select id="editMatchUser2" class="form-control" size="10"></select>
                         </div>
+
                         <div class="form-group">
-                            <label for="editMatchNotes">Нотатки:</label>
-                            <textarea id="editMatchNotes" class="form-control"></textarea>
+                            <label for="editMatchArchived">
+                                Архівовано:
+                                <input type="checkbox" id="editMatchArchived">
+                            </label>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editMatchComment">Коментар:</label>
+                            <textarea id="editMatchComment" class="form-control"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline" onclick="document.getElementById('editMatchModal').style.display='none'">Скасувати</button>
-                    <button type="button" class="btn btn-primary" onclick="saveMatchChanges()">Зберегти</button>
+                    <button type="button" class="btn btn-outline">Скасувати</button>
+                    <button type="button" class="btn btn-primary">Зберегти</button>
                 </div>
             </div>
         `
         document.body.appendChild(modal)
     }
 
-    // Fill form with match data
+    // Заповнюємо загальні поля
     document.getElementById('editMatchId').value = match.match_id
-    document.getElementById('editMatchStatus').value = match.status
-    document.getElementById('editMatchScore').value = match.score || ''
-    document.getElementById('editMatchNotes').value = match.notes || ''
+    document.getElementById('editMatchArchived').checked = !!match.archived
+    document.getElementById('editMatchComment').value = match.comment || ''
 
-    // Show modal
+    // --- Загальна підвантаження користувачів ---
+    const allUsers = []
+    let page = 1, pages = 1, loading = false
+
+    async function loadUsersPage() {
+        if (loading || page > pages) return false
+        loading = true
+        const resp = await fetch(`/api/user/?page=${page}&per_page=20`)
+        const data = await resp.json()
+        pages = data.pages
+        allUsers.push(...(data.items || []))
+        page++
+        loading = false
+        return true
+    }
+
+    await loadUsersPage()
+
+    // --- Функція для заповнення селектора ---
+    function fillSelect(selectEl, currentUser) {
+        selectEl.innerHTML = ''
+
+        // Поточного користувача ставимо першим
+        if (currentUser) {
+            const option = document.createElement('option')
+            option.value = currentUser.user_id
+            option.textContent = currentUser.name
+            option.selected = true
+            selectEl.appendChild(option)
+        }
+
+        allUsers.forEach(u => {
+            if (!currentUser || u.user_id !== currentUser.user_id) {
+                const option = document.createElement('option')
+                option.value = u.user_id
+                option.textContent = u.name
+                selectEl.appendChild(option)
+            }
+        })
+    }
+
+    const select1 = document.getElementById('editMatchUser1')
+    const select2 = document.getElementById('editMatchUser2')
+    fillSelect(select1, match.req_user)
+    fillSelect(select2, match.match_user)
+
+    // Lazy loading при скролі, але однакові дані для обох селекторів
+    async function handleScroll(el) {
+        if (el.scrollTop + el.clientHeight >= el.scrollHeight - 5) {
+            if (await loadUsersPage()) {
+                fillSelect(select1, match.req_user)
+                fillSelect(select2, match.match_user)
+            }
+        }
+    }
+
+    select1.addEventListener('scroll', () => handleScroll(select1))
+    select2.addEventListener('scroll', () => handleScroll(select2))
+
     modal.style.display = 'flex'
-}
-
-function closeEditMatchModal() {
-    const modal = document.getElementById('editMatchModal')
-    if (modal) modal.style.display = 'none'
 }
 
 async function saveMatchChanges() {
     const matchId = document.getElementById('editMatchId').value
-    const status = document.getElementById('editMatchStatus').value
-    const score = document.getElementById('editMatchScore').value
-    const notes = document.getElementById('editMatchNotes').value
+    const archived = document.getElementById('editMatchArchived').checked
+    const comment = document.getElementById('editMatchComment').value
+    const user1_id = parseInt(document.getElementById('editMatchUser1').value)
+    const user2_id = parseInt(document.getElementById('editMatchUser2').value)
 
-    const matchData = {
-        status,
-        notes
+    if (user1_id === user2_id) {
+        showNotification('user1 і user2 не можуть бути однаковими', 'error')
+        return
     }
 
-    if (score) {
-        matchData.score = parseInt(score)
-    }
+    const matchData = {archived, comment, user1_id, user2_id}
 
     try {
         const response = await fetch(`/api/match/${matchId}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(matchData)
         })
 
-        if (!response.ok) {
-            throw new Error('Failed to update match')
-        }
+        if (!response.ok) throw new Error('Failed to update match')
 
-        // Update match in local array
-        const matchIndex = matches.findIndex(m => m.match_id === parseInt(matchId))
+        const result = await response.json()
+        const updatedMatch = result.match
+
+        // Оновлюємо локальний масив matches
+        const matchIndex = matches.findIndex(m => m.match_id == matchId)
         if (matchIndex !== -1) {
-            matches[matchIndex] = {...matches[matchIndex], ...matchData}
+            matches[matchIndex] = updatedMatch
         }
 
-        // Re-render matches
+        // Оновлюємо картки на сторінці
         renderMatchesCards()
 
-        // Close modal
         closeEditMatchModal()
-
-        // Show success notification
         showNotification('Збіг успішно оновлено', 'success')
     } catch (error) {
         console.error('Error updating match:', error)

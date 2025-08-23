@@ -104,7 +104,7 @@ def update_match(match_id):
         return api_error("user1_id and user2_id cannot be the same", 400)
 
     db.session.commit()
-    return jsonify({"message": "Match updated", "match_id": match.match_id})
+    return jsonify({"message": "Match updated", "match": match.to_dict()})
 
 
 @match_bp.route('/', methods=['GET'])

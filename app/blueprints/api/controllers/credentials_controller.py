@@ -3,7 +3,7 @@
 from app.database import db
 from app.models import Credentials
 from app.utils.access_utils import api_error, login_required_api, admin_access_required_api
-from app.utils.admin_utils import paginate_query
+from app.utils.admin_utils import paginate_query, is_valid_email
 
 creds_bp = Blueprint('credentials', __name__)
 
@@ -16,7 +16,14 @@ def update_creds(creds_id):
     data = request.json or {}
 
     if "login" in data:
-        creds.login = data["login"]
+        login = data["login"]
+        if login.strip() == '':
+            return api_error("Empty login", 400)
+
+        if not is_valid_email(login):
+            return api_error("Not valid email", 400)
+
+        creds.login = login
     if "password" in data:
         password = data["password"]
         if password.strip() == '':
