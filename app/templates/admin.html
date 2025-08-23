@@ -230,40 +230,125 @@
                 </div>
             </div>
 
-            <!-- Filters -->
-            <div class="filters-bar">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" id="userSearch" placeholder="Пошук користувачів...">
-                </div>
-                <select id="statusFilter" class="filter-select">
-                    <option value="all">Всі статуси</option>
-                    <option value="active">Активні</option>
-                    <option value="inactive">Неактивні</option>
-                    <option value="banned">Заблоковані</option>
-                </select>
+            <!-- Admin Subsections Navigation -->
+            <div class="admin-subsections">
+                <button class="subsection-btn active" data-subsection="users-list">
+                    <i class="fas fa-users"></i>
+                    Users
+                </button>
+                <button class="subsection-btn" data-subsection="meetings-list">
+                    <i class="fas fa-calendar-alt"></i>
+                    Meetings
+                </button>
+                <button class="subsection-btn" data-subsection="credentials-list">
+                    <i class="fas fa-key"></i>
+                    Credentials
+                </button>
+                <button class="subsection-btn" data-subsection="matches-list">
+                    <i class="fas fa-heart"></i>
+                    Matches
+                </button>
             </div>
 
-            <!-- Users Table -->
-            <div class="table-container">
-                <table class="users-table">
-                    <thead>
-                    <tr>
-                        <th>Користувач</th>
-                        <th>Вік</th>
-                        <th>Знак</th>
-                        <th>Статус</th>
-                        <th>Реєстрація</th>
-                        <th>Остання активність</th>
-                        <th>Збіги</th>
-                        <th>Лайки</th>
-                        <th>Дії</th>
-                    </tr>
-                    </thead>
-                    <tbody id="usersTableBody">
-                    <!-- Users will be populated by JavaScript -->
-                    </tbody>
-                </table>
+            <!-- Users Subsection -->
+            <div class="admin-subsection active" id="users-list">
+                <!-- Filters -->
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearch" placeholder="Пошук користувачів...">
+                    </div>
+                    <select id="statusFilter" class="filter-select">
+                        <option value="all">Всі статуси</option>
+                        <option value="active">Активні</option>
+                        <option value="inactive">Неактивні</option>
+                        <option value="banned">Заблоковані</option>
+                    </select>
+                </div>
+
+                <!-- Users Table -->
+                <div class="table-container">
+                    <table class="users-table">
+                        <thead>
+                        <tr>
+                            <th>Користувач</th>
+                            <th>Вік</th>
+                            <th>Знак</th>
+                            <th>Статус</th>
+                            <th>Реєстрація</th>
+                            <th>Дії</th>
+                        </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                        <!-- Users will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    <div class="pagination" id="usersPagination">
+                        <!-- Pagination will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meetings Subsection -->
+            <div class="admin-subsection" id="meetings-list">
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="meetingSearch" placeholder="Пошук зустрічей...">
+                    </div>
+                    <select id="meetingStatusFilter" class="filter-select">
+                        <option value="all">Всі статуси</option>
+                        <option value="planned">Заплановані</option>
+                        <option value="completed">Завершені</option>
+                        <option value="cancelled">Скасовані</option>
+                    </select>
+                </div>
+
+                <div class="cards-container" id="meetingsContainer">
+                    <!-- Meetings cards will be populated by JavaScript -->
+                </div>
+                <div class="pagination" id="meetingsPagination">
+                    <!-- Pagination will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Credentials Subsection -->
+            <div class="admin-subsection" id="credentials-list">
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="credentialsSearch" placeholder="Пошук облікових даних...">
+                    </div>
+                </div>
+
+                <div class="cards-container" id="credentialsContainer">
+                    <!-- Credentials cards will be populated by JavaScript -->
+                </div>
+                <div class="pagination" id="credentialsPagination">
+                    <!-- Pagination will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Matches Subsection -->
+            <div class="admin-subsection" id="matches-list">
+                <div class="filters-bar">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="matchesSearch" placeholder="Пошук збігів...">
+                    </div>
+                    <select id="matchStatusFilter" class="filter-select">
+                        <option value="all">Всі статуси</option>
+                        <option value="active">Активні</option>
+                        <option value="successful">Успішні</option>
+                    </select>
+                </div>
+
+                <div class="cards-container" id="matchesContainer">
+                    <!-- Matches cards will be populated by JavaScript -->
+                </div>
+                <div class="pagination" id="matchesPagination">
+                    <!-- Pagination will be populated by JavaScript -->
+                </div>
             </div>
         </section>
     </div>
@@ -273,52 +358,47 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Редагувати користувача</h2>
-                <button class="modal-close" onclick="closeEditModal()">
+                <button class="modal-close" onclick="document.getElementById('editUserModal').style.display='none'">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <form class="edit-form">
+                <form class="edit-form" onsubmit="return false;">
                     <input type="hidden" id="editUserId">
 
                     <div class="form-group">
-                        <label for="editUserName">Ім'я</label>
-                        <input type="text" id="editUserName" required>
+                        <label for="editFirstName">Ім'я</label>
+                        <input type="text" id="editFirstName" required>
                     </div>
 
                     <div class="form-group">
-                        <label for="editUserEmail">Email</label>
-                        <input type="email" id="editUserEmail" required>
+                        <label for="editLastName">Прізвище</label>
+                        <input type="text" id="editLastName" required>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="editUserAge">Вік</label>
-                            <input type="number" id="editUserAge" min="18" max="100" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="editUserZodiac">Знак зодіаку</label>
-                            <select id="editUserZodiac" required>
-                                <option value="Овен">Овен</option>
-                                <option value="Телець">Телець</option>
-                                <option value="Близнюки">Близнюки</option>
-                                <option value="Рак">Рак</option>
-                                <option value="Лев">Лев</option>
-                                <option value="Діва">Діва</option>
-                                <option value="Терези">Терези</option>
-                                <option value="Скорпіон">Скорпіон</option>
-                                <option value="Стрілець">Стрілець</option>
-                                <option value="Козеріг">Козеріг</option>
-                                <option value="Водолій">Водолій</option>
-                                <option value="Риби">Риби</option>
-                            </select>
-                        </div>
+                    <div class="form-group">
+                        <label for="editBio">Біографія</label>
+                        <textarea id="editBio"></textarea>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="editIsActive"> Активний
+                        </label>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="editIsAdmin"> Адмін
+                        </label>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-outline" onclick="closeEditModal()">Скасувати</button>
-                <button class="btn btn-primary" onclick="saveUserChanges()">Зберегти</button>
+                <button class="btn btn-outline" onclick="document.getElementById('editUserModal').style.display='none'">
+                    Скасувати
+                </button>
+                <button class="btn btn-primary" id="saveUserBtn">Зберегти</button>
             </div>
         </div>
     </div>
@@ -334,10 +414,10 @@
                 <p>Ви впевнені, що хочете завершити адміністративну сесію? Всі незбережені зміни будуть втрачені.</p>
             </div>
             <div class="logout-modal-actions">
-                <button class="btn logout-btn-cancel" onclick="hideLogoutModal()">
+                <button class="btn logout-btn-cancel">
                     Скасувати
                 </button>
-                <button class="btn logout-btn-confirm" id="confirmLogoutBtn" onclick="confirmLogout()">
+                <button class="btn logout-btn-confirm" id="confirmLogoutBtn">
                     <span class="logout-text">Вийти</span>
                 </button>
             </div>

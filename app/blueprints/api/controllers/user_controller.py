@@ -38,13 +38,13 @@ def update_user(user_id):
         user_data.is_active = bool(data["is_active"])
 
     if "is_admin" in data:
-        user.is_admin = bool(data["is_admin"])
+        user_data.is_admin = bool(data["is_admin"])
 
-        if user.credentials:
-            if user.is_admin:
-                user.credentials.access_right = "operator"
+        if user_data.credentials:
+            if user_data.is_admin:
+                user_data.credentials.access_right = "operator"
             else:
-                user.credentials.access_right = "authorized"
+                user_data.credentials.access_right = "authorized"
 
     db.session.commit()
     return jsonify({"message": "User updated", "user_id": user_data.user_id})

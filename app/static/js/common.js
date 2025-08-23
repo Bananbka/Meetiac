@@ -1,4 +1,4 @@
-﻿export function showNotification(message, type = "info") {
+export function showNotification(message, type = "info") {
     // Remove existing notifications
     const existingNotification = document.querySelector(".notification")
     if (existingNotification) {
