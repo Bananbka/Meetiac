@@ -1,6 +1,6 @@
 ﻿from datetime import date
 
-from sqlalchemy import func, case, desc
+from sqlalchemy import func, case, desc, literal
 
 from app.database import db
 from app.models import User, PartnerPreference, Like, Dislike, Interest, UserInterest
@@ -76,5 +76,17 @@ def build_discover_query(user, include_likes=True):
                 .add_columns(func.sum(match_case).label("match_count"))
                 .order_by(desc("match_count"))
             )
+        else:
+            query = (
+                query
+                .group_by(User.user_id)
+                .add_columns(literal(0).label("match_count"))
+            )
+    else:
+        query = (
+            query
+            .group_by(User.user_id)
+            .add_columns(literal(0).label("match_count"))
+        )
 
     return query, prefs
