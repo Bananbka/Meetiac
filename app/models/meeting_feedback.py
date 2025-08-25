@@ -8,7 +8,7 @@ class MeetingFeedback(db.Model):
 
     feedback_id = db.Column(db.Integer, primary_key=True)
     meeting_id = db.Column(db.Integer, db.ForeignKey('meetings.meeting_id'), nullable=False)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
     comment = db.Column(db.Text, nullable=False)
     was_successful = db.Column(db.Boolean, nullable=False)
     stay_together = db.Column(db.Boolean, default=False)

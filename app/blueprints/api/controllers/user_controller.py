@@ -1,7 +1,9 @@
-﻿from flask import Blueprint, request, jsonify
+﻿import os
+
+from flask import Blueprint, request, jsonify
 
 from app.database import db
-from app.models import User
+from app.models import User, UserImage
 from app.utils.access_utils import api_error, login_required_api, admin_access_required_api
 from app.utils.admin_utils import paginate_query
 
@@ -62,6 +64,15 @@ def get_users():
 @admin_access_required_api
 def delete_user(user_id):
     user_data = User.query.get_or_404(user_id)
+
+    user_images = UserImage.query.filter_by(user_id=user_id).all()
+    for img in user_images:
+        if img.image_path and os.path.exists(img.image_path):
+            try:
+                os.remove(img.image_path)
+            except Exception as e:
+                print(f"Не вдалося видалити файл {img.image_path}: {e}")
+
     db.session.delete(user_data)
     db.session.commit()
     return "ok"

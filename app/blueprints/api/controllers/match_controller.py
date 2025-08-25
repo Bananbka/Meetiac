@@ -79,7 +79,7 @@ def delete_match(match_id):
     return "ok"
 
 
-@match_bp.route('/<int:match_id>', methods=['DELETE'])
+@match_bp.route('/a/<int:match_id>', methods=['DELETE'])
 @login_required_api
 @admin_access_required_api
 def delete_match_admin(match_id):

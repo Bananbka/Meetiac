@@ -8,8 +8,8 @@ from app.models.zodiac_compatibility import ZodiacCompatibility
 class Match(db.Model):
     __tablename__ = 'matches'
     match_id = db.Column(db.Integer, primary_key=True)
-    user1_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
-    user2_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user1_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
+    user2_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
     created_at = db.Column(db.Date, default=date.today)
     archived = db.Column(db.Boolean, default=False)
     comment = db.Column(db.Text)

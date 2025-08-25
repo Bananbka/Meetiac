@@ -11,7 +11,7 @@ class Credentials(UserMixin, db.Model):
     password = db.Column(db.String(256), nullable=False)  # Хешований пароль
     access_right = db.Column(db.String(20))  # 'admin', 'operator', 'authorized', 'guest'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
 
     def set_password(self, password):
         self.password = generate_password_hash(password)

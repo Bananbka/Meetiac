@@ -4,7 +4,7 @@
 class PartnerPreference(db.Model):
     __tablename__ = 'partner_preferences'
     preference_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.user_id', ondelete='CASCADE'), nullable=False)
     gender_id = db.Column(db.Integer, db.ForeignKey('gender.gender_id'), nullable=False)
     min_age = db.Column(db.Integer)
     max_age = db.Column(db.Integer)

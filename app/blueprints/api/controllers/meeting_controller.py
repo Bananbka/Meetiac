@@ -230,6 +230,7 @@ def get_admin_meetings():
 @admin_access_required_api
 def delete_meeting(meeting_id):
     meeting = Meeting.query.get_or_404(meeting_id)
+    MeetingFeedback.query.filter_by(meeting_id=meeting_id).delete()
     db.session.delete(meeting)
     db.session.commit()
     return "ok"
