@@ -223,3 +223,13 @@ def update_meeting(meeting_id):
 @admin_access_required_api
 def get_admin_meetings():
     return paginate_query(Meeting.query, lambda m: m.to_dict())
+
+
+@meeting_bp.route('/<int:meeting_id>', methods=['DELETE'])
+@login_required_api
+@admin_access_required_api
+def delete_meeting(meeting_id):
+    meeting = Meeting.query.get_or_404(meeting_id)
+    db.session.delete(meeting)
+    db.session.commit()
+    return "ok"

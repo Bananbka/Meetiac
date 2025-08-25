@@ -41,3 +41,13 @@ def update_creds(creds_id):
 @admin_access_required_api
 def get_credentials():
     return paginate_query(Credentials.query, lambda c: c.to_dict())
+
+
+@creds_bp.route('/<int:creds_id>', methods=['DELETE'])
+@login_required_api
+@admin_access_required_api
+def delete_credentials(creds_id):
+    creds = Credentials.query.get_or_404(creds_id)
+    db.session.delete(creds)
+    db.session.commit()
+    return jsonify({"message": "Credentials deleted"})

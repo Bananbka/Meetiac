@@ -55,3 +55,14 @@ def update_user(user_id):
 @admin_access_required_api
 def get_users():
     return paginate_query(User.query, lambda u: u.to_dict(full=True))
+
+
+@user_bp.route('/<int:user_id>', methods=['DELETE'])
+@login_required_api
+@admin_access_required_api
+def delete_user(user_id):
+    user_data = User.query.get_or_404(user_id)
+    db.session.delete(user_data)
+    db.session.commit()
+    return "ok"
+
