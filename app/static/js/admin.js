@@ -1847,3 +1847,31 @@ function deleteCredential(id) {
 // Функції showLogoutModal та hideLogoutModal видалено, оскільки вони імпортуються з common.js
 
 // Функцію confirmLogout видалено, оскільки вона імпортується з common.js
+
+
+document.getElementById("runSqlBtn").addEventListener("click", async () => {
+    const query = document.getElementById("sqlInput").value.trim();
+    const output = document.getElementById("sqlOutput");
+
+    if (!query) {
+        output.textContent = "Будь ласка, введіть SQL-запит.";
+        return;
+    }
+
+    try {
+        const res = await fetch("/api/admin/sql", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({query})
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+            output.textContent = JSON.stringify(data, null, 2);
+        } else {
+            output.textContent = "Помилка: " + (data.message || "невідома");
+        }
+    } catch (err) {
+        output.textContent = "Помилка виконання: " + err;
+    }
+});

@@ -67,10 +67,8 @@ def delete_user(user_id):
 
     user_images = UserImage.query.filter_by(user_id=user_id).all()
     for img in user_images:
-        print(img)
         _path = f"app/{img.image_path}"
         if img.image_path and os.path.exists(_path):
-            print("in")
             try:
                 os.remove(_path)
                 db.session.delete(img)

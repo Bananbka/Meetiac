@@ -29,6 +29,10 @@
                         <i class="fa-solid fa-database"></i>
                         Сховище Даних
                     </button>
+                    <button class="nav-item" data-section="console">
+                        <i class="fas fa-terminal"></i>
+                        Консоль
+                    </button>
                 </div>
                 <div class="admin-actions">
                     <a href="/" class="btn btn-outline btn-small">
@@ -350,6 +354,24 @@
                 <div class="pagination" id="matchesPagination">
                     <!-- Pagination will be populated by JavaScript -->
                 </div>
+            </div>
+        </section>
+
+        <section class="admin-section" id="console">
+            <div class="section-header">
+                <h1>SQL Консоль</h1>
+                <p>Введіть SQL-запит для виконання. Небезпечні операції (DROP, TRUNCATE, ALTER DATABASE)
+                    заблоковані.</p>
+            </div>
+
+            <div class="console-wrapper">
+                <textarea id="sqlInput" placeholder="Наприклад: SELECT * FROM users LIMIT 5;"></textarea>
+                <div class="console-actions">
+                    <button class="btn btn-primary" id="runSqlBtn">
+                        <i class="fas fa-play"></i> Виконати
+                    </button>
+                </div>
+                <pre id="sqlOutput" class="console-output">Результат буде тут...</pre>
             </div>
         </section>
     </div>
