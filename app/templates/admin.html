@@ -426,6 +426,27 @@
     </div>
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="delete-modal" id="deleteModal" style="display: none;">
+    <div class="delete-modal-content">
+        <div class="delete-modal-header">
+            <div class="delete-modal-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <h3>Підтвердити видалення</h3>
+            <p>Ви впевнені, що хочете видалити цей елемент? Цю дію неможливо скасувати.</p>
+        </div>
+        <div class="delete-modal-actions">
+            <button class="btn delete-btn-cancel">
+                Скасувати
+            </button>
+            <button class="btn delete-btn-confirm" id="confirmDeleteBtn">
+                <span class="delete-text">Видалити</span>
+            </button>
+        </div>
+    </div>
+</div>
+
 <script type="module" src="{{ url_for('static', filename='js/admin.js') }}"></script>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>

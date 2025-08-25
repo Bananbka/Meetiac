@@ -1436,3 +1436,99 @@
         flex-direction: column;
     }
 }
+
+
+.delete-modal {
+    position: fixed;
+    z-index: 2000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.delete-modal-content {
+    background: rgba(17, 24, 39, 0.85); /* як у карток */
+    border-radius: 0.75rem;
+    max-width: 420px;
+    width: 90%;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(236, 72, 153, 0.3); /* рожевий акцент */
+    animation: fadeIn 0.25s ease;
+    color: #e5e7eb; /* світлий текст */
+}
+
+.delete-modal-header {
+    margin-bottom: 1rem;
+}
+
+.delete-modal-icon {
+    font-size: 40px;
+    color: #f87171; /* червоний warning */
+    margin-bottom: 0.75rem;
+}
+
+.delete-modal h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #f9fafb;
+}
+
+.delete-modal p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #d1d5db;
+}
+
+/* Кнопки */
+.delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.delete-modal-actions .btn {
+    min-width: 100px;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+/* скасувати */
+.delete-btn-cancel {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #e5e7eb;
+}
+.delete-btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* видалити */
+.delete-btn-confirm {
+    background: #dc2626; /* червоний */
+    color: #fff;
+    border: none;
+}
+.delete-btn-confirm:hover {
+    background: #b91c1c;
+}
+
+/* анімація */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}

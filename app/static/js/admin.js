@@ -68,10 +68,6 @@ function setupEditButtons() {
             const matchId = parseInt(event.target.dataset.id);
             editMatch(matchId);
         }
-        if (event.target.matches('[data-action="delete-match"]')) {
-            const matchId = parseInt(event.target.dataset.id);
-            deleteMatch(matchId);
-        }
     });
 
     // Додаємо обробники для модальних вікон
@@ -474,7 +470,7 @@ function renderMeetingsCards(meetingsToRender = meetings) {
         editBtn.addEventListener('click', () => editMeeting(parseInt(editBtn.dataset.id)));
 
         const deleteBtn = card.querySelector('.action-btn.delete');
-        deleteBtn.addEventListener('click', () => deleteMatch(parseInt(deleteBtn.dataset.id)));
+        deleteBtn.addEventListener('click', () => deleteMeeting(parseInt(deleteBtn.dataset.id)));
 
         container.appendChild(card)
     })
@@ -499,7 +495,7 @@ function renderCredentialsCards(credentialsToRender = credentials) {
     }
 
     credentialsToRender.forEach((credential) => {
-    console.log(credential)
+        console.log(credential)
         const card = document.createElement("div")
         card.className = "credential-card"
 
@@ -527,7 +523,7 @@ function renderCredentialsCards(credentialsToRender = credentials) {
         editBtn.addEventListener('click', () => editCredential(parseInt(editBtn.dataset.id)));
 
         const deleteBtn = card.querySelector('.action-btn.delete');
-        deleteBtn.addEventListener('click', () => deleteMatch(parseInt(deleteBtn.dataset.id)));
+        deleteBtn.addEventListener('click', () => deleteCredential(parseInt(deleteBtn.dataset.id)));
 
         container.appendChild(card)
     })
@@ -1653,31 +1649,6 @@ async function saveMatchChanges() {
     }
 }
 
-async function deleteMatch(matchId) {
-    if (!confirm('Ви впевнені, що хочете видалити цей збіг?')) return
-
-    try {
-        const response = await fetch(`/api/match/${matchId}`, {
-            method: 'DELETE'
-        })
-
-        if (!response.ok) {
-            throw new Error('Failed to delete match')
-        }
-
-        // Remove match from local array
-        matches = matches.filter(m => m.match_id !== matchId)
-
-        // Re-render matches
-        renderMatchesCards()
-
-        // Show success notification
-        showNotification('Збіг видалено', 'success')
-    } catch (error) {
-        console.error('Error deleting match:', error)
-        showNotification('Не вдалося видалити збіг', 'error')
-    }
-}
 
 function banUser(userId) {
     const user = users.find((u) => u.id === userId)
@@ -1699,14 +1670,176 @@ function unbanUser(userId) {
     }
 }
 
-function deleteUser(userId) {
-    const user = users.find((u) => u.id === userId)
-    if (user && confirm(`Ви впевнені, що хочете видалити користувача ${user.name}?`)) {
-        users = users.filter((u) => u.id !== userId)
-        renderUsersTable()
-        updateStats()
-        showNotification(`Користувача ${user.name} видалено`, "info")
-    }
+
+function deleteMatch(id) {
+    const modal = document.getElementById("deleteModal");
+    const cancelBtn = modal.querySelector(".delete-btn-cancel");
+    const confirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    // показати модалку
+    modal.style.display = "flex";
+
+    // прибираємо старі слухачі (щоб не дублювались при кількох відкриттях)
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+
+    const newCancelBtn = modal.querySelector(".delete-btn-cancel");
+    const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    // натискання "Скасувати"
+    newCancelBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // натискання "Видалити"
+    newConfirmBtn.addEventListener("click", async () => {
+        try {
+            const response = await fetch(`/api/match/a/${id}`, {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                modal.style.display = "none";
+
+                // видаляємо зі списку matches
+                matches = matches.filter(m => m.match_id !== id);
+
+                // прибираємо картку з DOM
+                renderMatchesCards()
+                showNotification("Збіг успішно видалено!", "success")
+            } else {
+                modal.style.display = "none";
+                showNotification("Помилка при видаленні.", "warning")
+            }
+        } catch (error) {
+            console.error("Помилка запиту:", error);
+            modal.style.display = "none";
+            showNotification("Помилка під час видалення.", "error")
+        }
+    });
+}
+
+
+function deleteUser(id) {
+    const modal = document.getElementById("deleteModal");
+    const cancelBtn = modal.querySelector(".delete-btn-cancel");
+    const confirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    modal.style.display = "flex";
+
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+
+    const newCancelBtn = modal.querySelector(".delete-btn-cancel");
+    const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    newCancelBtn.addEventListener("click", () => modal.style.display = "none");
+
+    newConfirmBtn.addEventListener("click", async () => {
+        try {
+            const response = await fetch(`/api/user/${id}`, {
+                method: "DELETE",
+                headers: {"Content-Type": "application/json"}
+            });
+
+            if (response.ok) {
+                modal.style.display = "none";
+                users = users.filter(u => u.user_id !== id); // оновлюємо масив
+                renderUsersTable(users); // функція рендеру
+                showNotification("Користувача успішно видалено!", "success");
+            } else {
+                modal.style.display = "none";
+                showNotification("Помилка при видаленні користувача.", "warning");
+            }
+        } catch (err) {
+            console.error(err);
+            modal.style.display = "none";
+            showNotification("Помилка при видаленні користувача.", "error");
+        }
+    });
+}
+
+// ===== Видалення Meeting =====
+function deleteMeeting(id) {
+    const modal = document.getElementById("deleteModal");
+    const cancelBtn = modal.querySelector(".delete-btn-cancel");
+    const confirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    modal.style.display = "flex";
+
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+
+    const newCancelBtn = modal.querySelector(".delete-btn-cancel");
+    const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    newCancelBtn.addEventListener("click", () => modal.style.display = "none");
+
+    newConfirmBtn.addEventListener("click", async () => {
+        try {
+            const response = await fetch(`/api/meeting/${id}`, {
+                method: "DELETE",
+                headers: {"Content-Type": "application/json"}
+            });
+
+            if (response.ok) {
+                modal.style.display = "none";
+                meetings = meetings.filter(m => m.meeting_id !== id);
+                renderMeetingsCards();
+                showNotification("Зустріч успішно видалена!", "success");
+            } else {
+                modal.style.display = "none";
+                showNotification("Помилка при видаленні зустрічі.", "warning");
+            }
+        } catch (err) {
+            console.error(err);
+            modal.style.display = "none";
+            showNotification("Помилка при видаленні зустрічі.", "error");
+        }
+    });
+}
+
+// ===== Видалення Credential =====
+function deleteCredential(id) {
+    const modal = document.getElementById("deleteModal");
+    const cancelBtn = modal.querySelector(".delete-btn-cancel");
+    const confirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    modal.style.display = "flex";
+
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+
+    const newCancelBtn = modal.querySelector(".delete-btn-cancel");
+    const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
+
+    newCancelBtn.addEventListener("click", () => modal.style.display = "none");
+
+    newConfirmBtn.addEventListener("click", async () => {
+        try {
+            const response = await fetch(`/api/credentials/${id}`, {
+                method: "DELETE",
+                headers: {"Content-Type": "application/json"}
+            });
+
+            if (response.ok) {
+                modal.style.display = "none";
+                credentials = credentials.filter(c => c.key_id !== id);
+                renderCredentialsCards();
+                showNotification("Облікові дані успішно видалено!", "success");
+            } else {
+                modal.style.display = "none";
+                showNotification("Помилка при видаленні облікових даних.", "warning");
+            }
+        } catch (err) {
+            console.error(err);
+            modal.style.display = "none";
+            showNotification("Помилка при видаленні облікових даних.", "error");
+        }
+    });
 }
 
 // Функцію setupLogoutModal видалено, оскільки вона імпортується з common.js
