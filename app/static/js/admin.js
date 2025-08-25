@@ -253,11 +253,9 @@ function filterUsers() {
     const searchTerm = document.getElementById("userSearch").value.toLowerCase()
     const statusFilter = document.getElementById("statusFilter").value
 
-    console.log(users)
-
     const filteredUsers = users.filter((user) => {
         const matchesSearch = user.name.toLowerCase().includes(searchTerm)
-        const matchesStatus = statusFilter === "all" || user.status === statusFilter
+        const matchesStatus = statusFilter === "all" || `${user.is_active}` === statusFilter
 
         return matchesSearch && matchesStatus
     })
@@ -295,7 +293,7 @@ function filterMeetings() {
             (meeting.location && meeting.location.toLowerCase().includes(searchTerm)) ||
             (meeting.req_user && meeting.req_user.name.toLowerCase().includes(searchTerm)) ||
             (meeting.meet_user && meeting.meet_user.name.toLowerCase().includes(searchTerm))
-        const matchesStatus = statusFilter === "all" || meeting.status === statusFilter
+        const matchesStatus = statusFilter === "all" || `${meeting.archived}` === statusFilter
 
         return matchesSearch && matchesStatus
     })
@@ -363,7 +361,7 @@ function filterMatches() {
         const matchesSearch =
             (match.req_user && match.req_user.name.toLowerCase().includes(searchTerm)) ||
             (match.match_user && match.match_user.name.toLowerCase().includes(searchTerm))
-        const matchesStatus = statusFilter === "all" || match.status === statusFilter
+        const matchesStatus = statusFilter === "all" || `${match.archived}` === statusFilter
 
         return matchesSearch && matchesStatus
     })
@@ -447,7 +445,7 @@ function renderMeetingsCards(meetingsToRender = meetings) {
         card.innerHTML = `
             <div class="meeting-card-header">
                 <h4>Зустріч #${meeting.meeting_id || ''}</h4>
-                <span class="status-badge ${meeting.archived}">${meeting.archived ? "Активна" : "Архівована"}</span>
+                <span class="status-badge ${meeting.archived}">${meeting.archived ? "Архівована" : "Активна"}</span>
             </div>
             <div class="meeting-card-content">
                 <p><strong>Запросив:</strong> ${meeting.req_user ? meeting.req_user.name : 'Невідомо'}</p>
