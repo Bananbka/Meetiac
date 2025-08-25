@@ -1650,46 +1650,28 @@ async function saveMatchChanges() {
 }
 
 
-function banUser(userId) {
-    const user = users.find((u) => u.id === userId)
-    if (user && user.status !== "banned") {
-        user.status = "banned"
-        renderUsersTable()
-        updateStats()
-        showNotification(`Користувача ${user.name} заблоковано`, "warning")
-    }
-}
-
-function unbanUser(userId) {
-    const user = users.find((u) => u.id === userId)
-    if (user && user.status === "banned") {
-        user.status = "active"
-        renderUsersTable()
-        updateStats()
-        showNotification(`Користувача ${user.name} розблоковано`, "success")
-    }
-}
-
-
-function deleteMatch(id) {
+function showDeleteModal() {
     const modal = document.getElementById("deleteModal");
     const cancelBtn = modal.querySelector(".delete-btn-cancel");
     const confirmBtn = modal.querySelector("#confirmDeleteBtn");
 
-    // показати модалку
     modal.style.display = "flex";
 
-    // прибираємо старі слухачі (щоб не дублювались при кількох відкриттях)
     cancelBtn.replaceWith(cancelBtn.cloneNode(true));
     confirmBtn.replaceWith(confirmBtn.cloneNode(true));
 
     const newCancelBtn = modal.querySelector(".delete-btn-cancel");
-    const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
 
-    // натискання "Скасувати"
     newCancelBtn.addEventListener("click", () => {
         modal.style.display = "none";
     });
+}
+
+function deleteMatch(id) {
+    showDeleteModal();
+
+    const modal = document.getElementById("deleteModal");
+    const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
 
     // натискання "Видалити"
     newConfirmBtn.addEventListener("click", async () => {
@@ -1724,19 +1706,10 @@ function deleteMatch(id) {
 
 
 function deleteUser(id) {
+    showDeleteModal();
+
     const modal = document.getElementById("deleteModal");
-    const cancelBtn = modal.querySelector(".delete-btn-cancel");
-    const confirmBtn = modal.querySelector("#confirmDeleteBtn");
-
-    modal.style.display = "flex";
-
-    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-
-    const newCancelBtn = modal.querySelector(".delete-btn-cancel");
     const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
-
-    newCancelBtn.addEventListener("click", () => modal.style.display = "none");
 
     newConfirmBtn.addEventListener("click", async () => {
         try {
@@ -1762,21 +1735,11 @@ function deleteUser(id) {
     });
 }
 
-// ===== Видалення Meeting =====
 function deleteMeeting(id) {
+    showDeleteModal();
+
     const modal = document.getElementById("deleteModal");
-    const cancelBtn = modal.querySelector(".delete-btn-cancel");
-    const confirmBtn = modal.querySelector("#confirmDeleteBtn");
-
-    modal.style.display = "flex";
-
-    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-
-    const newCancelBtn = modal.querySelector(".delete-btn-cancel");
     const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
-
-    newCancelBtn.addEventListener("click", () => modal.style.display = "none");
 
     newConfirmBtn.addEventListener("click", async () => {
         try {
@@ -1804,19 +1767,10 @@ function deleteMeeting(id) {
 
 // ===== Видалення Credential =====
 function deleteCredential(id) {
+    showDeleteModal();
+
     const modal = document.getElementById("deleteModal");
-    const cancelBtn = modal.querySelector(".delete-btn-cancel");
-    const confirmBtn = modal.querySelector("#confirmDeleteBtn");
-
-    modal.style.display = "flex";
-
-    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
-    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
-
-    const newCancelBtn = modal.querySelector(".delete-btn-cancel");
     const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
-
-    newCancelBtn.addEventListener("click", () => modal.style.display = "none");
 
     newConfirmBtn.addEventListener("click", async () => {
         try {
@@ -1841,12 +1795,6 @@ function deleteCredential(id) {
         }
     });
 }
-
-// Функцію setupLogoutModal видалено, оскільки вона імпортується з common.js
-
-// Функції showLogoutModal та hideLogoutModal видалено, оскільки вони імпортуються з common.js
-
-// Функцію confirmLogout видалено, оскільки вона імпортується з common.js
 
 
 document.getElementById("runSqlBtn").addEventListener("click", async () => {
