@@ -249,19 +249,6 @@ async function loadUsersData(page = 1) {
     }
 }
 
-function filterUsers() {
-    const searchTerm = document.getElementById("userSearch").value.toLowerCase()
-    const statusFilter = document.getElementById("statusFilter").value
-
-    const filteredUsers = users.filter((user) => {
-        const matchesSearch = user.name.toLowerCase().includes(searchTerm)
-        const matchesStatus = statusFilter === "all" || `${user.is_active}` === statusFilter
-
-        return matchesSearch && matchesStatus
-    })
-
-    renderUsersTable(filteredUsers)
-}
 
 // Meetings data handling
 async function loadMeetingsData(page = 1) {
@@ -284,22 +271,6 @@ async function loadMeetingsData(page = 1) {
     }
 }
 
-function filterMeetings() {
-    const searchTerm = document.getElementById("meetingSearch").value.toLowerCase()
-    const statusFilter = document.getElementById("meetingStatusFilter").value
-
-    const filteredMeetings = meetings.filter((meeting) => {
-        const matchesSearch =
-            (meeting.location && meeting.location.toLowerCase().includes(searchTerm)) ||
-            (meeting.req_user && meeting.req_user.name.toLowerCase().includes(searchTerm)) ||
-            (meeting.meet_user && meeting.meet_user.name.toLowerCase().includes(searchTerm))
-        const matchesStatus = statusFilter === "all" || `${meeting.archived}` === statusFilter
-
-        return matchesSearch && matchesStatus
-    })
-
-    renderMeetingsCards(filteredMeetings)
-}
 
 // Credentials data handling
 async function loadCredentialsData(page = 1) {
@@ -322,15 +293,6 @@ async function loadCredentialsData(page = 1) {
     }
 }
 
-function filterCredentials() {
-    const searchTerm = document.getElementById("credentialsSearch").value.toLowerCase()
-
-    const filteredCredentials = credentials.filter((credential) => {
-        return credential.login.toLowerCase().includes(searchTerm)
-    })
-
-    renderCredentialsCards(filteredCredentials)
-}
 
 // Matches data handling
 async function loadMatchesData(page = 1) {
@@ -353,21 +315,6 @@ async function loadMatchesData(page = 1) {
     }
 }
 
-function filterMatches() {
-    const searchTerm = document.getElementById("matchesSearch").value.toLowerCase()
-    const statusFilter = document.getElementById("matchStatusFilter").value
-
-    const filteredMatches = matches.filter((match) => {
-        const matchesSearch =
-            (match.req_user && match.req_user.name.toLowerCase().includes(searchTerm)) ||
-            (match.match_user && match.match_user.name.toLowerCase().includes(searchTerm))
-        const matchesStatus = statusFilter === "all" || `${match.archived}` === statusFilter
-
-        return matchesSearch && matchesStatus
-    })
-
-    renderMatchesCards(filteredMatches)
-}
 
 function renderUsersTable(usersToRender = users) {
     const tbody = document.getElementById("usersTableBody")
@@ -1821,3 +1768,230 @@ document.getElementById("runSqlBtn").addEventListener("click", async () => {
         output.textContent = "Помилка виконання: " + err;
     }
 });
+
+
+// Фільтрація та пошук усього на світі (майже)
+let allUsers = []
+let isUsersLoaded = false
+let isLoadingUsers = false
+
+async function loadAllUsers() {
+    if (isUsersLoaded || isLoadingUsers) return
+    isLoadingUsers = true
+
+    let currentPage = 1
+    let totalPages = null
+    allUsers = []
+
+    try {
+        while (totalPages === null || currentPage <= totalPages) {
+            const data = await fetchUsersPage(currentPage)
+            if (data.items) {
+                allUsers = allUsers.concat(data.items)
+            }
+
+            if (data.pages) {
+                totalPages = data.pages
+            }
+
+            currentPage++
+        }
+        isUsersLoaded = true
+    } catch (err) {
+        console.error("❌ Помилка при завантаженні:", err)
+    } finally {
+        isLoadingUsers = false
+    }
+}
+
+async function filterUsers() {
+    const searchTerm = document.getElementById("userSearch").value.toLowerCase()
+    const statusFilter = document.getElementById("statusFilter").value
+
+    await loadAllUsers()
+
+    const filtered = allUsers.filter(user => {
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm)
+        const matchesStatus = statusFilter === "all" || `${user.is_active}` === statusFilter
+        return matchesSearch && matchesStatus
+    })
+
+    renderUsersTable(filtered)
+}
+
+async function fetchUsersPage(page) {
+    const response = await fetch(`/api/user/?page=${page}&limit=50`)
+    if (!response.ok) throw new Error(`Помилка завантаження сторінки ${page}`)
+    return await response.json()
+}
+
+
+// --- Matches ---
+let allMatches = []
+let isMatchesLoaded = false
+let isLoadingMatches = false
+
+async function loadAllMatches() {
+    if (isMatchesLoaded || isLoadingMatches) return
+    isLoadingMatches = true
+
+    let currentPage = 1
+    let totalPages = null
+    allMatches = []
+
+    try {
+        while (totalPages === null || currentPage <= totalPages) {
+            const data = await fetchMatchesPage(currentPage)
+            if (data.items) {
+                allMatches = allMatches.concat(data.items)
+            }
+
+            if (data.pages) {
+                totalPages = data.pages
+            }
+
+            currentPage++
+        }
+        isMatchesLoaded = true
+    } catch (err) {
+        console.error("❌ Помилка при завантаженні матчів:", err)
+    } finally {
+        isLoadingMatches = false
+    }
+}
+
+async function filterMatches() {
+    const searchTerm = document.getElementById("matchesSearch").value.toLowerCase()
+    const statusFilter = document.getElementById("matchStatusFilter").value
+
+    await loadAllMatches()
+
+    const filtered = allMatches.filter(match => {
+        const matchesSearch =
+            (match.req_user && match.req_user.name.toLowerCase().includes(searchTerm)) ||
+            (match.match_user && match.match_user.name.toLowerCase().includes(searchTerm))
+
+        const matchesStatus = statusFilter === "all" || `${match.archived}` === statusFilter
+
+        return matchesSearch && matchesStatus
+    })
+
+    renderMatchesCards(filtered)
+}
+
+async function fetchMatchesPage(page) {
+    const response = await fetch(`/api/match/?page=${page}&limit=50`)
+    if (!response.ok) throw new Error(`Помилка завантаження сторінки матчів ${page}`)
+    return await response.json()
+}
+
+
+// --- Credentials ---
+let allCredentials = []
+let isCredentialsLoaded = false
+let isLoadingCredentials = false
+
+async function loadAllCredentials() {
+    if (isCredentialsLoaded || isLoadingCredentials) return
+    isLoadingCredentials = true
+
+    let currentPage = 1
+    let totalPages = null
+    allCredentials = []
+
+    try {
+        while (totalPages === null || currentPage <= totalPages) {
+            const data = await fetchCredentialsPage(currentPage)
+            if (data.items) {
+                allCredentials = allCredentials.concat(data.items)
+            }
+
+            if (data.pages) {
+                totalPages = data.pages
+            }
+
+            currentPage++
+        }
+        isCredentialsLoaded = true
+    } catch (err) {
+        console.error("❌ Помилка при завантаженні credentials:", err)
+    } finally {
+        isLoadingCredentials = false
+    }
+}
+
+async function filterCredentials() {
+    const searchTerm = document.getElementById("credentialsSearch").value.toLowerCase()
+
+    await loadAllCredentials()
+
+    const filtered = allCredentials.filter(credential =>
+        credential.login.toLowerCase().includes(searchTerm)
+    )
+
+    renderCredentialsCards(filtered)
+}
+
+async function fetchCredentialsPage(page) {
+    const response = await fetch(`/api/credentials/?page=${page}&limit=50`)
+    if (!response.ok) throw new Error(`Помилка завантаження сторінки credentials ${page}`)
+    return await response.json()
+}
+
+// --- Meetings ---
+let allMeetings = []
+let isMeetingsLoaded = false
+let isLoadingMeetings = false
+
+async function loadAllMeetings() {
+    if (isMeetingsLoaded || isLoadingMeetings) return
+    isLoadingMeetings = true
+
+    let currentPage = 1
+    let totalPages = null
+    allMeetings = []
+
+    try {
+        while (totalPages === null || currentPage <= totalPages) {
+            const data = await fetchMeetingsPage(currentPage)
+            if (data.items) {
+                allMeetings = allMeetings.concat(data.items)
+            }
+
+            if (data.pages) {
+                totalPages = data.pages
+            }
+
+            currentPage++
+        }
+        isMeetingsLoaded = true
+    } catch (err) {
+        console.error("❌ Помилка при завантаженні meetings:", err)
+    } finally {
+        isLoadingMeetings = false
+    }
+}
+
+async function filterMeetings() {
+    const searchTerm = document.getElementById("meetingSearch").value.toLowerCase()
+    const statusFilter = document.getElementById("meetingStatusFilter").value
+
+    await loadAllMeetings()
+
+    const filtered = allMeetings.filter(meeting => {
+        const matchesSearch =
+            (meeting.location && meeting.location.toLowerCase().includes(searchTerm)) ||
+            (meeting.req_user && meeting.req_user.name.toLowerCase().includes(searchTerm)) ||
+            (meeting.meet_user && meeting.meet_user.name.toLowerCase().includes(searchTerm))
+        const matchesStatus = statusFilter === "all" || `${meeting.archived}` === statusFilter
+        return matchesSearch && matchesStatus
+    })
+
+    renderMeetingsCards(filtered)
+}
+
+async function fetchMeetingsPage(page) {
+    const response = await fetch(`/api/meeting/?page=${page}&limit=50`)
+    if (!response.ok) throw new Error(`Помилка завантаження сторінки meetings ${page}`)
+    return await response.json()
+}
