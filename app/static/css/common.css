@@ -695,4 +695,14 @@ body {
     .info-wrapper {
         padding: 0 50px 0 50px;
     }
+
+    .header-btn {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .info-wrapper {
+        padding: 0 5px 0 5px;
+    }
 }

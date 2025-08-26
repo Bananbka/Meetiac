@@ -37,9 +37,14 @@
     margin-left: 0.5rem;
 }
 
+#usersPagination {
+    padding-bottom: 1rem;
+}
+
 .admin-nav {
     display: flex;
     gap: 1rem;
+    padding: 0.5rem 0;
 }
 
 .nav-item {
@@ -669,7 +674,7 @@
 /* Stats Overview */
 .stats-overview {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
     margin-bottom: 3rem;
 }
@@ -972,7 +977,8 @@
     background: rgb(17, 24, 39);
     border: 1px solid rgba(236, 72, 153, 0.3);
     border-radius: 1rem;
-    overflow: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .users-table {
@@ -1378,6 +1384,7 @@
     position: relative;
 }
 
+
 .avatar {
     width: 42px;
     height: 42px;
@@ -1391,12 +1398,15 @@
     z-index: 1;
 }
 
+.meetings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 
 /* Responsive Design */
 @media (max-width: 1024px) {
-    .admin-nav {
-        display: none;
-    }
 
     .charts-section {
         grid-template-columns: 1fr;
@@ -1434,6 +1444,10 @@
 
     .action-buttons {
         flex-direction: column;
+    }
+
+    .stats-overview {
+        grid-template-columns: repeat(1, 1fr);
     }
 }
 

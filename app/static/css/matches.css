@@ -660,9 +660,7 @@ input[type="datetime-local"]:focus {
 
 
 @media (max-width: 768px) {
-    .info-wrapper {
-        padding: 0 50px 0 50px;
-    }
+
 
     .match-actions {
         flex-direction: column;
@@ -671,6 +669,10 @@ input[type="datetime-local"]:focus {
 
 /* Mobile Optimizations */
 @media (max-width: 480px) {
+    .info-wrapper {
+        padding: 0 5px 0 5px;
+    }
+
     .match-header {
         gap: 0.8rem;
     }

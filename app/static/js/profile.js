@@ -50,7 +50,7 @@ async function checkForAdmin() {
 
         adminButton.innerHTML = `
             <i class="fa-solid fa-toolbox"></i>
-            Адмін панель
+            <span class="header-btn">Адмін панель</span>
         `
 
         elContainer.prepend(adminButton);
