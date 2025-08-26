@@ -17,7 +17,7 @@ def register():
     data = request.get_json()
 
     if Credentials.query.filter_by(login=data["register-email"]).first():
-        return api_error("User already exists.", 409)
+        return api_error("Користувач з такою поштою уже існує!", 409)
 
     birthdate = datetime.strptime(data['birthdate'], '%Y-%m-%d')
     zodiac_name = get_zodiac_sign(birthdate)
@@ -31,7 +31,8 @@ def register():
         last_name=data["last-name"],
         birth_date=data["birthdate"],
         sign_id=zodiac.sign_id,
-        gender=gender.gender_id
+        gender=gender.gender_id,
+
     )
     db.session.add(new_user)
     db.session.flush()
@@ -46,9 +47,9 @@ def register():
 
     db.session.commit()
 
-    session['email'] = data["register-email"]
+    # session['email'] = data["register-email"]
 
-    return jsonify({"status": "success", "message": "User has been created"})
+    return jsonify({"status": "success", "message": "Акаунт було створено"})
 
 
 @auth_bp.route('/login', methods=['POST'])
@@ -57,14 +58,17 @@ def login():
 
     creds = Credentials.query.filter_by(login=data["login-email"]).first()
     if not creds:
-        return api_error("User does not exist.", 409)
+        return api_error("Такого користувача не існує", 409)
 
     if not creds.check_password(data["login-password"]):
-        return api_error("Wrong password.", 409)
+        return api_error("Неправильні дані для входу", 409)
+
+    if creds.access_right == "guest":
+        return api_error("Акаунт ще не підтверджений адміністрацією", 400)
 
     session['email'] = data["login-email"]
 
-    return jsonify({"status": "success", "message": "User has been logged in"})
+    return jsonify({"status": "success", "message": "Ласкаво просимо!"})
 
 
 @auth_bp.route('/logout', methods=['POST'])

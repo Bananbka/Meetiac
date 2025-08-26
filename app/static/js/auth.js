@@ -65,10 +65,13 @@ function initAuthPage() {
 
                 const result = await response.json()
                 if (response.ok) {
-                    showNotification(result.message, "success")
-                    setTimeout(() => {
-                        window.location.href = "/discover"
-                    }, 1000)
+                    if (formId === 'login') {
+                        setTimeout(() => {
+                            window.location.href = "/discover"
+                        }, 1000)
+                    } else {
+                        showNotification("Вас було зареєстровано. Очікуйте підтвердження адміністратора.", "success")
+                    }
                 } else {
                     showNotification(result.message, "error")
                 }

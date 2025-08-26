@@ -108,8 +108,8 @@ def conducted_meetings_by_gender():
 
 
 @admin_bp.route('/sql', methods=['POST'])
-# @login_required_api
-# @admin_access_required_api
+@login_required_api
+@admin_access_required_api
 def run_sql():
     data = request.get_json()
     query = data.get("query", "").strip().lower()
@@ -125,7 +125,6 @@ def run_sql():
         result = db.session.execute(text(query))
 
         if query.startswith("select"):
-            # result.keys() дає назви колонок
             columns = result.keys()
             rows = [dict(zip(columns, row)) for row in result.fetchall()]
             return jsonify({"result": rows})

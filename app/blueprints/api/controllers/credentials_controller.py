@@ -1,7 +1,7 @@
 ﻿from flask import Blueprint, request, jsonify
 
 from app.database import db
-from app.models import Credentials
+from app.models import Credentials, User
 from app.utils.access_utils import api_error, login_required_api, admin_access_required_api
 from app.utils.admin_utils import paginate_query, is_valid_email
 
@@ -12,7 +12,8 @@ creds_bp = Blueprint('credentials', __name__)
 @login_required_api
 @admin_access_required_api
 def update_creds(creds_id):
-    creds: Credentials = Credentials.query.get_or_404(creds_id)
+    admin_creds = update_creds.cred
+    creds = Credentials.query.get_or_404(creds_id)
     data = request.json or {}
 
     if "login" in data:
@@ -30,10 +31,18 @@ def update_creds(creds_id):
             return api_error("Empty password", 400)
         creds.set_password(data["password"])
     if "access_right" in data:
-        creds.access_right = data["access_right"]
+        new_access = data["access_right"]
+        user = User.query.get_or_404(creds.user_id)
+        if admin_creds.access_right == "admin":
+            if new_access == "operator" or new_access == "admin":
+                user.is_admin = True
+            else:
+                user.is_admin = False
+            creds.access_right = new_access
+
 
     db.session.commit()
-    return jsonify({"message": "Credentials updated", "key_id": creds.key_id})
+    return jsonify({"message": "Credentials updated", "new_data":creds.to_dict()})
 
 
 @creds_bp.route('/', methods=['GET'])

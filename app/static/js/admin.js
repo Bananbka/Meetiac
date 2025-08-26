@@ -210,9 +210,15 @@ function setupFilters() {
 
     // Credentials filters
     const credentialsSearchInput = document.getElementById("credentialsSearch")
+    const credentialsStatusFilter = document.getElementById("credentialsStatusFilter")
+
 
     if (credentialsSearchInput) {
         credentialsSearchInput.addEventListener("input", () => filterCredentials())
+    }
+
+    if (credentialsStatusFilter) {
+        credentialsStatusFilter.addEventListener("change", () => filterCredentials())
     }
 
     // Matches filters
@@ -1416,10 +1422,12 @@ async function saveCredentialChanges() {
             throw new Error('Failed to update credential')
         }
 
+        const data = await response.json()
+
         // Update credential in local array
         const credentialIndex = credentials.findIndex(c => c.key_id === parseInt(credentialId))
         if (credentialIndex !== -1) {
-            credentials[credentialIndex] = {...credentials[credentialIndex], ...credentialData}
+            credentials[credentialIndex] = {...credentials[credentialIndex], ...data.new_data}
         }
 
         renderCredentialsCards()
@@ -1922,15 +1930,19 @@ async function loadAllCredentials() {
 
 async function filterCredentials() {
     const searchTerm = document.getElementById("credentialsSearch").value.toLowerCase()
+    const statusFilter = document.getElementById("credentialsStatusFilter").value
 
     await loadAllCredentials()
 
-    const filtered = allCredentials.filter(credential =>
-        credential.login.toLowerCase().includes(searchTerm)
-    )
+    const filtered = allCredentials.filter(credential => {
+        const matchesSearch = credential.login.toLowerCase().includes(searchTerm)
+        const matchesStatus = statusFilter === "all" || `${credential.access_right}` === statusFilter
+        return matchesSearch && matchesStatus
+    })
 
     renderCredentialsCards(filtered)
 }
+
 
 async function fetchCredentialsPage(page) {
     const response = await fetch(`/api/credentials/?page=${page}&limit=50`)
