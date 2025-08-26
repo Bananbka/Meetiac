@@ -1,4 +1,7 @@
-﻿from flask import Flask
+﻿import logging
+import os
+from logging.handlers import RotatingFileHandler
+from flask import Flask, request
 from flask_migrate import Migrate
 
 from app.blueprints.api.admin import admin_bp
@@ -52,5 +55,34 @@ def create_app():
     app.register_blueprint(creds_bp, url_prefix='/api/credentials')
 
     app.register_blueprint(weather_bp, url_prefix='/api/weather')
+
+    # Логування
+    if not os.path.exists("logs"):
+        os.mkdir("logs")
+
+    file_handler = RotatingFileHandler("logs/app.log", maxBytes=10240, backupCount=5)
+    file_handler.setLevel(logging.INFO)
+    file_handler.setFormatter(logging.Formatter(
+        "%(asctime)s [%(levelname)s] %(message)s"
+    ))
+
+    app.logger.addHandler(file_handler)
+    app.logger.setLevel(logging.INFO)
+
+    # Мідлвейри для логів
+    @app.before_request
+    def log_request():
+        app.logger.info(
+            f"Request: {request.method} {request.path} "
+            f"from {request.remote_addr}"
+        )
+
+    @app.after_request
+    def log_response(response):
+        app.logger.info(
+            f"Answer: {response.status} "
+            f"on {request.method} {request.path}"
+        )
+        return response
 
     return app

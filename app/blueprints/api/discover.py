@@ -29,7 +29,7 @@ def discover():
     includes = request.args.get('includes')
     include_list = includes.split(',') if includes else None
 
-    users_data = [(u[0] if prefs else u).to_dict(include_list) for u in pagination.items]
+    users_data = [u[0].to_dict(include_list) for u in pagination.items]
 
     return jsonify({
         "users": users_data,
