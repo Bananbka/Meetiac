@@ -699,6 +699,10 @@ body {
     .header-btn {
         display: none;
     }
+
+    .header-actions .btn {
+        aspect-ratio: 1/1;
+    }
 }
 
 @media (max-width: 480px) {
