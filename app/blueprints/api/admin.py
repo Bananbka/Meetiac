@@ -1,5 +1,8 @@
-﻿from flask import Blueprint, jsonify, request
+﻿import re
+
+from flask import Blueprint, jsonify, request
 from sqlalchemy import text
+import sqlparse
 
 from app.database import db
 from app.utils.access_utils import login_required_api, admin_access_required_api, api_error
@@ -120,6 +123,16 @@ def run_sql():
     for word in DANGEROUS_SQL:
         if word in query:
             return api_error(f"Заборонено виконувати SQL: {word}", 403)
+
+    if getattr(run_sql, "cred", None) and run_sql.cred.access_right != "admin":
+        parsed = sqlparse.parse(query)
+        for stmt in parsed:
+            if stmt.get_type() == "UPDATE":
+                table_name = stmt.tokens[2].value.lower()
+                if table_name == "credentials" and "access_right" in query:
+                    return api_error("Заборонено змінювати access_right", 403)
+                if table_name == "users" and "is_admin" in query:
+                    return api_error("Заборонено змінювати is_admin", 403)
 
     try:
         result = db.session.execute(text(query))
