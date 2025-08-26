@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 })
 
 async function initProfilePage() {
+    await checkForAdmin();
     setupFormHandlers()
     setupDeleteAccountModal()
     setupBioCounter()
@@ -27,6 +28,34 @@ async function initProfilePage() {
     await setupProfileData();
     await setupPreferencesData();
     setupButtons();
+}
+
+async function checkForAdmin() {
+    const resp = await fetch('/api/admin/is-admin');
+    if (!resp.ok) {
+        showNotification("Сталася помилка під час завантаження")
+        return
+    }
+
+    const data = await resp.json();
+
+    if (data.is_admin === true) {
+        const elContainer = document.querySelector(".header-actions");
+
+        const adminButton = document.createElement('a');
+        adminButton.setAttribute('href', '/admin');
+
+        const classes = ["btn", "btn-outline", "btn-small"]
+        adminButton.classList.add(...classes)
+
+        adminButton.innerHTML = `
+            <i class="fa-solid fa-toolbox"></i>
+            Адмін панель
+        `
+
+        elContainer.prepend(adminButton);
+    }
+
 }
 
 function setupButtons() {

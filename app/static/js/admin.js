@@ -3,7 +3,6 @@ import {
     showNotification,
     zodiacsNames,
     formatDate,
-    setupLogoutModal,
     showLogoutModal,
     hideLogoutModal,
     confirmLogout
@@ -68,6 +67,10 @@ function setupEditButtons() {
             const matchId = parseInt(event.target.dataset.id);
             editMatch(matchId);
         }
+
+        if (event.target.matches('.logout-btn')) {
+            showLogoutModal()
+        }
     });
 
     // Додаємо обробники для модальних вікон
@@ -104,7 +107,8 @@ function setupEditButtons() {
         if (event.target.matches('#logoutModal .logout-btn-cancel')) {
             hideLogoutModal();
         }
-        if (event.target.matches('#logoutModal .logout-btn-confirm')) {
+        if (event.target.closest('#confirmLogoutBtn')) {
+            console.log('heh')
             confirmLogout();
         }
     });

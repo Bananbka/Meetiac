@@ -1,6 +1,4 @@
-﻿import re
-
-from flask import Blueprint, jsonify, request
+﻿from flask import Blueprint, jsonify, request
 from sqlalchemy import text
 import sqlparse
 
@@ -148,3 +146,9 @@ def run_sql():
     except Exception as e:
         db.session.rollback()
         return api_error(str(e), 500)
+
+
+@admin_bp.route('/is-admin', methods=["GET"])
+@login_required_api
+def is_user_admin():
+    return {"is_admin": is_user_admin.cred.user.is_admin}
