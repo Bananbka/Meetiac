@@ -69,7 +69,6 @@ async function loadUserProfile() {
     document.querySelector("#compatibility .compatibility-percent").textContent = `${prediction.percent}%`
     document.getElementById("userPrediction").textContent = prediction.description
 
-    // Interests
     const userInterestsElement = document.getElementById("userInterests")
     userInterestsElement.innerHTML = ""
     user.interests.forEach((interest) => {
@@ -79,7 +78,6 @@ async function loadUserProfile() {
         userInterestsElement.appendChild(span)
     })
 
-    // Photos
     const photoSlider = document.getElementById("photoSlider")
     const photoIndicators = document.getElementById("photoIndicators")
     photoSlider.innerHTML = ""
@@ -132,7 +130,6 @@ function checkPredictionOverflow() {
     const card = document.getElementById("zodiac-card");
     const prediction = document.getElementById("userPrediction");
 
-    // Якщо кнопка вже є — не створюємо знову
     if (card.querySelector(".show-more-btn")) return;
 
     if (prediction.scrollHeight > prediction.clientHeight) {

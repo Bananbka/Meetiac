@@ -1,6 +1,5 @@
 import {goToMeetings, showNotification} from "./common.js";
 
-// Mock data for demonstration
 let meeting = {};
 
 let currentMeetingId = null
@@ -49,7 +48,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function loadFeedbacks() {
     const feedbackSection = document.getElementById("feedbacks-section");
-    feedbackSection.innerHTML = ""; // очищення попереднього вмісту (за потреби)
+    feedbackSection.innerHTML = "";
 
     if (feedbacks.length > 0) {
         const feedbackHeader = document.createElement("div");
@@ -79,7 +78,6 @@ function loadFeedbacks() {
             feedbackElement.classList.add("left");
         }
 
-        // Формуємо HTML із ключовими полями
         feedbackElement.innerHTML = feedbackElement.innerHTML = `
         ${user_id !== feedback.user_id ? "Коментар від вашого партнера після зустрічі:" : "Ваш коментар про цю зустріч:"}
         <div><strong>Коментар:</strong> ${feedback.comment || "<i>немає</i>"}</div>
@@ -190,7 +188,6 @@ function setupSuccessButtons() {
         });
     });
 
-    // Якщо вже є вибране значення (наприклад, при редагуванні), відобразити відповідно
     if (wasSuccessfulInput.value === 'no') {
         failureReasonGroup.style.display = 'block';
     }
@@ -268,7 +265,6 @@ async function loadMeetingDetails(meetingId) {
 
     isArchived = meeting.archived;
 
-    // Учасник
     const partner = meeting.meet_user
     document.getElementById("partnerAvatar").src = `/${partner.images[0]}` || "/static/uploads/blank.jpg"
     document.getElementById("partnerAvatar").alt = partner.name
@@ -279,7 +275,6 @@ async function loadMeetingDetails(meetingId) {
     document.getElementById("userName").textContent = meeting.req_user.name
 
 
-    // Дата й час
     const dateObj = new Date(meeting.meeting_date)
     document.getElementById("meetingDate").textContent = dateObj.toLocaleDateString("uk-UA", {
         year: "numeric", month: "long", day: "numeric"
@@ -288,10 +283,8 @@ async function loadMeetingDetails(meetingId) {
         hour: "2-digit", minute: "2-digit"
     })
 
-    // Локація
     const [lat, lng] = meeting.location.split(" ").map(parseFloat)
 
-    // Повідомлення
     const meetMessage = meeting.meet_comment
     const reqMessage = meeting.req_comment
     const meetMessageContent = document.getElementById("meetMessageContent")
@@ -301,7 +294,6 @@ async function loadMeetingDetails(meetingId) {
     reqMessageContent.innerHTML = reqMessage ? reqMessage : "*<i>Ви ще не залишили коментаря...</i>*"
 
 
-    // Мапа
     if (map) {
         map.remove()
     }
@@ -319,13 +311,10 @@ async function loadMeetingDetails(meetingId) {
         }
     }, 2000)
 
-    // Погода
     loadWeather([lat, lng])
 
-    // Кнопки дій (немає статусу, тому ховаємо)
     renderMeetingActions(null)
 
-    // Таймер
     startCountdown(dateObj.toISOString())
 
 
@@ -558,7 +547,6 @@ function openInMaps() {
 function toggleMapSize() {
     const mapElement = document.getElementById("map")
     mapElement.classList.toggle("expanded")
-    // Invalidate map size to re-render tiles correctly after size change
     if (map) {
         map.invalidateSize()
     }
@@ -576,12 +564,11 @@ async function updateMeeting(event) {
     meeting.place = document.getElementById("editPlace").value
     meeting.message = document.getElementById("editMessage").value
 
-    // In a real app, you'd send this to the backend
     showLoading()
     await new Promise((resolve) => setTimeout(resolve, 1000))
     alert("Зміни збережено!")
     closeEditMeeting()
-    loadMeetingDetails(currentMeetingId) // Reload details to reflect changes
+    loadMeetingDetails(currentMeetingId)
     hideLoading()
 }
 

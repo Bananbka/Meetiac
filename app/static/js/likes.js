@@ -1,6 +1,5 @@
 import {formatDate, showNotification, goToDiscover, goToProfile} from "./common.js";
 
-// Mock data for demonstration
 let mockLikes = [];
 let mockDislikes = [];
 let curLikesPage = 1;
@@ -9,7 +8,6 @@ let curDislikesPage = 1;
 let isFilterPanelOpen = false;
 let currentTab = 'likes';
 
-// DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
     switchTab("likes")
     setupButtons()

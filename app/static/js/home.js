@@ -1,10 +1,8 @@
-// Home page functionality
 document.addEventListener("DOMContentLoaded", () => {
   initHomePage()
 })
 
 function initHomePage() {
-  // Add smooth scrolling for anchor links
   document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
     anchor.addEventListener("click", function (e) {
       e.preventDefault()
@@ -18,7 +16,6 @@ function initHomePage() {
     })
   })
 
-  // Add hover effects to zodiac signs
   document.querySelectorAll(".zodiac-sign").forEach((sign) => {
     sign.addEventListener("mouseenter", function () {
       this.style.transform = "scale(1.2) rotate(10deg)"
@@ -29,7 +26,6 @@ function initHomePage() {
     })
   })
 
-  // Add ripple effect to buttons
   addRippleEffect()
 }
 
@@ -65,7 +61,6 @@ function addRippleEffect() {
     })
   })
 
-  // Add CSS for ripple animation
   const style = document.createElement("style")
   style.textContent = `
     @keyframes ripple {

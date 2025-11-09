@@ -1,7 +1,6 @@
 import {showNotification, hideLogoutModal, showLogoutModal, confirmLogout} from "./common.js"
 import {isAdult} from "./auth.js";
 
-// Profile page functionality
 let selectedInterests = []
 let selectedPrefInterests = []
 let currentPhotoSlot = 0
@@ -11,7 +10,6 @@ const uploadedPhotos = [
     null,
 ]
 
-// Available interests
 let availableInterests = []
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -129,7 +127,7 @@ function toggleInterest(list, interest, element) {
     const index = list.indexOf(interest);
 
     if (index !== -1) {
-        list.splice(index, 1); // змінює сам масив
+        list.splice(index, 1);
         element.classList.remove("selected");
     } else {
         if (list.length < 5) {
@@ -142,7 +140,6 @@ function toggleInterest(list, interest, element) {
 }
 
 function setupFormHandlers() {
-    // Save button
     const saveBtn = document.querySelector("#save-profile-changes")
     if (saveBtn) {
         saveBtn.addEventListener("click", () => {
@@ -169,7 +166,6 @@ function setupBioCounter() {
 
             charCount.textContent = currentLength
 
-            // Update counter color based on length
             const counter = charCount.parentElement
             counter.classList.remove("warning", "danger")
 
@@ -181,7 +177,7 @@ function setupBioCounter() {
         }
 
         bioTextarea.addEventListener("input", updateCounter)
-        updateCounter() // Initial count
+        updateCounter()
     }
 }
 
@@ -206,7 +202,6 @@ function validateField(event) {
     }
 }
 
-// Photo Upload Functions
 function uploadPhoto(slotIndex) {
     currentPhotoSlot = slotIndex
     const fileInput = document.getElementById("photoUpload")
@@ -218,13 +213,11 @@ function handlePhotoUpload(event) {
     const file = event.target.files[0]
     if (!file) return
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
         showNotification("Будь ласка, оберіть файл зображення", "error")
         return
     }
 
-    // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
         showNotification("Розмір файлу не повинен перевищувати 5MB", "error")
         return
@@ -239,7 +232,6 @@ function handlePhotoUpload(event) {
 
     reader.readAsDataURL(file)
 
-    // Clear the input
     event.target.value = ""
 }
 
@@ -279,7 +271,6 @@ function updatePhotoGrid() {
 }
 
 async function saveProfile() {
-    // Validate required fields
     const form = document.querySelector(".profile-form")
     const requiredFields = form.querySelectorAll("[required]")
     let isValid = true
@@ -295,7 +286,7 @@ async function saveProfile() {
                 isValid = false;
                 field.style.borderColor = "rgba(239, 68, 68, 0.5)";
                 showNotification("Вам повинно бути більше 18 років.", "error");
-                return; // Тепер це поверне з зовнішньої функції (наприклад saveProfile)
+                return;
             }
         }
     }
@@ -306,7 +297,6 @@ async function saveProfile() {
         return
     }
 
-    // Collect form data
     const formData = {
         name: document.getElementById("profile-name")?.value,
         surname: document.getElementById("profile-surname")?.value,
@@ -324,7 +314,6 @@ async function saveProfile() {
         // }
     }
 
-    // Simulate saving with loading state
     const saveBtn = document.querySelector(".save-btn")
     const originalText = saveBtn.innerHTML
     saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Збереження...'
@@ -343,14 +332,11 @@ async function saveProfile() {
     }
 
     setTimeout(() => {
-        // Restore button
         saveBtn.innerHTML = originalText
         saveBtn.disabled = false
 
-        // Show success message
         showNotification("Профіль збережено успішно! ✨", "success")
 
-        // Store in localStorage for demo purposes
         localStorage.setItem("meetiacProfile", JSON.stringify(formData))
     }, 1500)
 }
@@ -369,7 +355,6 @@ async function savePreferences() {
     const minWeight = parseInt(form.min_weight.value) || null;
     const maxWeight = parseInt(form.max_weight.value) || null;
 
-    // Валідація меж
     if (minAge > maxAge) {
         showNotification("Мінімальний вік не може бути більшим за максимальний", "warning");
         return;
@@ -418,7 +403,6 @@ async function savePreferences() {
 }
 
 
-// Delete Account Modal Functions
 function setupDeleteAccountModal() {
     const deleteBtn = document.querySelector(".disable-account-btn")
     const reasonSelect = document.getElementById("deleteReason")
@@ -448,7 +432,6 @@ function setupDeleteAccountModal() {
         confirmCheckbox.addEventListener("change", checkDeleteFormValidity)
     }
 
-    // Check form validity on input
     document.getElementById("deleteAccountForm").addEventListener("input", checkDeleteFormValidity)
 }
 
@@ -460,17 +443,14 @@ function checkDeleteFormValidity() {
 
     let isValid = true
 
-    // Check if reason is selected
     if (!reasonSelect.value) {
         isValid = false
     }
 
-    // Check if "other" reason is filled when selected
     if (reasonSelect.value === "other" && !otherReason.value.trim()) {
         isValid = false
     }
 
-    // Check if confirmation checkbox is checked
     if (!confirmCheckbox.checked) {
         isValid = false
     }
@@ -482,7 +462,6 @@ function closeDeleteModal() {
     const modal = document.getElementById("deleteAccountModal")
     if (modal) {
         modal.style.display = "none"
-        // Reset form
         document.getElementById("deleteAccountForm").reset()
         document.getElementById("otherReasonGroup").style.display = "none"
         document.getElementById("confirmDeleteBtn").disabled = true
@@ -497,7 +476,6 @@ function confirmDeleteAccount() {
         timestamp: new Date().toISOString(),
     }
 
-    // Show loading state
     const confirmBtn = document.getElementById("confirmDeleteBtn")
     confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Видалення...'
     confirmBtn.disabled = true
@@ -507,12 +485,9 @@ function confirmDeleteAccount() {
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(formData)
     })
-    // Simulate API call
     setTimeout(() => {
-        // Store deletion reason for analytics (in real app, send to server)
         localStorage.setItem("meetiacDeletionReason", JSON.stringify(formData))
 
-        // Show final confirmation
         showFinalDeleteConfirmation()
     }, 2000)
 }
@@ -543,7 +518,6 @@ function showFinalDeleteConfirmation() {
     const homeBtn = document.getElementById("home-btn");
     homeBtn.addEventListener("click", redirectToHome)
 
-    // Add styles for final confirmation
     const style = document.createElement("style")
     style.textContent = `
     .final-confirmation {
@@ -573,19 +547,15 @@ function showFinalDeleteConfirmation() {
 }
 
 function redirectToHome() {
-    // Clear all user data
     localStorage.clear()
 
-    // Show final notification
     showNotification("Акаунт успішно деактивовано. До побачення! 👋", "success")
 
-    // Redirect to home page
     setTimeout(() => {
         window.location.href = ""
     }, 2000)
 }
 
-// Close modal when clicking outside
 document.addEventListener("click", (event) => {
     const modal = document.getElementById("deleteAccountModal")
     if (event.target === modal) {
@@ -593,7 +563,6 @@ document.addEventListener("click", (event) => {
     }
 })
 
-// Close modal with Escape key
 document.addEventListener("keydown", (event) => {
     if (event.key === "Escape") {
         const modal = document.getElementById("deleteAccountModal")
@@ -605,7 +574,6 @@ document.addEventListener("keydown", (event) => {
 
 
 function setupLogoutModal() {
-    // Close modal when clicking outside
     document.addEventListener("click", (event) => {
         const modal = document.getElementById("logoutModal")
         if (event.target === modal) {
@@ -613,7 +581,6 @@ function setupLogoutModal() {
         }
     })
 
-    // Close modal with Escape key
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
             const modal = document.getElementById("logoutModal")
@@ -676,7 +643,6 @@ async function loadProfilePhotos() {
         const data = await res.json();
 
         if (res.ok) {
-            // Обнуляємо масив
             console.log(data.photos)
             for (let i = 0; i < 3; i++) {
 

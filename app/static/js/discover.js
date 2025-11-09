@@ -10,12 +10,10 @@ import {
     zodiacsNames
 } from "./common.js"
 
-// Discover page functionality
 let currentProfileIndex = 0
 const likedProfiles = []
 let currentSortType = "default"
 
-// Sample profile data
 let profiles = [];
 let currentPage = 1;
 let hasNext = true;
@@ -138,7 +136,6 @@ async function handleLike() {
     const profile = profiles[currentProfileIndex]
     likedProfiles.push(profile.id)
 
-    // Add animation effect
     const card = document.getElementById("profileCard")
     card.style.transform = "translateX(100%) rotate(20deg)"
     card.style.opacity = "0"
@@ -255,7 +252,7 @@ function setupKeyboardNavigation() {
         if (isProcessing) return;
 
         if (["ArrowLeft", "ArrowRight", " "].includes(e.key)) {
-            e.preventDefault(); // блокуємо прокручування сторінки (особливо для Space)
+            e.preventDefault();
             isProcessing = true;
 
 
@@ -265,7 +262,6 @@ function setupKeyboardNavigation() {
                 await handleLike();
             }
 
-            // sleep-затримка 400 мс
             setTimeout(() => {
                 isProcessing = false;
             }, 400);
@@ -389,7 +385,6 @@ function setupTouchGestures() {
             const deltaX = currentX - startX
             const deltaY = currentY - startY
 
-            // Only handle horizontal swipes
             if (Math.abs(deltaX) > Math.abs(deltaY)) {
                 e.preventDefault()
                 const rotation = deltaX * 0.1
@@ -411,7 +406,6 @@ function setupTouchGestures() {
                     await handleReject()
                 }
             } else {
-                // Snap back
                 this.style.transform = "translateX(0) rotate(0deg)"
                 this.style.opacity = "1"
             }
@@ -420,7 +414,6 @@ function setupTouchGestures() {
 }
 
 
-// Logout Function
 function setupBio(bioElement, toggleElement, fullText) {
     bioElement.textContent = fullText;
     bioElement.style.marginBottom = "25px";
@@ -449,10 +442,8 @@ async function handleSortChange() {
     const sortType = sortSelect.value
     currentSortType = sortType
 
-    // Reset to first profile when sorting changes
     currentProfileIndex = 0
 
-    // Apply sorting
     switch (sortType) {
         case "default":
             await uploadProfilesData()
@@ -518,10 +509,8 @@ function resetSort() {
 }
 
 function playMatchAnimation() {
-    // Перевірка чи вже існує, щоб не дублювати
     if (document.getElementById("matchAnimationOverlay")) return;
 
-    // Створюємо оверлей
     const overlay = document.createElement("div");
     overlay.id = "matchAnimationOverlay";
     overlay.style.position = "fixed";
@@ -537,7 +526,6 @@ function playMatchAnimation() {
     overlay.style.flexDirection = "column";
     overlay.style.animation = "fadeOut 0.5s ease-out 2.5s forwards";
 
-    // Серце або що завгодно
     const heart = document.createElement("div");
     heart.innerHTML = "💖";
     heart.style.fontSize = "8rem";
@@ -554,7 +542,6 @@ function playMatchAnimation() {
     overlay.appendChild(text);
     document.body.appendChild(overlay);
 
-    // Видаляємо анімацію через 3с
     setTimeout(() => {
         overlay.remove();
     }, 3000);
@@ -564,12 +551,9 @@ function setupMoreButton(tipCardId, elementId) {
     const tipCard = document.getElementById(tipCardId);
     const desc = document.getElementById(elementId);
 
-    // Створюємо кнопку
     const btn = document.createElement("button");
     btn.className = "show-more-btn";
     btn.textContent = "Показати більше";
-
-    // Перевірка, чи текст виходить за межі блоку
 
     if (desc.scrollHeight > desc.clientHeight) {
         tipCard.appendChild(btn);

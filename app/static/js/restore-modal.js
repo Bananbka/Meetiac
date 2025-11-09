@@ -33,7 +33,7 @@ let restoreState = {
     email: null,
     token: null,
     timerId: null,
-    expiresAt: null, // epoch ms
+    expiresAt: null,
 };
 
 function openModal() {
@@ -98,7 +98,6 @@ function stopTimer() {
     }
 }
 
-// API helpers
 async function apiPost(url, payload) {
     const res = await fetch(url, {
         method: 'POST',
@@ -118,7 +117,6 @@ async function apiPost(url, payload) {
     return data;
 }
 
-// Open/close
 forgotLink?.addEventListener('click', (e) => {
     e.preventDefault();
     openModal();
@@ -127,7 +125,6 @@ restoreModal.querySelectorAll('[data-close]').forEach(el => {
     el.addEventListener('click', closeModal);
 });
 
-// Step 1: send code
 emailForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -153,7 +150,6 @@ emailForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Resend code
 resendBtn.addEventListener('click', async () => {
     if (!restoreState.email) return;
     try {
@@ -168,7 +164,6 @@ resendBtn.addEventListener('click', async () => {
     }
 });
 
-// Back buttons
 backToEmailBtn.addEventListener('click', () => {
     stopTimer();
     showStep(1);
@@ -177,7 +172,6 @@ backToCodeBtn.addEventListener('click', () => {
     showStep(2);
 });
 
-// Step 2: verify code
 codeForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();
@@ -209,7 +203,6 @@ codeForm.addEventListener('submit', async (e) => {
     }
 });
 
-// Step 3: set new password
 passForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     clearErrors();

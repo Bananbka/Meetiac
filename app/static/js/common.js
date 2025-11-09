@@ -1,5 +1,4 @@
 export function showNotification(message, type = "info") {
-    // Remove existing notifications
     const existingNotification = document.querySelector(".notification")
     if (existingNotification) {
         existingNotification.remove()
@@ -14,7 +13,6 @@ export function showNotification(message, type = "info") {
     </div>
   `
 
-    // Add styles
     notification.style.cssText = `
     position: fixed;
     top: 20px;
@@ -30,7 +28,6 @@ export function showNotification(message, type = "info") {
     max-width: 300px;
   `
 
-    // Set background color based on type
     switch (type) {
         case "success":
             notification.style.background = "linear-gradient(135deg, #10b981, #059669)"
@@ -47,18 +44,15 @@ export function showNotification(message, type = "info") {
 
     document.body.appendChild(notification)
 
-    // Animate in
     setTimeout(() => {
         notification.style.transform = "translateX(0)"
     }, 100)
 
-    // Close button functionality
     const closeBtn = notification.querySelector(".notification-close")
     closeBtn.addEventListener("click", () => {
         removeNotification(notification)
     })
 
-    // Auto remove after 4 seconds
     setTimeout(() => {
         removeNotification(notification)
     }, 4000)
@@ -74,7 +68,6 @@ function removeNotification(notification) {
 }
 
 export function setupLogoutModal() {
-    // Close modal when clicking outside
     document.addEventListener("click", (event) => {
         const modal = document.getElementById("logoutModal")
         if (event.target === modal) {
@@ -82,7 +75,6 @@ export function setupLogoutModal() {
         }
     })
 
-    // Close modal with Escape key
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
             const modal = document.getElementById("logoutModal")
@@ -109,7 +101,6 @@ export async function confirmLogout() {
     const confirmBtn = document.getElementById("confirmLogoutBtn")
     const logoutText = confirmBtn.querySelector(".logout-text")
 
-    // Show loading state
     confirmBtn.disabled = true
     logoutText.innerHTML = `
     <div class="logout-loading">
@@ -129,15 +120,12 @@ export async function confirmLogout() {
         })
 
         if (response.ok) {
-            // Clear cookies if any
             document.cookie.split(";").forEach((c) => {
                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/")
             })
 
-            // Show success message
             showNotification("До побачення! 👋", "success")
 
-            // Hide modal and redirect
             hideLogoutModal()
             setTimeout(() => {
                 window.location.href = ""
@@ -148,7 +136,6 @@ export async function confirmLogout() {
     } catch (error) {
         console.error("Logout error:", error)
 
-        // Even if backend fails, clear local data and redirect
         localStorage.removeItem("meetiacProfile")
         localStorage.removeItem("userSession")
         localStorage.removeItem("authToken")

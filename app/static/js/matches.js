@@ -2,7 +2,6 @@ import {formatDate} from "./common.js"
 import {showNotification} from "./common.js"
 import {goToDiscover} from "./common.js"
 
-// Mock data for demonstration
 let curMatchesPage = 1
 let mockMatches = {
     matches: [],
@@ -69,7 +68,6 @@ async function loadMatches(filters = {}) {
 
     mockMatches.pagination = data.pagination
 
-    // Apply search & sort
     const searchTerm = document.getElementById("searchInput").value.toLowerCase()
     let filteredMatches = [...mockMatches.matches]
 
@@ -166,7 +164,7 @@ function createMatchCard(match) {
     info.appendChild(name)
 
     const time = document.createElement("div")
-    time.className = "match-time" // ТУТ ЧАС КОЛИ БУЛО СТВОРЕНО
+    time.className = "match-time"
     time.textContent = formatDate(match.created_at);
     info.appendChild(time)
 
@@ -201,7 +199,7 @@ function toggleSearch() {
     document.getElementById("searchBar").classList.toggle("show", isSearchBarVisible)
     document.getElementById("searchInput").value = ""
     document.querySelector(".clear-search").style.display = "none"
-    loadMatches() // Reload matches when search bar is toggled
+    loadMatches()
 }
 
 function toggleFilter() {
@@ -272,10 +270,9 @@ function openMeetingModal(match) {
 
     document.getElementById("meetingModal").style.display = "flex"
 
-    // Показати карту з центром у Києві
     setTimeout(() => {
         if (!map) {
-            map = L.map('map').setView([50.45, 30.52], 12) // Київ
+            map = L.map('map').setView([50.45, 30.52], 12)
 
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; OpenStreetMap'
@@ -295,7 +292,7 @@ function openMeetingModal(match) {
         } else {
             map.invalidateSize()
         }
-    }, 100) // Дати час DOM'у промалюватися
+    }, 100)
 }
 
 function closeMeetingModal() {
@@ -310,13 +307,11 @@ document.getElementById("meetingForm").addEventListener("submit", async (e) => {
     const lat = document.getElementById("meetingLat").value
     const lng = document.getElementById("meetingLng").value
 
-    // Перевірка координат
     if (!lat || !lng) {
         showNotification("Оберіть точку на карті.")
         return
     }
 
-    // Перевірка дати
     const selectedDate = new Date(meeting_date)
     const now = new Date()
 
@@ -332,7 +327,6 @@ document.getElementById("meetingForm").addEventListener("submit", async (e) => {
 
     console.log({user2_id, meeting_date, lat, lng})
 
-    // Надсилання запиту
     const res = await fetch('/api/meeting/', {
         method: "PUT",
         headers: {"Content-Type": "application/json"},

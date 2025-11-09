@@ -262,6 +262,9 @@
                         <option value="true">Активні</option>
                         <option value="false">Неактивні</option>
                     </select>
+                    <button class="btn btn-primary" id="createUserBtn">
+                        <i class="fas fa-plus"></i> Створити користувача
+                    </button>
                 </div>
 
                 <!-- Users Table -->
@@ -421,6 +424,107 @@
                     Скасувати
                 </button>
                 <button class="btn btn-primary" id="saveUserBtn">Зберегти</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create User Modal -->
+    <div class="modal" id="createUserModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Створити нового користувача</h2>
+                <button class="modal-close" onclick="document.getElementById('createUserModal').style.display='none'">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="edit-form" id="createUserForm" onsubmit="return false;">
+                    <div class="form-group">
+                        <label for="createFirstName">Ім'я *</label>
+                        <input type="text" id="createFirstName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createLastName">Прізвище *</label>
+                        <input type="text" id="createLastName" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createLogin">Логін *</label>
+                        <input type="text" id="createLogin" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createPassword">Пароль *</label>
+                        <input type="password" id="createPassword" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createBio">Біографія</label>
+                        <textarea id="createBio"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createBirthDate">Дата народження</label>
+                        <input type="date" id="createBirthDate">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createGender">Стать</label>
+                        <select id="createGender">
+                            <option value="">Не вказано</option>
+                            <option value="1">Чоловік</option>
+                            <option value="2">Жінка</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createHeight">Зріст (см)</label>
+                        <input type="number" id="createHeight" min="100" max="250">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createWeight">Вага (кг)</label>
+                        <input type="number" id="createWeight" min="30" max="200">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="createSignId">Знак зодіаку</label>
+                        <select id="createSignId">
+                            <option value="">Не вказано</option>
+                            <option value="1">Овен</option>
+                            <option value="2">Телець</option>
+                            <option value="3">Близнюки</option>
+                            <option value="4">Рак</option>
+                            <option value="5">Лев</option>
+                            <option value="6">Діва</option>
+                            <option value="7">Терези</option>
+                            <option value="8">Скорпіон</option>
+                            <option value="9">Стрілець</option>
+                            <option value="10">Козеріг</option>
+                            <option value="11">Водолій</option>
+                            <option value="12">Риби</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="createIsActive" checked> Активний
+                        </label>
+                    </div>
+
+                    <div class="form-group checkbox-group">
+                        <label>
+                            <input type="checkbox" id="createIsAdmin"> Адміністратор
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="document.getElementById('createUserModal').style.display='none'">
+                    Скасувати
+                </button>
+                <button class="btn btn-primary" id="createUserBtnModal">Створити</button>
             </div>
         </div>
     </div>

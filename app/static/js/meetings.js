@@ -226,7 +226,7 @@ function updateLoadMoreButton() {
     const loadMoreBtn = document.getElementById("loadMoreBtn");
     const loadMoreText = loadMoreBtn.querySelector(".load-more-text");
 
-    loadMoreContainer.style.display = "flex"; // кнопка завжди показана
+    loadMoreContainer.style.display = "flex";
 
     if (!pagination.has_next) {
         loadMoreBtn.disabled = true;
@@ -291,10 +291,8 @@ function renderCalendar() {
 
     calendarMonth.textContent = `${monthNames[month]} ${year}`
 
-    // Clear calendar
     calendarGrid.innerHTML = ""
 
-    // Add day headers
     const dayHeaders = ["Пн", "Вт", "Ср", "Чт", "Пт", "Сб", "Нд"]
     dayHeaders.forEach((day) => {
         const dayHeader = document.createElement("div")
@@ -311,13 +309,11 @@ function renderCalendar() {
         calendarGrid.appendChild(dayHeader)
     })
 
-    // Get first day of month and number of days
     const firstDay = new Date(year, month, 1)
     const lastDay = new Date(year, month + 1, 0)
     const daysInMonth = lastDay.getDate()
-    const startingDayOfWeek = (firstDay.getDay() + 6) % 7 // Convert to Monday = 0
+    const startingDayOfWeek = (firstDay.getDay() + 6) % 7
 
-    // Add empty cells for days before month starts
     for (let i = 0; i < startingDayOfWeek; i++) {
         const emptyDay = document.createElement("div")
         emptyDay.className = "calendar-day"
@@ -325,7 +321,6 @@ function renderCalendar() {
         calendarGrid.appendChild(emptyDay)
     }
 
-    // Add days of month
     const today = new Date()
     for (let day = 1; day <= daysInMonth; day++) {
         const dayElement = document.createElement("div")
@@ -334,12 +329,10 @@ function renderCalendar() {
 
         const currentDate = new Date(year, month, day)
 
-        // Check if today
         if (currentDate.toDateString() === today.toDateString()) {
             dayElement.classList.add("today")
         }
 
-        // Check if has meetings
         const hasMeeting = meetings.some((meeting) => {
             const meetingDate = new Date(meeting.date)
             return meetingDate.toDateString() === currentDate.toDateString()
@@ -361,7 +354,6 @@ function selectCalendarDay(date) {
     })
 
     if (dayMeetings.length > 0) {
-        // Show meetings for this day
         console.log("Meetings for", date, dayMeetings)
     }
 }

@@ -44,13 +44,21 @@ function initAuthPage() {
                 return
             }
 
-            // ВАЖЛИВО: Перевірка віку для форми реєстрації
             if (formId === "register") {
                 const birthdateValue = payload["birthdate"]
                 if (!isAdult(birthdateValue)) {
                     showNotification("Вам має бути не менше 18 років для реєстрації", "error")
                     const birthdateInput = form.querySelector("#birthdate")
                     birthdateInput.style.borderColor = "#ef4444"
+                    return
+                }
+
+                const password = payload["register-password"]
+                if (password.length < 8) {
+                    showNotification("Пароль повинен бути довше 8 символів.", "error")
+                    return
+                } else if (password.length > 16) {
+                    showNotification("Пароль повинен бути коротше 16 символів.", "error")
                     return
                 }
             }
@@ -84,7 +92,6 @@ function initAuthPage() {
     addRippleEffect()
 }
 
-// Функція перевірки 18 років+
 export function isAdult(dateString) {
     if (!dateString) return false
     const today = new Date()
@@ -95,8 +102,7 @@ export function isAdult(dateString) {
     if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
         age--
     }
-    // return true;
-    return age >= 18 // ПОТІМ ЗАМІНИТИ НА НОРМ
+    return age >= 18
 
 }
 

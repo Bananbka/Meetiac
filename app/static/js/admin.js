@@ -1,4 +1,3 @@
-// Admin panel functionality
 import {
     showNotification,
     zodiacsNames,
@@ -17,7 +16,6 @@ let matches = []
 let mapInstance;
 let mapMarker;
 
-// Pagination state
 let usersPagination = {page: 1, totalPages: 1, limit: 10}
 let meetingsPagination = {page: 1, totalPages: 1, limit: 10}
 let credentialsPagination = {page: 1, totalPages: 1, limit: 10}
@@ -27,22 +25,18 @@ function initAdminPanel() {
     setupNavigation()
     setupSubsectionsNavigation()
     setupFilters()
-    // setupLogoutModal викликається автоматично з common.js
     setupEditButtons()
     loadUsersData()
     updateStats()
 }
 
 function setupEditButtons() {
-    // Додаємо делегування подій для кнопок редагування
     document.addEventListener('click', function (event) {
-        // Кнопки для користувачів
         if (event.target.matches('[data-action="edit-user"]')) {
             const userId = parseInt(event.target.dataset.id);
             editUser(userId);
         }
 
-        // Кнопки для зустрічей
         if (event.target.matches('[data-action="edit-meeting"]')) {
             const meetingId = parseInt(event.target.dataset.id);
             editMeeting(meetingId);
@@ -56,13 +50,11 @@ function setupEditButtons() {
             restoreMeeting(meetingId);
         }
 
-        // Кнопки для облікових даних
         if (event.target.matches('[data-action="edit-credential"]')) {
             const credentialId = parseInt(event.target.dataset.id);
             editCredential(credentialId);
         }
 
-        // Кнопки для пар
         if (event.target.matches('[data-action="edit-match"]')) {
             const matchId = parseInt(event.target.dataset.id);
             editMatch(matchId);
@@ -73,7 +65,6 @@ function setupEditButtons() {
         }
     });
 
-    // Додаємо обробники для модальних вікон
     document.addEventListener('click', function (event) {
         if (event.target.matches('#editUserModal .btn-outline') ||
             event.target.matches('#editUserModal .close')) {
@@ -140,13 +131,11 @@ function setupSubsectionsNavigation() {
 }
 
 function switchSubsection(subsectionName) {
-    // Update navigation
     document.querySelectorAll(".subsection-btn").forEach((btn) => {
         btn.classList.remove("active")
     })
     document.querySelector(`[data-subsection="${subsectionName}"]`).classList.add("active")
 
-    // Update subsections
     document.querySelectorAll(".admin-subsection").forEach((section) => {
         section.classList.remove("active")
     })
@@ -154,7 +143,6 @@ function switchSubsection(subsectionName) {
 
     currentSubsection = subsectionName
 
-    // Load data for the selected subsection
     switch (subsectionName) {
         case "users-list":
             loadUsersData()
@@ -172,13 +160,11 @@ function switchSubsection(subsectionName) {
 }
 
 function switchSection(sectionName) {
-    // Update navigation
     document.querySelectorAll(".nav-item").forEach((item) => {
         item.classList.remove("active")
     })
     document.querySelector(`[data-section="${sectionName}"]`).classList.add("active")
 
-    // Update sections
     document.querySelectorAll(".admin-section").forEach((section) => {
         section.classList.remove("active")
     })
@@ -188,9 +174,9 @@ function switchSection(sectionName) {
 }
 
 function setupFilters() {
-    // Users filters
     const userSearchInput = document.getElementById("userSearch")
     const userStatusFilter = document.getElementById("statusFilter")
+    const createUserBtn = document.getElementById('createUserBtn')
 
     if (userSearchInput) {
         userSearchInput.addEventListener("input", () => filterUsers())
@@ -200,7 +186,64 @@ function setupFilters() {
         userStatusFilter.addEventListener("change", () => filterUsers())
     }
 
-    // Meetings filters
+    if (createUserBtn) {
+        createUserBtn.addEventListener('click', () => {
+            document.getElementById('createUserModal').style.display = 'flex'
+        })
+    }
+
+    const createUserBtnModal = document.getElementById('createUserBtnModal')
+    if (createUserBtnModal) {
+        createUserBtnModal.addEventListener('click', createUser)
+    }
+
+    function createUser() {
+        const formData = {
+            first_name: document.getElementById('createFirstName').value,
+            last_name: document.getElementById('createLastName').value,
+            login: document.getElementById('createLogin').value,
+            password: document.getElementById('createPassword').value,
+            bio: document.getElementById('createBio').value,
+            birth_date: document.getElementById('createBirthDate').value,
+            gender: document.getElementById('createGender').value,
+            height: document.getElementById('createHeight').value,
+            weight: document.getElementById('createWeight').value,
+            sign_id: document.getElementById('createSignId').value,
+            is_active: document.getElementById('createIsActive').checked,
+            is_admin: document.getElementById('createIsAdmin').checked
+        };
+
+        if (!formData.first_name || !formData.last_name || !formData.login || !formData.password) {
+            showNotification('Будь ласка, заповніть всі обов\'язкові поля', 'error');
+            return;
+        }
+
+        fetch('/api/user/create_user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => {
+            return response.json().then(data => ({status: response.status, ok: response.ok, data: data}));
+        })
+        .then(result => {
+            if (result.ok && result.data.status !== 'error') {
+                showNotification('Користувача успішно створено!', 'success');
+                document.getElementById('createUserModal').style.display = 'none';
+                document.getElementById('createUserForm').reset();
+                loadUsersData();
+            } else {
+                showNotification('Помилка при створенні користувача: ' + (result.data.message || result.data.error || 'Невідома помилка'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Помилка:', error);
+            showNotification('Помилка при створенні користувача', 'error');
+        });
+    }
+
     const meetingSearchInput = document.getElementById("meetingSearch")
     const meetingStatusFilter = document.getElementById("meetingStatusFilter")
 
@@ -212,7 +255,6 @@ function setupFilters() {
         meetingStatusFilter.addEventListener("change", () => filterMeetings())
     }
 
-    // Credentials filters
     const credentialsSearchInput = document.getElementById("credentialsSearch")
     const credentialsStatusFilter = document.getElementById("credentialsStatusFilter")
 
@@ -225,7 +267,6 @@ function setupFilters() {
         credentialsStatusFilter.addEventListener("change", () => filterCredentials())
     }
 
-    // Matches filters
     const matchesSearchInput = document.getElementById("matchesSearch")
     const matchStatusFilter = document.getElementById("matchStatusFilter")
 
@@ -238,7 +279,6 @@ function setupFilters() {
     }
 }
 
-// Users data handling
 async function loadUsersData(page = 1) {
     try {
         const response = await fetch(`/api/user/?page=${page}&limit=${usersPagination.limit}`)
@@ -260,7 +300,6 @@ async function loadUsersData(page = 1) {
 }
 
 
-// Meetings data handling
 async function loadMeetingsData(page = 1) {
     try {
         const response = await fetch(`/api/meeting/?page=${page}&limit=${meetingsPagination.limit}`)
@@ -282,7 +321,6 @@ async function loadMeetingsData(page = 1) {
 }
 
 
-// Credentials data handling
 async function loadCredentialsData(page = 1) {
     try {
         const response = await fetch(`/api/credentials/?page=${page}&limit=${credentialsPagination.limit}`)
@@ -304,7 +342,6 @@ async function loadCredentialsData(page = 1) {
 }
 
 
-// Matches data handling
 async function loadMatchesData(page = 1) {
     try {
         const response = await fetch(`/api/match/?page=${page}&limit=${matchesPagination.limit}`)
@@ -370,7 +407,6 @@ function renderUsersTable(usersToRender = users) {
         </div>
       </td>
     `
-        // Add event listeners to buttons
         const editBtn = row.querySelector('.action-btn.edit');
         editBtn.addEventListener('click', () => editUser(parseInt(editBtn.dataset.id)));
 
@@ -396,7 +432,6 @@ function renderMeetingsCards(meetingsToRender = meetings) {
         const card = document.createElement("div")
         card.className = "meeting-card"
 
-        // Format date if available
         const meetingDate = meeting.meeting_date ? new Date(meeting.meeting_date).toLocaleString("uk-UA") : 'Не заплановано'
 
         card.innerHTML = `
@@ -420,7 +455,6 @@ function renderMeetingsCards(meetingsToRender = meetings) {
             </div>
         `
 
-        // Add event listeners to buttons
         const editBtn = card.querySelector('.action-btn.edit');
         editBtn.addEventListener('click', () => editMeeting(parseInt(editBtn.dataset.id)));
 
@@ -473,7 +507,6 @@ function renderCredentialsCards(credentialsToRender = credentials) {
             </div>
         `
 
-        // Add event listeners to buttons
         const editBtn = card.querySelector('.action-btn.edit');
         editBtn.addEventListener('click', () => editCredential(parseInt(editBtn.dataset.id)));
 
@@ -533,7 +566,6 @@ function renderMatchesCards(matchesToRender = matches) {
     </div>
 `
 
-        // Add event listeners to buttons
         const editBtn = card.querySelector('.action-btn.edit');
         editBtn.addEventListener('click', () => editMatch(parseInt(editBtn.dataset.id)));
 
@@ -552,7 +584,6 @@ function renderPagination(containerId, paginationState, loadFunction) {
 
     if (paginationState.totalPages <= 1) return
 
-    // Previous button
     const prevBtn = document.createElement('button')
     prevBtn.className = 'pagination-btn'
     prevBtn.innerHTML = '&laquo;'
@@ -560,7 +591,6 @@ function renderPagination(containerId, paginationState, loadFunction) {
     prevBtn.addEventListener('click', () => loadFunction(paginationState.page - 1))
     container.appendChild(prevBtn)
 
-    // Page buttons
     const startPage = Math.max(1, paginationState.page - 2)
     const endPage = Math.min(paginationState.totalPages, startPage + 4)
 
@@ -572,7 +602,6 @@ function renderPagination(containerId, paginationState, loadFunction) {
         container.appendChild(pageBtn)
     }
 
-    // Next button
     const nextBtn = document.createElement('button')
     nextBtn.className = 'pagination-btn'
     nextBtn.innerHTML = '&raquo;'
@@ -714,10 +743,8 @@ async function updateQuartalStats() {
 async function updateRecentRegistrations() {
     const statsData = await fetchRecentRegistrations();
 
-    // беремо максимум для масштабу висоти барів
     const maxVal = Math.max(statsData.last_6_months, statsData.last_month, 1);
 
-    // шестимісячний бар
     const sixMonthBar = document.getElementById("six-month");
     if (sixMonthBar) {
         const percent = (statsData.last_6_months / maxVal * 100).toFixed(2);
@@ -726,7 +753,6 @@ async function updateRecentRegistrations() {
         if (numEl) numEl.textContent = statsData.last_6_months;
     }
 
-    // одномісячний бар
     const oneMonthBar = document.getElementById("one-month");
     if (oneMonthBar) {
         const percent = (statsData.last_month / maxVal * 100).toFixed(2);
@@ -777,13 +803,12 @@ async function updateSuccessfulCouples() {
 
     if (!couplesData) return;
 
-    listContainer.innerHTML = ""; // очистка
+    listContainer.innerHTML = "";
 
     couplesData.forEach(({match, meeting}) => {
         const u1 = match.match_user;
         const u2 = match.req_user;
 
-        // форматування дати
         const date = new Date(meeting.meeting_date).toLocaleString("uk-UA", {
             day: "2-digit",
             month: "long",
@@ -792,7 +817,6 @@ async function updateSuccessfulCouples() {
             minute: "2-digit"
         });
 
-        // місце
         const location = meeting.location?.replace(" ", ", ") || "—";
 
         const item = document.createElement("div");
@@ -825,10 +849,9 @@ async function updatePlannedMeetings() {
 
     if (!meetingsData) return;
 
-    listContainer.innerHTML = ""; // очистка перед заповненням
+    listContainer.innerHTML = "";
 
     meetingsData.forEach(({meet_user, req_user, meeting_date, location}) => {
-        // форматування дати
         const date = new Date(meeting_date).toLocaleString("uk-UA", {
             day: "2-digit",
             month: "long",
@@ -837,7 +860,6 @@ async function updatePlannedMeetings() {
             minute: "2-digit"
         });
 
-        // форматування місця
         const loc = location?.replace(" ", ", ") || "—";
 
         const item = document.createElement("div");
@@ -870,7 +892,7 @@ async function updateAttendanceByGender() {
 
     if (!attendanceData) return;
 
-    listContainer.innerHTML = ""; // очистка перед заповненням
+    listContainer.innerHTML = "";
 
     const genders = ["female", "male", "other"];
 
@@ -878,7 +900,6 @@ async function updateAttendanceByGender() {
         const users = attendanceData[gender];
         if (!users || users.length === 0) return;
 
-        // Додаємо заголовок по гендеру
         const genderHeader = document.createElement("div");
         genderHeader.classList.add("gender-header");
         genderHeader.textContent = gender === "female" ? "Жінки" : gender === "male" ? "Чоловіки" : "Інші";
@@ -897,7 +918,6 @@ async function updateAttendanceByGender() {
     });
 }
 
-// функція для емодзі за гендером
 function genderEmoji(gender) {
     if (gender === "female") return "♀️";
     if (gender === "male") return "♂️";
@@ -1019,13 +1039,11 @@ async function fetchQuartalStats() {
     return await resp.json()
 }
 
-// User editing functions
 function editUser(userId) {
     const user = users.find((u) => u.user_id === userId)
     if (!user) return
 
     console.log(user)
-    // Заповнюємо форму поточними даними користувача
     document.getElementById("editUserId").value = user.user_id
     document.getElementById("editFirstName").value = user.first_name || ""
     document.getElementById("editLastName").value = user.last_name || ""
@@ -1033,7 +1051,6 @@ function editUser(userId) {
     document.getElementById("editIsActive").checked = !!user.is_active
     document.getElementById("editIsAdmin").checked = !!user.is_admin
 
-    // Показуємо модалку
     document.getElementById("editUserModal").style.display = "flex"
     document.body.style.overflow = "hidden"
 }
@@ -1053,7 +1070,7 @@ async function saveUserChanges() {
 
     try {
         const response = await fetch(`/api/user/${userId}`, {
-            method: "POST", // бо у тебе у Flask `methods=['POST']`
+            method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
@@ -1064,7 +1081,6 @@ async function saveUserChanges() {
             throw new Error("Failed to update user")
         }
 
-        // Update the user in the local array
         const userIndex = users.findIndex((u) => u.user_id === userId)
         if (userIndex !== -1) {
             users[userIndex] = {
@@ -1077,13 +1093,10 @@ async function saveUserChanges() {
             }
         }
 
-        // Re-render the table
         renderUsersTable()
 
-        // Close the modal
         closeEditModal()
 
-        // Show success notification
         showNotification("Користувача успішно оновлено ✅", "success")
     } catch (error) {
         console.error("Error updating user:", error)
@@ -1091,12 +1104,10 @@ async function saveUserChanges() {
     }
 }
 
-// Meeting editing functions
 function editMeeting(meetingId) {
     const meeting = meetings.find(m => m.meeting_id === meetingId);
     if (!meeting) return;
 
-    // Create modal if it doesn't exist
     let modal = document.getElementById('editMeetingModal');
     if (!modal) {
         modal = document.createElement('div');
@@ -1161,7 +1172,6 @@ function editMeeting(meetingId) {
         document.body.appendChild(modal);
     }
 
-    // Fill form with meeting data
     document.getElementById('editMeetingId').value = meeting.meeting_id;
     document.getElementById('editMeetingUser1Comment').value = meeting.user1_comment || '';
     document.getElementById('editMeetingUser2Comment').value = meeting.user2_comment || '';
@@ -1175,21 +1185,18 @@ function editMeeting(meetingId) {
         document.getElementById('editMeetingDate').value = '';
     }
 
-    // Видаляємо стару карту і маркер, якщо існують
     if (mapInstance) {
         mapInstance.remove();
         mapInstance = null;
         mapMarker = null;
     }
 
-    // Ініціалізація карти
     setTimeout(() => {
         mapInstance = L.map('editMeetingMap').setView([50.4501, 30.5234], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(mapInstance);
 
-        // Створюємо маркер для поточного місця
         if (meeting.location) {
             const coords = meeting.location.split(' ').map(Number);
             if (!isNaN(coords[0]) && !isNaN(coords[1])) {
@@ -1200,7 +1207,6 @@ function editMeeting(meetingId) {
             }
         }
 
-        // Клік по карті оновлює маркер і поле
         mapInstance.on('click', function (e) {
             if (mapMarker) mapMarker.setLatLng(e.latlng);
             else mapMarker = L.marker(e.latlng).addTo(mapInstance);
@@ -1208,7 +1214,6 @@ function editMeeting(meetingId) {
         });
     }, 200);
 
-    // Show modal
     modal.style.display = 'flex';
 }
 
@@ -1244,16 +1249,13 @@ async function saveMeetingChanges() {
 
         const updatedMeeting = await response.json();
 
-        // Оновлюємо локальний масив meetings
         const index = meetings.findIndex(m => m.meeting_id == meetingId);
         if (index !== -1) {
             meetings[index] = {...meetings[index], ...meetingData};
         }
 
-        // Перерендерюємо картки
         renderMeetingsCards();
 
-        // Закриваємо модалку
         closeEditMeetingModal();
 
         showNotification('Зустріч успішно оновлено', 'success');
@@ -1280,16 +1282,13 @@ async function cancelMeeting(meetingId) {
             throw new Error('Failed to cancel meeting')
         }
 
-        // Update meeting in local array
         const meetingIndex = meetings.findIndex(m => m.meeting_id === meetingId)
         if (meetingIndex !== -1) {
             meetings[meetingIndex].status = 'cancelled'
         }
 
-        // Re-render meetings
         renderMeetingsCards()
 
-        // Show success notification
         showNotification('Зустріч скасовано', 'success')
     } catch (error) {
         console.error('Error cancelling meeting:', error)
@@ -1311,16 +1310,13 @@ async function restoreMeeting(meetingId) {
             throw new Error('Failed to restore meeting')
         }
 
-        // Update meeting in local array
         const meetingIndex = meetings.findIndex(m => m.meeting_id === meetingId)
         if (meetingIndex !== -1) {
             meetings[meetingIndex].status = 'pending'
         }
 
-        // Re-render meetings
         renderMeetingsCards()
 
-        // Show success notification
         showNotification('Зустріч відновлено', 'success')
     } catch (error) {
         console.error('Error restoring meeting:', error)
@@ -1328,12 +1324,10 @@ async function restoreMeeting(meetingId) {
     }
 }
 
-// Credential editing functions
 function editCredential(credentialId) {
     const credential = credentials.find(c => c.key_id === credentialId)
     if (!credential) return
 
-    // Create modal if it doesn't exist
     let modal = document.getElementById('editCredentialModal')
     if (!modal) {
         modal = document.createElement('div')
@@ -1378,13 +1372,11 @@ function editCredential(credentialId) {
         document.body.appendChild(modal)
     }
 
-    // Fill form with credential data
     document.getElementById('editCredentialId').value = credential.key_id
     document.getElementById('editCredentialLogin').value = credential.login
     document.getElementById('editCredentialPassword').value = ''
     document.getElementById('editCredentialAccess').value = credential.access_right || 'guest'
 
-    // Show modal
     modal.style.display = 'flex'
 }
 
@@ -1415,7 +1407,7 @@ async function saveCredentialChanges() {
 
     try {
         const response = await fetch(`/api/credentials/${credentialId}`, {
-            method: 'POST', // бо бекенд чекає POST
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -1428,7 +1420,6 @@ async function saveCredentialChanges() {
 
         const data = await response.json()
 
-        // Update credential in local array
         const credentialIndex = credentials.findIndex(c => c.key_id === parseInt(credentialId))
         if (credentialIndex !== -1) {
             credentials[credentialIndex] = {...credentials[credentialIndex], ...data.new_data}
@@ -1443,7 +1434,6 @@ async function saveCredentialChanges() {
     }
 }
 
-// Match editing functions
 async function editMatch(matchId) {
     const match = matches.find(m => m.match_id === matchId)
     if (!match) return
@@ -1496,12 +1486,10 @@ async function editMatch(matchId) {
         document.body.appendChild(modal)
     }
 
-    // Заповнюємо загальні поля
     document.getElementById('editMatchId').value = match.match_id
     document.getElementById('editMatchArchived').checked = !!match.archived
     document.getElementById('editMatchComment').value = match.comment || ''
 
-    // --- Загальна підвантаження користувачів ---
     const allUsers = []
     let page = 1, pages = 1, loading = false
 
@@ -1519,11 +1507,9 @@ async function editMatch(matchId) {
 
     await loadUsersPage()
 
-    // --- Функція для заповнення селектора ---
     function fillSelect(selectEl, currentUser) {
         selectEl.innerHTML = ''
 
-        // Поточного користувача ставимо першим
         if (currentUser) {
             const option = document.createElement('option')
             option.value = currentUser.user_id
@@ -1547,7 +1533,6 @@ async function editMatch(matchId) {
     fillSelect(select1, match.req_user)
     fillSelect(select2, match.match_user)
 
-    // Lazy loading при скролі, але однакові дані для обох селекторів
     async function handleScroll(el) {
         if (el.scrollTop + el.clientHeight >= el.scrollHeight - 5) {
             if (await loadUsersPage()) {
@@ -1589,13 +1574,11 @@ async function saveMatchChanges() {
         const result = await response.json()
         const updatedMatch = result.match
 
-        // Оновлюємо локальний масив matches
         const matchIndex = matches.findIndex(m => m.match_id == matchId)
         if (matchIndex !== -1) {
             matches[matchIndex] = updatedMatch
         }
 
-        // Оновлюємо картки на сторінці
         renderMatchesCards()
 
         closeEditMatchModal()
@@ -1630,7 +1613,6 @@ function deleteMatch(id) {
     const modal = document.getElementById("deleteModal");
     const newConfirmBtn = modal.querySelector("#confirmDeleteBtn");
 
-    // натискання "Видалити"
     newConfirmBtn.addEventListener("click", async () => {
         try {
             const response = await fetch(`/api/match/a/${id}`, {
@@ -1643,10 +1625,8 @@ function deleteMatch(id) {
             if (response.ok) {
                 modal.style.display = "none";
 
-                // видаляємо зі списку matches
                 matches = matches.filter(m => m.match_id !== id);
 
-                // прибираємо картку з DOM
                 renderMatchesCards()
                 showNotification("Збіг успішно видалено!", "success")
             } else {
@@ -1677,8 +1657,8 @@ function deleteUser(id) {
 
             if (response.ok) {
                 modal.style.display = "none";
-                users = users.filter(u => u.user_id !== id); // оновлюємо масив
-                renderUsersTable(users); // функція рендеру
+                users = users.filter(u => u.user_id !== id);
+                renderUsersTable(users);
                 showNotification("Користувача успішно видалено!", "success");
             } else {
                 modal.style.display = "none";
@@ -1722,7 +1702,6 @@ function deleteMeeting(id) {
     });
 }
 
-// ===== Видалення Credential =====
 function deleteCredential(id) {
     showDeleteModal();
 
@@ -1782,7 +1761,6 @@ document.getElementById("runSqlBtn").addEventListener("click", async () => {
 });
 
 
-// Фільтрація та пошук усього на світі (майже)
 let allUsers = []
 let isUsersLoaded = false
 let isLoadingUsers = false
@@ -1838,7 +1816,6 @@ async function fetchUsersPage(page) {
 }
 
 
-// --- Matches ---
 let allMatches = []
 let isMatchesLoaded = false
 let isLoadingMatches = false
@@ -1898,7 +1875,6 @@ async function fetchMatchesPage(page) {
 }
 
 
-// --- Credentials ---
 let allCredentials = []
 let isCredentialsLoaded = false
 let isLoadingCredentials = false
@@ -1954,7 +1930,6 @@ async function fetchCredentialsPage(page) {
     return await response.json()
 }
 
-// --- Meetings ---
 let allMeetings = []
 let isMeetingsLoaded = false
 let isLoadingMeetings = false

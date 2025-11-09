@@ -3,7 +3,7 @@
 from flask import Blueprint, request, jsonify
 
 from app.database import db
-from app.models import User, UserImage
+from app.models import User, UserImage, Credentials
 from app.utils.access_utils import api_error, login_required_api, admin_access_required_api
 from app.utils.admin_utils import paginate_query
 
@@ -21,6 +21,69 @@ def user(user_id):
 
     user_object = User.query.filter_by(user_id=user_id).first()
     return user_object.to_dict(fields) if user_object else api_error("User not found", 404)
+
+
+@user_bp.route('/create_user', methods=['POST'])
+@login_required_api
+@admin_access_required_api
+def create_user():
+    data = request.json or {}
+
+    required_fields = ['first_name', 'last_name', 'login', 'password']
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return api_error(f"Missing required field: {field}", 400)
+
+    existing_credentials = Credentials.query.filter_by(login=data['login']).first()
+    if existing_credentials:
+        return api_error("Login already exists", 400)
+
+    try:
+        new_user = User(
+            first_name=data['first_name'],
+            last_name=data['last_name'],
+            bio=data.get('bio', ''),
+            is_active=data.get('is_active', True),
+            is_admin=data.get('is_admin', False)
+        )
+
+        if 'birth_date' in data:
+            new_user.birth_date = data['birth_date']
+        if 'gender' in data:
+            new_user.gender = data['gender']
+        if 'height' in data:
+            new_user.height = data['height']
+        if 'weight' in data:
+            new_user.weight = data['weight']
+        if 'sign_id' in data:
+            new_user.sign_id = data['sign_id']
+
+        db.session.add(new_user)
+        db.session.flush()
+
+        new_credentials = Credentials(
+            login=data['login'],
+            user_id=new_user.user_id
+        )
+        new_credentials.set_password(data['password'])
+
+        if new_user.is_admin:
+            new_credentials.access_right = "operator"
+        else:
+            new_credentials.access_right = "authorized"
+
+        db.session.add(new_credentials)
+        db.session.commit()
+
+        return jsonify({
+            "message": "User created successfully",
+            "user_id": new_user.user_id,
+            "login": new_credentials.login
+        }), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return api_error(f"Error creating user: {str(e)}", 500)
 
 
 @user_bp.route('/<int:user_id>', methods=['POST'])
@@ -78,4 +141,3 @@ def delete_user(user_id):
     db.session.delete(user_data)
     db.session.commit()
     return "ok"
-
