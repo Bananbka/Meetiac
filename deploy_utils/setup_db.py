@@ -3,19 +3,16 @@ import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from dotenv import load_dotenv
 
-# Завантажуємо змінні середовища, якщо є .env файл
 load_dotenv()
 
-# Налаштування (можна брати з .env або задати дефолтні)
 DB_HOST = os.getenv("POSTGRES_HOST", "localhost")
 DB_USER = os.getenv("POSTGRES_USER", "postgres")
-DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "your_password") # Викладач може змінити це в .env
+DB_PASSWORD = os.getenv("POSTGRES_PASSWORD", "your_password")
 DB_NAME = os.getenv("POSTGRES_DB", "meetiac_db")
-BACKUP_FILE = "backup.sql" # Назва вашого файлу з дампом
+BACKUP_FILE = "backup.sql"
 
 def create_database():
     try:
-        # Підключення до системної бази 'postgres' для створення нової БД
         con = psycopg2.connect(
             dbname="postgres",
             user=DB_USER,
@@ -25,7 +22,6 @@ def create_database():
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = con.cursor()
 
-        # Перевіряємо, чи існує база
         cursor.execute(f"SELECT 1 FROM pg_catalog.pg_database WHERE datname = '{DB_NAME}'")
         exists = cursor.fetchone()
 
@@ -53,7 +49,6 @@ def restore_backup():
     try:
         print(f"Відновлення даних з '{BACKUP_FILE}'...")
         
-        # Підключення до новоствореної бази
         con = psycopg2.connect(
             dbname=DB_NAME,
             user=DB_USER,
@@ -63,7 +58,6 @@ def restore_backup():
         con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
         cursor = con.cursor()
 
-        # Читаємо SQL файл і виконуємо його
         with open(BACKUP_FILE, 'r', encoding='utf-8') as f:
             sql_script = f.read()
             cursor.execute(sql_script)
